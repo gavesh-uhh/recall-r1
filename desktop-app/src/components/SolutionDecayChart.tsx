@@ -34,7 +34,7 @@ export const SolutionDecayChart: React.FC<SolutionDecayChartProps> = ({
       formatter: (params: any) => {
         const p = params[0];
         return `<div class="font-mono">
-          <div class="text-blue-400 font-bold">Day ${p.name}</div>
+          <div class="text-[#fdad00] font-bold">Day ${p.name}</div>
           <div class="text-slate-200">Decay Score: <b>${p.value}</b></div>
           <div class="text-slate-400 text-[10px]">exp(-${lambda} * ${p.name})</div>
         </div>`;
@@ -73,11 +73,11 @@ export const SolutionDecayChart: React.FC<SolutionDecayChartProps> = ({
         symbol: 'circle',
         symbolSize: 6,
         lineStyle: {
-          color: '#3b82f6',
+          color: '#fdad00',
           width: 3,
         },
         itemStyle: {
-          color: '#60a5fa',
+          color: '#ffca3a',
           borderColor: '#1d4ed8',
           borderWidth: 2,
         },

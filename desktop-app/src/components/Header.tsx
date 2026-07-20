@@ -7,12 +7,12 @@ import {
   Plus,
   RefreshCw,
   Server,
-  Layers,
   Database,
   Trash2,
   Activity,
   Boxes,
 } from 'lucide-react';
+import logoImage from '../assets/logo1.png';
 import { HealthStatus } from '../types/api';
 
 interface HeaderProps {
@@ -65,13 +65,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className="tool-sidebar">
       <div style={{ padding: '14px 14px 12px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-900 flex items-center justify-center border border-blue-400/50 shadow-lg shadow-blue-500/25 flex-shrink-0">
-          <Layers className="h-5 w-5 text-white" />
+        <div className="h-14 w-14 flex-shrink-0 flex items-center justify-center">
+          <img src={logoImage} alt="Recall logo" className="h-full w-full" />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span className="text-base font-extrabold text-white tracking-tight">Recall</span>
-            <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 select-none">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#3b2a00] text-[#fdad00] border border-[#fdad00] select-none">
               R1
             </span>
           </div>

@@ -141,14 +141,14 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     tooltip: {
       trigger: 'item',
       backgroundColor: '#090f1e',
-      borderColor: '#2563eb',
+      borderColor: '#fdad00',
       textStyle: { color: '#f8fafc', fontSize: 12, fontFamily: 'JetBrains Mono' },
       formatter: (params: any) => {
         if (params.dataType === 'node') {
           return `<div class="font-mono p-1">
-            <div class="text-blue-400 font-bold">${params.data.fullName || params.data.name}</div>
+            <div class="text-[#fdad00] font-bold">${params.data.fullName || params.data.name}</div>
             <div class="text-slate-300 text-xs mt-1">${params.data.value}</div>
-            <div class="text-blue-400/80 text-[10px] mt-1">Click node to inspect related error network</div>
+            <div class="text-[#fdad00]/80 text-[10px] mt-1">Click node to inspect related error network</div>
           </div>`;
         } else if (params.dataType === 'edge') {
           return `<div class="font-mono text-xs text-sky-300 p-1">

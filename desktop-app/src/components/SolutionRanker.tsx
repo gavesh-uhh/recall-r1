@@ -107,12 +107,12 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                     style={{
                       padding: '14px 18px',
                       borderBottom: '1px solid var(--border-subtle)',
-                      borderLeft: `3px solid ${isSelected ? 'var(--primary)' : 'transparent'}`,
-                      background: isSelected ? 'rgba(29,78,216,0.12)' : 'transparent',
+                      borderLeft: `4px solid ${isSelected ? '#fdad00' : 'transparent'}`,
+                      background: isSelected ? 'rgba(253, 173, 0, 0.12)' : 'transparent',
                       cursor: 'pointer',
                     }}
                   >
-                    <div className="mono" style={{ fontSize: 11, fontWeight: 600, color: isSelected ? '#3b82f6' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>
+                    <div className="mono" style={{ fontSize: 11, fontWeight: 600, color: isSelected ? '#fdad00' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>
                       {err.signature}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -130,7 +130,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
               <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                   <div className="section-label" style={{ marginBottom: 4 }}>Selected Signature</div>
-                  <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#3b82f6', wordBreak: 'break-all' }}>
+                  <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all' }}>
                     {selectedError.signature}
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-slate-300">Days Passed:</span>
-                <span className="text-blue-400 font-bold">{simDaysAgo} days</span>
+                <span className="text-[#fdad00] font-bold">{simDaysAgo} days</span>
               </div>
               <input
                 type="range"
@@ -225,7 +225,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                 step="1"
                 value={simDaysAgo}
                 onChange={(e) => setSimDaysAgo(Number(e.target.value))}
-                className="w-full accent-blue-500 cursor-pointer"
+                className="w-full accent-[#fdad00] cursor-pointer"
               />
             </div>
 
@@ -275,8 +275,8 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
               />
             </div>
 
-            <div className="p-3 rounded-lg bg-black border border-blue-955 text-[11px] text-slate-300 leading-relaxed font-mono">
-              <div>Computed Score: <b className="text-blue-400">{simResult.totalScore.toFixed(4)}</b></div>
+            <div className="p-3 rounded-lg bg-black border border-[#fdad00]/40 text-[11px] text-slate-300 leading-relaxed font-mono">
+              <div>Computed Score: <b className="text-[#fdad00]">{simResult.totalScore.toFixed(4)}</b></div>
               <div className="text-slate-500 text-[10px] mt-0.5">
                 Multiplier: {simResult.decayFactor.toFixed(4)}
               </div>

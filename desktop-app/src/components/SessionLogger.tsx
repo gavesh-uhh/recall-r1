@@ -114,7 +114,7 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                     <Calendar style={{ width: 10, height: 10, color: 'var(--text-dim)' }} />
                     <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>{formattedDate}</span>
                   </div>
-                  <span className="mono" style={{ fontSize: 10, color: linkedCount > 0 ? '#3b82f6' : 'var(--text-dim)' }}>
+                  <span className="mono" style={{ fontSize: 10, color: linkedCount > 0 ? '#fdad00' : 'var(--text-dim)' }}>
                     {linkedCount} linked error{linkedCount !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -228,11 +228,11 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                             padding: '3px 6px',
                             borderRadius: 4,
                             cursor: 'pointer',
-                            background: isChecked ? 'rgba(29,78,216,0.15)' : 'transparent',
-                            border: `1px solid ${isChecked ? 'rgba(29,78,216,0.4)' : 'transparent'}`,
+                            background: isChecked ? 'rgba(253, 173, 0, 0.15)' : 'transparent',
+                            border: `1px solid ${isChecked ? 'rgba(253, 173, 0, 0.4)' : 'transparent'}`,
                           }}
                         >
-                          <span className="mono" style={{ fontSize: 10, color: isChecked ? '#3b82f6' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                          <span className="mono" style={{ fontSize: 10, color: isChecked ? '#fdad00' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                             #{err.id} {err.signature}
                           </span>
                           {isChecked && <CheckCircle style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />}

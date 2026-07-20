@@ -172,8 +172,8 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     padding: '16px 20px',
                     borderBottom: '1px solid var(--border-subtle)',
                     cursor: 'pointer',
-                    background: isSelected ? 'rgba(29,78,216,0.12)' : 'transparent',
-                    borderLeft: `3px solid ${isSelected ? 'var(--primary)' : 'transparent'}`,
+                    background: isSelected ? 'rgba(253, 173, 0, 0.12)' : 'transparent',
+                    borderLeft: `4px solid ${isSelected ? '#fdad00' : 'transparent'}`,
                     transition: 'background 0.1s',
                   }}
                   onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'var(--hover)'; }}
@@ -183,7 +183,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     <Terminal style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />
                     <span className="mono" style={{
                       fontSize: 11,
-                      color: isSelected ? '#3b82f6' : 'var(--text)',
+                      color: isSelected ? '#fdad00' : 'var(--text)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -240,7 +240,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     <span className="badge badge-blue">{selectedError.language}</span>
                     <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
                   </div>
-                  <div className="mono" style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', wordBreak: 'break-all', lineHeight: 1.4 }}>
+                  <div className="mono" style={{ fontSize: 12, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.4 }}>
                     {selectedError.signature}
                   </div>
                 </div>
