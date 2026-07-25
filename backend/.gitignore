@@ -1,0 +1,49 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.kotlin
+
+### H2 embedded database ###
+*.mv.db
+*.trace.db
+
+### Internal planning notes — not part of the deliverable ###
+docs/
+
+### Tooling scratch ###
+.claude/
+
+
+### IntelliJ IDEA ###
+# Whole directory: the per-file rules below missed misc.xml/encodings.xml/vcs.xml,
+# which are machine-specific and cause pointless conflicts across four contributors.
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
