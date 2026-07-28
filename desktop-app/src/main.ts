@@ -14,9 +14,9 @@ const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1280,
-    height: 830,
+    height: 720,
     minWidth: 1000,
-    minHeight: 650,
+    minHeight: 600,
     title: 'Recall - Error Memory Hub',
     autoHideMenuBar: true,
     webPreferences: {
