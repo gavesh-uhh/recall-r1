@@ -1,0 +1,50 @@
+# Operating System
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# IDEs & Editors
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+
+# Node.js & Electron (desktop-app)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.eslintcache
+.vite/
+.webpack/
+out/
+dist/
+
+# Java & Maven (backend)
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+!.mvn/wrapper/maven-wrapper.jar
+
+# Database files
+*.mv.db
+*.trace.db
+*.sqlite
+*.db
+
+# Tooling & Logs
+.claude/
+logs/
+*.log
+.cache/
+.env
+.env.local
+.env.*.local
