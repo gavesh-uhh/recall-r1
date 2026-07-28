@@ -1,13 +1,14 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Hello World!</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Desktop App</title>
   </head>
-  <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
-    <script type="module" src="/src/renderer.js"></script>
+  <body class="bg-white text-slate-900 flex items-center justify-center h-screen">
+    <div id="app" class="text-center">
+      <h1 class="text-4xl font-bold tracking-tight text-slate-900">Hello World!</h1>
+    </div>
+    <script type="module" src="/src/renderer.ts"></script>
   </body>
 </html>
