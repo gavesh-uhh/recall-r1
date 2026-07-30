@@ -173,7 +173,7 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
         categories: categories,
         roam: true,
         circular: {
-          rotateLabel: true,
+          rotateLabel: false,
         },
         label: {
           show: true,
