@@ -62,19 +62,19 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
     .filter(Boolean);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden select-none animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-[var(--bg)] text-[var(--text)] flex flex-col h-screen w-screen overflow-hidden select-none animate-fade-in">
       {/* Top Compact Navigation Header */}
-      <header className="bg-slate-900 border-b border-slate-700/80 px-6 py-3 flex items-center justify-between shadow-xl flex-shrink-0">
+      <header className="bg-[var(--surface)] border-b border-[var(--border)] px-6 py-3 flex items-center justify-between shadow-xl flex-shrink-0">
         <div className="flex items-center space-x-4">
           <button
             onClick={onClose}
-            className="flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-700 transition"
+            className="flex items-center space-x-2 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text)] bg-[var(--card)] px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--hover)] transition"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Workspace</span>
           </button>
 
-          <div className="h-5 w-[1px] bg-slate-700" />
+          <div className="h-5 w-[1px] bg-[var(--border)]" />
 
           <div className="flex items-center space-x-3">
             <div className="p-1.5 rounded-xl bg-blue-950 text-blue-400 border border-blue-600/40 shadow-md">
@@ -107,12 +107,12 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
           <div className="col-span-7 flex flex-col space-y-4 min-h-0">
             {/* Step 1: Exception Info */}
             <div className="pro-panel p-5 rounded-2xl space-y-3 flex-1 flex flex-col justify-between">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-2">
+              <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+                <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center space-x-2">
                   <Terminal className="h-3.5 w-3.5 text-blue-400" />
                   <span>1. Exception Signature & Stack Trace</span>
                 </h3>
-                <span className="text-[10px] font-mono text-blue-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                <span className="text-[10px] font-mono text-blue-400 bg-[var(--card)] px-2 py-0.5 rounded border border-[var(--border)]">
                   Required
                 </span>
               </div>
@@ -149,12 +149,12 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
 
             {/* Step 2: Categorization */}
             <div className="pro-panel p-5 rounded-2xl space-y-3 flex-shrink-0">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-2">
+              <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+                <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center space-x-2">
                   <Code className="h-3.5 w-3.5 text-blue-400" />
                   <span>2. Project & Categorization</span>
                 </h3>
-                <span className="text-[10px] font-mono text-blue-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                <span className="text-[10px] font-mono text-blue-400 bg-[var(--card)] px-2 py-0.5 rounded border border-[var(--border)]">
                   Metadata
                 </span>
               </div>
@@ -213,7 +213,7 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
           <div className="col-span-5 flex flex-col h-full min-h-0">
             <div className="pro-panel p-5 rounded-2xl flex-1 flex flex-col justify-between space-y-3 min-h-0">
               <div className="space-y-3 flex-1 flex flex-col min-h-0">
-                <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+                <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
                   <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     <span>Initial Fix Strategy (Optional)</span>
@@ -234,7 +234,7 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                 </div>
 
                 {/* Realtime Live Preview Card */}
-                <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2 flex-shrink-0">
+                <div className="bg-[var(--bg)] p-3 rounded-xl border border-[var(--border)] space-y-2 flex-shrink-0">
                   <div className="text-[10px] font-mono text-blue-400 uppercase tracking-wider font-bold">
                     Indexing Live Preview
                   </div>
@@ -262,11 +262,11 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
               </div>
 
               {/* Primary Form Action Buttons */}
-              <div className="flex items-center space-x-3 pt-3 border-t border-slate-700 flex-shrink-0">
+              <div className="flex items-center space-x-3 pt-3 border-t border-[var(--border)] flex-shrink-0">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition border border-slate-700 text-center"
+                  className="flex-1 py-2 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text)] bg-[var(--card)] hover:bg-[var(--hover)] transition border border-[var(--border)] text-center"
                 >
                   Cancel
                 </button>
