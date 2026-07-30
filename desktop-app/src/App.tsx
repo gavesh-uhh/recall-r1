@@ -7,6 +7,7 @@ import { SessionLogger } from './components/SessionLogger';
 import { LogErrorModal } from './components/LogErrorModal';
 import { AddSolutionModal } from './components/AddSolutionModal';
 import { LinkErrorModal } from './components/LinkErrorModal';
+import { SplashScreen } from './components/SplashScreen';
 import {
   ErrorRecord,
   DebugSession,
@@ -59,6 +60,7 @@ class TabErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
 }
 
 export const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>('explorer');
   const [health, setHealth] = useState<HealthStatus>({ status: 'offline', indexStale: false });
   const [errors, setErrors] = useState<ErrorRecord[]>([]);
@@ -235,7 +237,10 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gradient-app text-slate-100 overflow-hidden font-sans select-none">
+    <div className="h-screen w-screen flex flex-col bg-gradient-app text-slate-100 overflow-hidden font-sans select-none relative">
+      {/* Startup Loading Splash Screen */}
+      {showSplash && <SplashScreen onFinished={() => setShowSplash(false)} />}
+
       {/* Header */}
       <Header
         activeTab={activeTab}

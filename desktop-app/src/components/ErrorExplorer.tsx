@@ -286,7 +286,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                         </p>
                         <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono border-t border-slate-700 pt-1.5">
                           <span>Successes: {sol.successCount}</span>
-                          <span>Rating: ⭐ {sol.feedbackScore?.toFixed(1) ?? 'N/A'}</span>
+                          <span>Failures: {sol.failureCount}</span>
                         </div>
                       </div>
                     ))

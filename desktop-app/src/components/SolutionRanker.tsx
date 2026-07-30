@@ -197,7 +197,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                           </div>
 
                           {/* Formula Breakdown Progress Bars */}
-                          <div className="grid grid-cols-4 gap-2 bg-slate-900/90 p-2.5 rounded-lg border border-slate-700 text-xs font-mono">
+                          <div className="grid grid-cols-3 gap-2 bg-slate-900/90 p-2.5 rounded-lg border border-slate-700 text-xs font-mono">
                             <div>
                               <div className="text-[10px] text-slate-400">Success Rate</div>
                               <div className="font-semibold text-emerald-400">
@@ -205,55 +205,34 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                               </div>
                             </div>
                             <div>
-                              <div className="text-[10px] text-slate-400">Usage Freq</div>
+                              <div className="text-[10px] text-slate-400 font-mono">Usage Freq</div>
                               <div className="font-semibold text-blue-400">
                                 {(math.usageFreq * 100).toFixed(0)}%
                               </div>
                             </div>
                             <div>
-                              <div className="text-[10px] text-slate-400">Rating</div>
-                              <div className="font-semibold text-amber-300">
-                                ⭐ {sol.feedbackScore?.toFixed(1)}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] text-slate-400">Decay Factor</div>
+                              <div className="text-[10px] text-slate-400 font-mono">Decay Factor</div>
                               <div className="font-semibold text-slate-300">
                                 {math.decayFactor.toFixed(3)}
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between pt-2 border-t border-blue-955">
-                            <div className="flex items-center space-x-1.5">
-                              <span className="text-xs text-slate-400">Rate:</span>
-                              {[1, 2, 3, 4, 5].map((s) => (
-                                <button
-                                  key={s}
-                                  onClick={() => onFeedback(sol.id, { success: true, rating: s })}
-                                  className="text-amber-400 hover:scale-110 transition"
-                                >
-                                  <Star className="h-3.5 w-3.5 fill-amber-400/20 hover:fill-amber-400" />
-                                </button>
-                              ))}
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => onFeedback(sol.id, { success: false })}
-                                className="flex items-center space-x-1 text-xs text-rose-400 bg-rose-950 px-2.5 py-1 rounded border border-rose-800 transition"
-                              >
-                                <XCircle className="h-3.5 w-3.5" />
-                                <span>Failed</span>
-                              </button>
-                              <button
-                                onClick={() => onFeedback(sol.id, { success: true })}
-                                className="flex items-center space-x-1 text-xs text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded border border-emerald-800 transition font-semibold"
-                              >
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                <span>Worked (+1 Success)</span>
-                              </button>
-                            </div>
+                          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-700/80">
+                            <button
+                              onClick={() => onFeedback(sol.id, { success: false })}
+                              className="flex items-center space-x-1 text-xs text-rose-400 bg-rose-950 px-2.5 py-1 rounded border border-rose-800 transition"
+                            >
+                              <XCircle className="h-3.5 w-3.5" />
+                              <span>Failed</span>
+                            </button>
+                            <button
+                              onClick={() => onFeedback(sol.id, { success: true })}
+                              className="flex items-center space-x-1 text-xs text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded border border-emerald-800 transition font-semibold"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              <span>Worked (+1 Success)</span>
+                            </button>
                           </div>
                         </div>
                       );
