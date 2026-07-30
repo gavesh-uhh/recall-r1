@@ -9,6 +9,8 @@ import {
   RefreshCw,
   Server,
   Layers,
+  Database,
+  Trash2,
 } from 'lucide-react';
 import { HealthStatus } from '../types/api';
 
@@ -18,6 +20,8 @@ interface HeaderProps {
   health: HealthStatus;
   onOpenLogError: () => void;
   onRebuildIndex: () => void;
+  onSeedData?: () => void;
+  onClearData?: () => void;
   isRebuilding: boolean;
 }
 
@@ -27,6 +31,8 @@ export const Header: React.FC<HeaderProps> = ({
   health,
   onOpenLogError,
   onRebuildIndex,
+  onSeedData,
+  onClearData,
   isRebuilding,
 }) => {
   const tabs = [
@@ -85,6 +91,31 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Status & Primary Actions */}
       <div className="flex items-center space-x-3">
+        {/* Seed & Clear Data Action Buttons */}
+        <div className="flex items-center space-x-2">
+          {onSeedData && (
+            <button
+              onClick={onSeedData}
+              title="Populate database with rich multi-project sample errors, fix strategies & debug logs"
+              className="flex items-center space-x-1.5 text-xs text-emerald-300 bg-emerald-950/80 px-3 py-1.5 rounded-lg border border-emerald-700/60 hover:bg-emerald-900 transition font-medium"
+            >
+              <Database className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Seed DB</span>
+            </button>
+          )}
+
+          {onClearData && (
+            <button
+              onClick={onClearData}
+              title="Clear all error records, solutions, relations, and debug sessions"
+              className="flex items-center space-x-1.5 text-xs text-rose-300 bg-rose-950/80 px-3 py-1.5 rounded-lg border border-rose-800/80 hover:bg-rose-900 transition font-medium"
+            >
+              <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+              <span>Clear DB</span>
+            </button>
+          )}
+        </div>
+
         {/* Backend Status Badge */}
         <div className="flex items-center space-x-2 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-700/50 text-xs shadow-inner">
           <Server className="h-3.5 w-3.5 text-slate-400" />

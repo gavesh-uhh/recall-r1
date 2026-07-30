@@ -39,7 +39,7 @@ public class ErrorRecord {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "errorRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "errorRecord", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Solution> solutions = new ArrayList<>();
 
     @PrePersist
@@ -76,7 +76,6 @@ public class ErrorRecord {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public List<Solution> getSolutions() { return solutions; }
     public void setSolutions(List<Solution> solutions) { this.solutions = solutions; }
 }

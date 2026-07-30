@@ -38,13 +38,30 @@ public class ErrorRecordController {
     private final ErrorRecordService errorRecordService;
     private final SolutionService solutionService;
     private final GraphService graphService;
+    private final com.recall.config.SampleDataLoader sampleDataLoader;
 
     public ErrorRecordController(ErrorRecordService errorRecordService,
                                  SolutionService solutionService,
-                                 GraphService graphService) {
+                                 GraphService graphService,
+                                 com.recall.config.SampleDataLoader sampleDataLoader) {
         this.errorRecordService = errorRecordService;
         this.solutionService = solutionService;
         this.graphService = graphService;
+        this.sampleDataLoader = sampleDataLoader;
+    }
+
+    /** Force seeds rich sample data into the database (clears first then populates). */
+    @PostMapping("/seed")
+    public ResponseEntity<String> seedSampleData() {
+        sampleDataLoader.forceSeedData();
+        return ResponseEntity.ok("Sample data seeded successfully.");
+    }
+
+    /** Clears all errors, solutions, relations, and debug sessions from the database. */
+    @PostMapping("/clear")
+    public ResponseEntity<String> clearAllData() {
+        sampleDataLoader.clearAllData();
+        return ResponseEntity.ok("All data cleared successfully.");
     }
 
     /** 201 Created with a {@code Location} header pointing at the new record. */
@@ -67,16 +84,16 @@ public class ErrorRecordController {
                         "No error record with signature '" + signature + "'"));
     }
 
-    @GetMapping("/{id}")
-    public ErrorRecord findById(@PathVariable Long id) {
-        return errorRecordService.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No error record with id " + id));
-    }
-
     @GetMapping
     public List<ErrorRecord> browse(@RequestParam(required = false) String project,
                                     @RequestParam(required = false) String language) {
         return errorRecordService.browse(project, language);
+    }
+
+    @GetMapping("/{id}")
+    public ErrorRecord findById(@PathVariable Long id) {
+        return errorRecordService.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No error record with id " + id));
     }
 
     @DeleteMapping("/{id}")

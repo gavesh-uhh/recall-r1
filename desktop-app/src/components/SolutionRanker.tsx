@@ -22,6 +22,7 @@ interface SolutionRankerProps {
 export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedback }) => {
   const [selectedErrorId, setSelectedErrorId] = useState<number>(errors[0]?.id || 0);
   const [activeTab, setActiveTab] = useState<'ranker' | 'simulator'>('ranker');
+  const [fetchedSolutions, setFetchedSolutions] = useState<Solution[]>([]);
 
   // Simulator state
   const [simSuccessCount, setSimSuccessCount] = useState<number>(10);
@@ -30,6 +31,31 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
   const [simFeedbackScore, setSimFeedbackScore] = useState<number>(4.8);
 
   const selectedError = errors.find((e) => e.id === selectedErrorId) || errors[0];
+
+  React.useEffect(() => {
+    if (errors.length > 0 && (!selectedErrorId || !errors.some((e) => e.id === selectedErrorId))) {
+      setSelectedErrorId(errors[0].id);
+    }
+  }, [errors, selectedErrorId]);
+
+  React.useEffect(() => {
+    if (selectedErrorId) {
+      let isMounted = true;
+      recallApi.getRankedSolutions(selectedErrorId)
+        .then((sols) => {
+          if (isMounted && sols && sols.length > 0) {
+            setFetchedSolutions(sols);
+          }
+        })
+        .catch(() => {});
+      return () => { isMounted = false; };
+    }
+  }, [selectedErrorId]);
+
+  // Use freshly fetched solutions if available, else immediately render in-memory solutions with ZERO flicker
+  const activeSolutions = fetchedSolutions.length > 0
+    ? fetchedSolutions
+    : (selectedError?.solutions || []);
 
   const simSolution: Solution = {
     id: 9999,
@@ -136,8 +162,8 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                 </div>
 
                 <div className="space-y-3">
-                  {selectedError.solutions && selectedError.solutions.length > 0 ? (
-                    selectedError.solutions.map((sol, index) => {
+                  {activeSolutions && activeSolutions.length > 0 ? (
+                    activeSolutions.map((sol, index) => {
                       const math = recallApi.calculateDecayScore(sol);
 
                       return (

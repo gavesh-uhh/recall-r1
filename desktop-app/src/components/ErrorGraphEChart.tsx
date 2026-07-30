@@ -190,11 +190,11 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
           distance: 8,
         },
         force: {
-          repulsion: 1200,
-          edgeLength: [160, 260],
-          gravity: 0.04,
-          friction: 0.6,
-          layoutAnimation: true,
+          repulsion: 500,
+          edgeLength: [120, 200],
+          gravity: 0.1,
+          friction: 0.1,
+          layoutAnimation: false,
         },
         emphasis: {
           focus: 'adjacency',

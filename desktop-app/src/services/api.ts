@@ -157,6 +157,26 @@ export class RecallApiService {
   }
 
   /**
+   * Seed rich sample data into the database
+   */
+  public async seedSampleData(): Promise<boolean> {
+    const res = await this.executeRequest<string>('/errors/seed', {
+      method: 'POST',
+    });
+    return res.ok;
+  }
+
+  /**
+   * Clear all errors, solutions, relations, and debug sessions from the database
+   */
+  public async clearDatabase(): Promise<boolean> {
+    const res = await this.executeRequest<string>('/errors/clear', {
+      method: 'POST',
+    });
+    return res.ok;
+  }
+
+  /**
    * 2. POST /api/errors
    */
   public async createError(req: CreateErrorRequest): Promise<ErrorRecord> {

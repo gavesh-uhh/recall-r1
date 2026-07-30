@@ -1,5 +1,6 @@
 export interface Solution {
   id: number;
+  errorRecordId?: number;
   description: string;
   successCount: number;
   failureCount: number;

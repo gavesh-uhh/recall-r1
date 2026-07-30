@@ -209,6 +209,32 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleSeedData = async () => {
+    try {
+      showToast('Populating sample errors, fix strategies & sessions...');
+      await recallApi.seedSampleData();
+      showToast('Sample data seeded successfully into backend DB!');
+      setSelectedError(null);
+      await loadErrors();
+      await loadSessions();
+    } catch (err) {
+      showToast('Error: Failed to seed sample data');
+    }
+  };
+
+  const handleClearData = async () => {
+    try {
+      showToast('Clearing all database records...');
+      await recallApi.clearDatabase();
+      showToast('Cleared all errors, solutions, and debug sessions!');
+      setSelectedError(null);
+      await loadErrors();
+      await loadSessions();
+    } catch (err) {
+      showToast('Error: Failed to clear database');
+    }
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col bg-gradient-app text-slate-100 overflow-hidden font-sans select-none">
       {/* Header */}
@@ -218,6 +244,8 @@ export const App: React.FC = () => {
         health={health}
         onOpenLogError={() => setIsLogErrorOpen(true)}
         onRebuildIndex={handleRebuildIndex}
+        onSeedData={handleSeedData}
+        onClearData={handleClearData}
         isRebuilding={isRebuilding}
       />
 
