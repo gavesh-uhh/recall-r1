@@ -75,10 +75,10 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
         {/* Edge filter */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)', marginRight: 2 }} />
-          {(['all', 'patterns', 'tags'] as const).map((f) => (
+          {(['all', 'tags'] as const).map((f) => (
             <button key={f} onClick={() => setEdgeFilter(f)}
               className={`btn btn-sm ${edgeFilter === f ? 'btn-primary' : 'btn-ghost'}`}>
-              {f === 'all' ? 'All' : f === 'patterns' ? `Clusters (${patterns.length})` : 'Tags'}
+              {f === 'all' ? 'All' : 'Tags'}
             </button>
           ))}
         </div>
@@ -169,27 +169,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                 </div>
               </div>
 
-              <div>
-                <div className="section-label" style={{ marginBottom: 10 }}>
-                  Pattern Clusters ({patterns.length})
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {patterns.length > 0 ? (
-                    patterns.map((pat) => (
-                      <div key={pat.id} className="tool-card" style={{ padding: '14px 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>{pat.name}</span>
-                          <span className="badge badge-green">{pat.projectCount}p</span>
-                        </div>
-                        <p style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>{pat.description}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>
-                      No clusters yet. Log errors across 2+ projects to auto-cluster.
-                    </div>
-                  )}
-                </div>
               </div>
             </>
           ) : (
