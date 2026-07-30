@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, Component, ErrorInfo, ReactNode } from 'react';
-import { Header } from './components/Header';
+import { Header, Sidebar } from './components/Header';
 import { ErrorExplorer } from './components/ErrorExplorer';
 import { SolutionRanker } from './components/SolutionRanker';
 import { GraphVisualizer } from './components/GraphVisualizer';
@@ -237,11 +237,11 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gradient-app text-slate-100 overflow-hidden font-sans select-none relative">
-      {/* Startup Loading Splash Screen */}
+    <div className="tool-root select-none">
+      {/* Splash Screen */}
       {showSplash && <SplashScreen onFinished={() => setShowSplash(false)} />}
 
-      {/* Header */}
+      {/* Title Bar */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -253,58 +253,61 @@ export const App: React.FC = () => {
         isRebuilding={isRebuilding}
       />
 
-      {/* Ambient Background Blur Glow Matching Splash Screen */}
-      <div className="absolute top-1/4 left-1/3 h-96 w-96 rounded-full bg-blue-600/10 blur-3xl pointer-events-none animate-pulse z-0" />
-      <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-sky-500/10 blur-3xl pointer-events-none z-0" />
+      {/* Body: Sidebar + Content */}
+      <div className="tool-body">
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          errorCount={errors.length}
+          health={health}
+        />
 
-      {/* Main View */}
-      <main className="flex-1 min-h-0 relative z-10">
-        <TabErrorBoundary key={activeTab}>
-          {activeTab === 'explorer' && (
-            <ErrorExplorer
-              errors={errors}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              selectedProject={selectedProject}
-              setSelectedProject={setSelectedProject}
-              selectedLanguage={selectedLanguage}
-              setSelectedLanguage={setSelectedLanguage}
-              onSelectError={setSelectedError}
-              selectedError={selectedError}
-              onDeleteError={handleDeleteError}
-              onAddSolution={(id) => setAddSolutionErrorId(id)}
-              onLinkError={(id) => setLinkErrorSourceId(id)}
-              onOpenLogError={() => setIsLogErrorOpen(true)}
-              isOnline={health.status === 'ok'}
-            />
-          )}
+        <div className="tool-content">
+          <TabErrorBoundary key={activeTab}>
+            {activeTab === 'explorer' && (
+              <ErrorExplorer
+                errors={errors}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedProject={selectedProject}
+                setSelectedProject={setSelectedProject}
+                selectedLanguage={selectedLanguage}
+                setSelectedLanguage={setSelectedLanguage}
+                onSelectError={setSelectedError}
+                selectedError={selectedError}
+                onDeleteError={handleDeleteError}
+                onAddSolution={(id) => setAddSolutionErrorId(id)}
+                onLinkError={(id) => setLinkErrorSourceId(id)}
+                onOpenLogError={() => setIsLogErrorOpen(true)}
+                isOnline={health.status === 'ok'}
+              />
+            )}
 
-          {activeTab === 'solutions' && (
-            <SolutionRanker errors={errors} onFeedback={handleSolutionFeedback} />
-          )}
+            {activeTab === 'solutions' && (
+              <SolutionRanker errors={errors} onFeedback={handleSolutionFeedback} />
+            )}
 
-          {activeTab === 'patterns' && (
-            <GraphVisualizer
-              errors={errors}
-              onOpenLinkModal={() => setLinkErrorSourceId(errors[0]?.id || 1)}
-            />
-          )}
+            {activeTab === 'patterns' && (
+              <GraphVisualizer
+                errors={errors}
+                onOpenLinkModal={() => setLinkErrorSourceId(errors[0]?.id || 1)}
+              />
+            )}
 
-          {activeTab === 'sessions' && (
-            <SessionLogger
-              sessions={sessions}
-              errors={errors}
-              onCreateSession={handleCreateSession}
-            />
-          )}
-        </TabErrorBoundary>
-      </main>
-
-      {/* Toast Notification Banner */}
-      {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-slate-100 font-mono text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl border border-slate-700 animate-fade-in flex items-center space-x-2">
-          <span>{toastMessage}</span>
+            {activeTab === 'sessions' && (
+              <SessionLogger
+                sessions={sessions}
+                errors={errors}
+                onCreateSession={handleCreateSession}
+              />
+            )}
+          </TabErrorBoundary>
         </div>
+      </div>
+
+      {/* Toast */}
+      {toastMessage && (
+        <div className="toast fade-in">{toastMessage}</div>
       )}
 
       {/* Modals */}
@@ -313,14 +316,12 @@ export const App: React.FC = () => {
         onClose={() => setIsLogErrorOpen(false)}
         onSubmit={handleCreateError}
       />
-
       <AddSolutionModal
         isOpen={addSolutionErrorId !== null}
         errorId={addSolutionErrorId}
         onClose={() => setAddSolutionErrorId(null)}
         onSubmit={handleAddSolution}
       />
-
       <LinkErrorModal
         isOpen={linkErrorSourceId !== null}
         sourceErrorId={linkErrorSourceId}

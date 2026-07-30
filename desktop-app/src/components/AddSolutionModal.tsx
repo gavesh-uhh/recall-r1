@@ -46,77 +46,50 @@ export const AddSolutionModal: React.FC<AddSolutionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="pro-panel w-full max-w-lg rounded-xl shadow-2xl p-5 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center space-x-2">
-            <Zap className="h-4 w-4 text-emerald-400" />
-            <h3 className="text-sm font-bold text-white">Attach Solution Strategy</h3>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(1,4,9,0.75)', backdropFilter: 'blur(4px)' }} className="fade-in">
+      <div className="tool-panel" style={{ width: '100%', maxWidth: 440, padding: '14px 16px', borderRadius: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <Zap style={{ width: 13, height: 13, color: 'var(--success)' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Attach Solution Strategy</span>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
-            <X className="h-5 w-5" />
-          </button>
+          <button onClick={onClose} className="btn btn-ghost btn-icon"><X style={{ width: 14, height: 14 }} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Solution Description *
-            </label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Solution Description *</label>
             <textarea
               required
               rows={3}
-              placeholder="Detailed resolution steps, code guard, or configuration fix..."
+              placeholder="Resolution steps, code guard, or configuration fix..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="pro-input w-full px-3 py-2 rounded-lg text-xs"
+              className="tool-input"
+              style={{ width: '100%', resize: 'vertical' }}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Initial Success Count
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={100}
-                value={successCount}
+              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Success Count</label>
+              <input type="number" min={1} max={100} value={successCount}
                 onChange={(e) => setSuccessCount(Number(e.target.value))}
-                className="pro-input w-full px-3 py-2 rounded-lg text-xs font-mono"
-              />
+                className="tool-input mono" style={{ width: '100%' }} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Feedback Score (1.0 - 5.0)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min={1.0}
-                max={5.0}
-                value={feedbackScore}
+              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Feedback Score (1–5)</label>
+              <input type="number" step="0.1" min={1.0} max={5.0} value={feedbackScore}
                 onChange={(e) => setFeedbackScore(Number(e.target.value))}
-                className="pro-input w-full px-3 py-2 rounded-lg text-xs font-mono"
-              />
+                className="tool-input mono" style={{ width: '100%' }} />
             </div>
           </div>
 
-          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3.5 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="pro-button-primary text-xs font-semibold px-4 py-2 rounded-lg"
-            >
-              {isSubmitting ? 'Attaching...' : 'Attach Solution'}
+          <div className="tool-divider" />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+            <button type="button" onClick={onClose} className="btn btn-ghost">Cancel</button>
+            <button type="submit" disabled={isSubmitting} className="btn btn-primary">
+              {isSubmitting ? 'Attaching…' : 'Attach Solution'}
             </button>
           </div>
         </form>

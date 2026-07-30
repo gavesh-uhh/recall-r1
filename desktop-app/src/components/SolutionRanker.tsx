@@ -69,55 +69,37 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
   const baseScore = simResult.successRate * 0.5 + simResult.usageFreq * 0.3 + simResult.feedbackNorm * 0.2;
 
   return (
-    <div className="h-[calc(100vh-62px)] flex flex-col p-6 space-y-4 overflow-hidden">
-      {/* Header */}
-      <div className="pro-panel p-3.5 rounded-xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-blue-950 text-blue-400 border border-blue-800">
-            <Zap className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-white">Solution Decay & MaxHeap Ranking Engine</h2>
-            <p className="text-xs text-slate-400 font-mono">
-              score = (successRate*w1 + usageFreq*w2 + feedbackNorm*w3) * exp(-λ * days)
-            </p>
-          </div>
-        </div>
-
-        {/* Tab Toggle */}
-        <div className="flex items-center space-x-1 bg-black p-1 rounded-lg border border-blue-950">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* Toolbar */}
+      <div className="tool-toolbar">
+        <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
+        <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>
+          score = (successRate·w₁ + usageFreq·w₂ + feedbackNorm·w₃) · e^(−λ·days)
+        </span>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
           <button
             onClick={() => setActiveTab('ranker')}
-            className={`flex items-center space-x-2 px-3 py-1 rounded text-xs font-medium transition ${
-              activeTab === 'ranker'
-                ? 'bg-blue-700 text-white font-semibold shadow-md shadow-blue-900/50'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`btn btn-sm ${activeTab === 'ranker' ? 'btn-primary' : 'btn-ghost'}`}
           >
-            <Award className="h-3.5 w-3.5" />
-            <span>Ranked Solutions</span>
+            <Award style={{ width: 11, height: 11 }} />
+            Rankings
           </button>
           <button
             onClick={() => setActiveTab('simulator')}
-            className={`flex items-center space-x-2 px-3 py-1 rounded text-xs font-medium transition ${
-              activeTab === 'simulator'
-                ? 'bg-blue-700 text-white font-semibold shadow-md shadow-blue-900/50'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`btn btn-sm ${activeTab === 'simulator' ? 'btn-primary' : 'btn-ghost'}`}
           >
-            <Calculator className="h-3.5 w-3.5" />
-            <span>Decay Simulator</span>
+            <Calculator style={{ width: 11, height: 11 }} />
+            Simulator
           </button>
         </div>
       </div>
 
       {activeTab === 'ranker' ? (
-        <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
-          {/* Error Selector List (4 cols) */}
-          <div className="col-span-4 pro-panel p-4 rounded-xl flex flex-col space-y-2 overflow-y-auto">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mb-1">
-              Select Error Record
-            </h3>
+        <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          {/* Error Selector List */}
+          <div style={{ width: 270, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div className="section-label" style={{ padding: '12px 14px 6px' }}>Error Record</div>
             {errors.length === 0 ? (
               <div className="text-xs text-slate-500 p-4 text-center">
                 No error records found in database.
@@ -129,20 +111,20 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                   <div
                     key={err.id}
                     onClick={() => setSelectedErrorId(err.id)}
-                    className={`p-3 rounded-lg cursor-pointer border transition ${
-                      isSelected
-                        ? 'bg-slate-800 border-blue-500'
-                        : 'bg-slate-900/90 border-slate-700 hover:bg-slate-800'
-                    }`}
+                    style={{
+                      padding: '10px 14px',
+                      borderBottom: '1px solid var(--border-subtle)',
+                      borderLeft: `3px solid ${isSelected ? 'var(--primary)' : 'transparent'}`,
+                      background: isSelected ? 'rgba(56,139,253,0.06)' : 'transparent',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <h4 className="font-mono text-xs font-semibold text-blue-200 line-clamp-1">
+                    <div className="mono" style={{ fontSize: 11, fontWeight: 600, color: isSelected ? '#58a6ff' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>
                       {err.signature}
-                    </h4>
-                    <div className="flex items-center justify-between mt-2 text-[11px] text-slate-400">
-                      <span>{err.project}</span>
-                      <span className="font-mono text-emerald-400 font-semibold">
-                        {err.solutions?.length || 0} fixes
-                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{err.project}</span>
+                      <span style={{ fontSize: 10, color: 'var(--success)', fontFamily: 'monospace' }}>{err.solutions?.length || 0} fixes</span>
                     </div>
                   </div>
                 );
@@ -150,115 +132,95 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
             )}
           </div>
 
-          {/* Solutions & Feedback Panel (8 cols) */}
-          <div className="col-span-8 pro-panel p-5 rounded-xl flex flex-col space-y-4 overflow-y-auto">
+          {/* Solutions & Feedback Panel */}
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             {selectedError ? (
-              <>
-                <div className="border-b border-slate-700 pb-3">
-                  <div className="text-[10px] font-mono text-blue-400 uppercase">Selected Signature</div>
-                  <h3 className="font-mono text-xs font-bold text-white mt-0.5">
+              <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                  <div className="section-label" style={{ marginBottom: 4 }}>Selected Signature</div>
+                  <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#58a6ff', wordBreak: 'break-all' }}>
                     {selectedError.signature}
-                  </h3>
+                  </div>
                 </div>
 
-                <div className="space-y-3">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {activeSolutions && activeSolutions.length > 0 ? (
                     activeSolutions.map((sol, index) => {
                       const math = recallApi.calculateDecayScore(sol);
 
                       return (
-                        <div key={sol.id} className="pro-card p-4 rounded-xl space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="h-7 w-7 rounded bg-slate-800 text-blue-300 border border-slate-700 font-bold font-mono text-xs flex items-center justify-center">
-                                #{index + 1}
-                              </div>
-                              <div>
-                                <h4 className="text-xs font-semibold text-white leading-tight">
+                        <div key={sol.id} className="tool-card" style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                              <span className="badge badge-blue mono" style={{ flexShrink: 0 }}>#{index + 1}</span>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 11.5, color: 'var(--text)', fontWeight: 500, lineHeight: 1.5, marginBottom: 5 }}>
                                   {sol.description}
-                                </h4>
-                                <div className="flex items-center space-x-2 text-[11px] text-slate-400 mt-1">
-                                  <Clock className="h-3 w-3" />
-                                  <span>
-                                    Last success: {math.daysSinceSuccess.toFixed(1)} days ago
-                                  </span>
+                                </div>
+                                <div className="mono" style={{ fontSize: 10, color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                                  <Clock style={{ width: 10, height: 10 }} />
+                                  {math.daysSinceSuccess.toFixed(1)}d ago
                                 </div>
                               </div>
                             </div>
-
-                            <div className="text-right">
-                              <div className="text-[10px] font-mono text-slate-400 uppercase">
-                                Decay Score
-                              </div>
-                              <div className="text-base font-mono font-bold text-blue-400">
+                            <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 14 }}>
+                              <div className="section-label" style={{ marginBottom: 3 }}>Score</div>
+                              <div className="mono" style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary)' }}>
                                 {math.totalScore.toFixed(4)}
                               </div>
                             </div>
                           </div>
 
-                          {/* Formula Breakdown Progress Bars */}
-                          <div className="grid grid-cols-3 gap-2 bg-slate-900/90 p-2.5 rounded-lg border border-slate-700 text-xs font-mono">
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px', marginBottom: 10 }}>
                             <div>
-                              <div className="text-[10px] text-slate-400">Success Rate</div>
-                              <div className="font-semibold text-emerald-400">
-                                {(math.successRate * 100).toFixed(0)}%
-                              </div>
+                              <div className="section-label" style={{ marginBottom: 4 }}>Success Rate</div>
+                              <div className="mono" style={{ fontSize: 11, color: 'var(--success)', fontWeight: 600 }}>{(math.successRate * 100).toFixed(0)}%</div>
                             </div>
                             <div>
-                              <div className="text-[10px] text-slate-400 font-mono">Usage Freq</div>
-                              <div className="font-semibold text-blue-400">
-                                {(math.usageFreq * 100).toFixed(0)}%
-                              </div>
+                              <div className="section-label" style={{ marginBottom: 4 }}>Usage Freq</div>
+                              <div className="mono" style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600 }}>{(math.usageFreq * 100).toFixed(0)}%</div>
                             </div>
                             <div>
-                              <div className="text-[10px] text-slate-400 font-mono">Decay Factor</div>
-                              <div className="font-semibold text-slate-300">
-                                {math.decayFactor.toFixed(3)}
-                              </div>
+                              <div className="section-label" style={{ marginBottom: 4 }}>Decay</div>
+                              <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{math.decayFactor.toFixed(3)}</div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-700/80">
-                            <button
-                              onClick={() => onFeedback(sol.id, { success: false })}
-                              className="flex items-center space-x-1 text-xs text-rose-400 bg-rose-950 px-2.5 py-1 rounded border border-rose-800 transition"
-                            >
-                              <XCircle className="h-3.5 w-3.5" />
-                              <span>Failed</span>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                            <button onClick={() => onFeedback(sol.id, { success: false })} className="btn btn-danger btn-sm">
+                              <XCircle style={{ width: 11, height: 11 }} />
+                              Failed
                             </button>
-                            <button
-                              onClick={() => onFeedback(sol.id, { success: true })}
-                              className="flex items-center space-x-1 text-xs text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded border border-emerald-800 transition font-semibold"
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              <span>Worked (+1 Success)</span>
+                            <button onClick={() => onFeedback(sol.id, { success: true })} className="btn btn-success btn-sm">
+                              <CheckCircle2 style={{ width: 11, height: 11 }} />
+                              Worked
                             </button>
                           </div>
                         </div>
                       );
                     })
                   ) : (
-                    <div className="p-8 text-center text-slate-500 text-xs">
-                      No solutions logged for this error record.
-                    </div>
-                  )}
-                </div>
-              </>
+                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 11 }}>
+                    No solutions logged for this error record.
+                  </div>
+                )}
+              </div>
+            </div>
             ) : (
-              <div className="text-slate-500 text-xs p-6 text-center">
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: 11 }}>
                 Select an error record on the left.
               </div>
             )}
           </div>
         </div>
       ) : (
-        /* Simulator View with Apache ECharts */
-        <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
-          <div className="col-span-5 pro-panel p-5 rounded-xl space-y-4 overflow-y-auto">
-            <h3 className="text-xs font-bold text-white flex items-center space-x-2">
-              <Sliders className="h-4 w-4 text-blue-400" />
-              <span>Decay Math Controls</span>
-            </h3>
+        /* Simulator */
+        <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <div style={{ width: 300, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: '16px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Sliders style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Controls</span>
+            </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono">
@@ -330,16 +292,14 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
             </div>
           </div>
 
-          {/* Apache ECharts Dynamic Decay Plot */}
-          <div className="col-span-7 pro-panel p-4 rounded-xl flex flex-col justify-between overflow-hidden">
-            <div className="border-b border-blue-955 pb-2 flex items-center justify-between">
-              <div className="text-xs font-bold text-white flex items-center space-x-2">
-                <Calculator className="h-4 w-4 text-blue-400" />
-                <span>Apache ECharts — Solution Decay Trajectory</span>
+          {/* ECharts Decay Plot */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '16px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Calculator style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Trajectory</span>
               </div>
-              <span className="text-[10px] font-mono text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
-                λ = 0.05
-              </span>
+              <span className="badge badge-blue mono">λ = 0.05</span>
             </div>
 
             <div className="flex-1 min-h-0 mt-2">

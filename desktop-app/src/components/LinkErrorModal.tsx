@@ -41,57 +41,43 @@ export const LinkErrorModal: React.FC<LinkErrorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="pro-panel w-full max-w-md rounded-xl shadow-2xl p-5 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center space-x-2">
-            <Link className="h-4 w-4 text-sky-400" />
-            <h3 className="text-sm font-bold text-white">Manual Graph Error Edge</h3>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(1,4,9,0.75)', backdropFilter: 'blur(4px)' }} className="fade-in">
+      <div className="tool-panel" style={{ width: '100%', maxWidth: 400, padding: '14px 16px', borderRadius: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <Link style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Link Graph Edge</span>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
-            <X className="h-5 w-5" />
-          </button>
+          <button onClick={onClose} className="btn btn-ghost btn-icon"><X style={{ width: 14, height: 14 }} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div>
-            <span className="text-xs text-slate-400">Source Error Record:</span>
-            <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-xs font-mono text-sky-300 mt-1">
+            <div className="section-label" style={{ marginBottom: 4 }}>Source Node</div>
+            <div className="code-block" style={{ fontSize: 11 }}>
               #{sourceErr?.id}: {sourceErr?.signature}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Target Related Error *
-            </label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Target Error *</label>
             <select
               value={targetId}
               onChange={(e) => setTargetId(Number(e.target.value))}
-              className="pro-input w-full px-3 py-2 rounded-lg text-xs font-mono bg-slate-900"
+              className="tool-select mono"
+              style={{ width: '100%' }}
             >
               {availableTargets.map((e) => (
-                <option key={e.id} value={e.id} className="bg-slate-900 text-slate-200">
-                  #{e.id} [{e.project}] {e.signature}
-                </option>
+                <option key={e.id} value={e.id}>#{e.id} [{e.project}] {e.signature}</option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3.5 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || !targetId}
-              className="pro-button-primary text-xs font-semibold px-4 py-2 rounded-lg"
-            >
-              {isSubmitting ? 'Linking...' : 'Create Undirected Edge'}
+          <div className="tool-divider" />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+            <button type="button" onClick={onClose} className="btn btn-ghost">Cancel</button>
+            <button type="submit" disabled={isSubmitting || !targetId} className="btn btn-primary">
+              {isSubmitting ? 'Linking…' : 'Create Edge'}
             </button>
           </div>
         </form>

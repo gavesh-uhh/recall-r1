@@ -10,6 +10,7 @@ import {
   Terminal,
   Database,
   AlertCircle,
+  ChevronRight,
 } from 'lucide-react';
 import { ErrorRecord } from '../types/api';
 
@@ -52,83 +53,85 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
   const languages = Array.from(new Set(errors.map((e) => e.language)));
 
   return (
-    <div className="h-[calc(100vh-62px)] flex flex-col p-6 space-y-4 overflow-hidden bg-transparent">
-      {/* Search & Filter Bar */}
-      <div className="pro-panel p-3.5 rounded-xl flex flex-wrap items-center justify-between gap-4">
-        {/* AVL Signature Search */}
-        <div className="relative flex-1 min-w-[280px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400" />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+
+      {/* ── Toolbar ─────────────────────────────────────────────────── */}
+      <div className="tool-toolbar">
+        {/* Search */}
+        <div style={{ position: 'relative', flex: 1, maxWidth: 340 }}>
+          <Search style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, color: 'var(--text-dim)' }} />
           <input
             type="text"
-            placeholder="Search error signatures (AVL O(log n) lookup)..."
+            placeholder="Search signatures…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pro-input w-full pl-10 pr-4 py-2 rounded-lg text-xs font-mono placeholder-slate-500"
+            className="tool-input mono"
+            style={{ width: '100%', paddingLeft: 24 }}
           />
         </div>
 
-        {/* Filters */}
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700">
-            <Filter className="h-3.5 w-3.5 text-slate-400" />
-            <select
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value)}
-              className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
-            >
-              <option value="" className="bg-slate-900/90 text-slate-200">All Projects ({projects.length})</option>
-              {projects.map((p) => (
-                <option key={p} value={p} className="bg-slate-900/90 text-slate-200">
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="vert-divider" style={{ height: 18 }} />
 
-          <div className="flex items-center space-x-2 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700">
-            <Code className="h-3.5 w-3.5 text-blue-400" />
-            <select
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer uppercase font-mono"
-            >
-              <option value="" className="bg-slate-900/90 text-slate-200">All Languages</option>
-              {languages.map((l) => (
-                <option key={l} value={l} className="bg-slate-900/90 text-slate-200">
-                  {l}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Project filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            className="tool-select"
+          >
+            <option value="">All Projects ({projects.length})</option>
+            {projects.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
+
+        {/* Language filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Code style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <select
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+            className="tool-select mono"
+          >
+            <option value="">All Languages</option>
+            {languages.map((l) => <option key={l} value={l}>{l}</option>)}
+          </select>
+        </div>
+
+        <div style={{ marginLeft: 'auto' }}>
+          <span className="section-label">{errors.length} record{errors.length !== 1 ? 's' : ''}</span>
         </div>
       </div>
 
-      {/* Main Content Split Pane */}
-      <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
-        {/* Error Cards List (7 Cols) */}
-        <div className="col-span-7 flex flex-col space-y-3 overflow-y-auto pt-1 px-1 pr-2">
+      {/* ── Content: List + Detail ───────────────────────────────────── */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+
+        {/* Error List */}
+        <div style={{
+          width: 340,
+          flexShrink: 0,
+          borderRight: '1px solid var(--border)',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
           {!isOnline ? (
-            <div className="pro-panel p-10 rounded-xl text-center flex flex-col items-center justify-center space-y-3">
-              <AlertCircle className="h-8 w-8 text-rose-400" />
-              <h3 className="text-sm font-semibold text-white">Backend Service Offline</h3>
-              <p className="text-xs text-slate-400 max-w-sm">
-                Could not connect to Spring Boot backend at <code className="text-blue-400 font-mono">http://localhost:8080/api</code>.
-                Start the backend server using <code className="text-slate-200 font-mono">mvn spring-boot:run</code>.
-              </p>
+            <div style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-muted)' }}>
+              <AlertCircle style={{ width: 24, height: 24, color: 'var(--danger)' }} />
+              <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text)' }}>Backend Offline</div>
+              <div className="mono" style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Start Spring Boot at<br />
+                <span style={{ color: 'var(--primary)' }}>localhost:8080</span>
+              </div>
             </div>
           ) : errors.length === 0 ? (
-            <div className="pro-panel p-10 rounded-xl text-center flex flex-col items-center justify-center space-y-3">
-              <Database className="h-8 w-8 text-blue-500/50" />
-              <h3 className="text-sm font-semibold text-white">No Errors Logged in Database</h3>
-              <p className="text-xs text-slate-400 max-w-sm">
-                No error records were found in your Spring Boot H2 database matching this filter.
-              </p>
-              <button
-                onClick={onOpenLogError}
-                className="pro-button-primary text-xs font-semibold px-4 py-2 rounded-lg mt-2 flex items-center space-x-1.5"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Log First Error Record</span>
+            <div style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-muted)' }}>
+              <Database style={{ width: 24, height: 24, color: 'var(--text-dim)' }} />
+              <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text)' }}>No Records</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>No errors match this filter</div>
+              <button onClick={onOpenLogError} className="btn btn-primary" style={{ marginTop: 4 }}>
+                <Plus style={{ width: 12, height: 12 }} />
+                Log Error
               </button>
             </div>
           ) : (
@@ -140,46 +143,60 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                 <div
                   key={err.id}
                   onClick={() => onSelectError(err)}
-                  className={`pro-card p-4 rounded-xl cursor-pointer ${
-                    isSelected ? 'border-blue-500 bg-slate-900/90 shadow-md shadow-blue-950' : ''
-                  }`}
+                  style={{
+                    padding: '11px 14px',
+                    borderBottom: '1px solid var(--border-subtle)',
+                    cursor: 'pointer',
+                    background: isSelected ? 'rgba(56,139,253,0.06)' : 'transparent',
+                    borderLeft: `3px solid ${isSelected ? 'var(--primary)' : 'transparent'}`,
+                    transition: 'background 0.1s',
+                  }}
+                  onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'var(--hover)'; }}
+                  onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Terminal className="h-4 w-4 text-blue-400 flex-shrink-0" />
-                      <h3 className="font-mono font-semibold text-xs text-blue-200 line-clamp-1">
-                        {err.signature}
-                      </h3>
-                    </div>
-                    <span className="text-[10px] font-mono uppercase font-semibold px-2 py-0.5 rounded badge-blue">
-                      {err.language}
+                  {/* Signature row */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+                    <Terminal style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />
+                    <span className="mono" style={{
+                      fontSize: 11,
+                      color: isSelected ? '#58a6ff' : 'var(--text)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: 1,
+                      fontWeight: 600,
+                    }}>
+                      {err.signature}
                     </span>
+                    <span className="badge badge-blue">{err.language}</span>
                   </div>
 
-                  <p className="text-xs text-slate-300 mt-2 font-mono line-clamp-2 bg-slate-900/90 p-2 rounded border border-slate-700">
+                  {/* Message preview */}
+                  <div className="mono" style={{
+                    fontSize: 10,
+                    color: 'var(--text-muted)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    marginBottom: 6,
+                  }}>
                     {err.message}
-                  </p>
+                  </div>
 
-                  <div className="flex items-center justify-between mt-3 text-xs text-slate-400">
-                    <div className="flex items-center space-x-2">
-                      <span className="px-2 py-0.5 rounded bg-slate-900/90 text-blue-200 border border-slate-700 text-[11px]">
-                        Project: {err.project}
-                      </span>
-                      {err.tags.slice(0, 2).map((t) => (
-                        <span key={t} className="text-[10px] badge-dark px-1.5 py-0.5 rounded">
-                          #{t}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center space-x-3 text-[11px] font-mono">
-                      <span className="flex items-center space-x-1 text-emerald-400">
-                        <Zap className="h-3.5 w-3.5" />
-                        <span>{err.solutions?.length || 0} fixes</span>
+                  {/* Meta row */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{err.project}</span>
+                    {err.tags.slice(0, 2).map((t) => (
+                      <span key={t} className="badge badge-muted" style={{ fontSize: 9 }}>#{t}</span>
+                    ))}
+                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Zap style={{ width: 10, height: 10, color: 'var(--success)' }} />
+                      <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>
+                        {err.solutions?.length || 0}
                       </span>
                       {topSolution?.decayScore !== undefined && (
-                        <span className="text-blue-300 bg-slate-900/90 px-1.5 py-0.5 rounded border border-slate-700">
-                          Score: {topSolution.decayScore.toFixed(3)}
+                        <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>
+                          · {topSolution.decayScore.toFixed(2)}
                         </span>
                       )}
                     </div>
@@ -190,141 +207,130 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           )}
         </div>
 
-        {/* Selected Error Detail Drawer (5 Cols) */}
-        <div className="col-span-5 pro-panel rounded-xl p-5 flex flex-col justify-between overflow-y-auto">
+        {/* Detail Pane */}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {selectedError ? (
-            <div className="space-y-4">
-              <div className="border-b border-slate-700 pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-blue">
-                    ID #{selectedError.id}
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => onLinkError(selectedError.id)}
-                      className="p-1 text-slate-400 hover:text-blue-400 hover:bg-slate-900/90 rounded transition"
-                      title="Link to another error"
-                    >
-                      <Link className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirmId(selectedError.id)}
-                      className="p-1 text-slate-400 hover:text-rose-400 hover:bg-slate-900/90 rounded transition"
-                      title="Delete Error Record"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+            <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+              {/* Detail Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span className="badge badge-blue">#{selectedError.id}</span>
+                    <span className="badge badge-blue">{selectedError.language}</span>
+                    <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
+                  </div>
+                  <div className="mono" style={{ fontSize: 12, fontWeight: 700, color: '#58a6ff', wordBreak: 'break-all', lineHeight: 1.4 }}>
+                    {selectedError.signature}
                   </div>
                 </div>
-
-                <h2 className="font-mono text-xs font-bold text-blue-200 break-all">
-                  {selectedError.signature}
-                </h2>
-                <div className="flex items-center space-x-2 mt-1.5 text-xs text-slate-400">
-                  <span>Project: {selectedError.project}</span>
-                  <span>•</span>
-                  <span className="font-mono text-blue-400">{selectedError.language}</span>
+                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                  <button
+                    onClick={() => onLinkError(selectedError.id)}
+                    className="btn btn-ghost btn-icon"
+                    title="Link to another error"
+                  >
+                    <Link style={{ width: 13, height: 13 }} />
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirmId(selectedError.id)}
+                    className="btn btn-ghost btn-icon"
+                    title="Delete"
+                  >
+                    <Trash2 style={{ width: 13, height: 13 }} />
+                  </button>
                 </div>
               </div>
 
+              <div className="tool-divider" />
+
+              {/* Exception Message */}
               <div>
-                <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                  Exception Message
-                </h4>
-                <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-700 font-mono text-xs text-slate-200 leading-relaxed">
-                  {selectedError.message}
-                </div>
+                <div className="section-label" style={{ marginBottom: 5 }}>Exception Message</div>
+                <div className="code-block">{selectedError.message}</div>
               </div>
 
+              {/* Tags */}
               {selectedError.tags.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                    Indexed Tags
-                  </h4>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="section-label" style={{ marginBottom: 5 }}>Tags</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                     {selectedError.tags.map((t) => (
-                      <span key={t} className="text-xs badge-dark px-2 py-0.5 rounded">
-                        #{t}
-                      </span>
+                      <span key={t} className="badge badge-muted">#{t}</span>
                     ))}
                   </div>
                 </div>
               )}
 
+              {/* Solutions */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                    <Zap className="h-3.5 w-3.5 text-emerald-400" />
-                    <span>Ranked Fix Strategies</span>
-                  </h4>
-                  <button
-                    onClick={() => onAddSolution(selectedError.id)}
-                    className="flex items-center space-x-1 text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950 px-2 py-1 rounded border border-emerald-800 transition"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Attach Fix</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Zap style={{ width: 11, height: 11, color: 'var(--success)' }} />
+                    Ranked Fix Strategies
+                    <span className="badge badge-muted">{selectedError.solutions?.length || 0}</span>
+                  </div>
+                  <button onClick={() => onAddSolution(selectedError.id)} className="btn btn-success btn-sm">
+                    <Plus style={{ width: 10, height: 10 }} />
+                    Attach Fix
                   </button>
                 </div>
 
-                <div className="space-y-2 mt-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {selectedError.solutions && selectedError.solutions.length > 0 ? (
                     selectedError.solutions.map((sol, index) => (
-                      <div
-                        key={sol.id}
-                        className="bg-slate-900/90 p-3 rounded-lg border border-slate-700 space-y-1.5"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded badge-emerald">
-                            Rank #{index + 1}
-                          </span>
-                          <span className="text-[11px] font-mono text-blue-300">
-                            Decay Score: {sol.decayScore?.toFixed(4) ?? 'N/A'}
+                      <div key={sol.id} className="tool-card" style={{ padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span className="badge badge-green">#{index + 1}</span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                              <ChevronRight style={{ width: 10, height: 10, color: 'var(--text-dim)' }} />
+                            </span>
+                          </div>
+                          <span className="mono" style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                            score {sol.decayScore?.toFixed(4) ?? 'N/A'}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-200 font-sans leading-relaxed">
+                        <p style={{ fontSize: 11.5, color: 'var(--text)', lineHeight: 1.55, margin: 0 }}>
                           {sol.description}
                         </p>
-                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono border-t border-slate-700 pt-1.5">
-                          <span>Successes: {sol.successCount}</span>
-                          <span>Failures: {sol.failureCount}</span>
+                        <div className="tool-divider" style={{ margin: '8px 0' }} />
+                        <div className="mono" style={{ display: 'flex', gap: 14, fontSize: 10, color: 'var(--text-dim)' }}>
+                          <span>✓ {sol.successCount} success</span>
+                          <span>✗ {sol.failureCount} fail</span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="bg-slate-900/90 p-4 rounded text-center text-xs text-slate-500 border border-slate-700">
-                      No solutions attached yet. Click "Attach Fix" to log one.
+                    <div className="tool-card" style={{ padding: '16px 10px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 11 }}>
+                      No solutions attached. Click "Attach Fix" to log one.
                     </div>
                   )}
                 </div>
               </div>
+
+              {/* Delete Confirm */}
+              {deleteConfirmId && (
+                <div style={{ background: 'rgba(248,81,73,0.08)', border: '1px solid rgba(248,81,73,0.3)', borderRadius: 7, padding: '14px 16px' }}>
+                  <p style={{ fontSize: 11.5, color: '#f85149', fontWeight: 600, marginBottom: 10 }}>
+                    Delete error record #{deleteConfirmId}?
+                  </p>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                    <button onClick={() => setDeleteConfirmId(null)} className="btn btn-ghost btn-sm">Cancel</button>
+                    <button
+                      onClick={async () => { await onDeleteError(deleteConfirmId); setDeleteConfirmId(null); }}
+                      className="btn btn-danger btn-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2 text-slate-400">
-              <Terminal className="h-8 w-8 text-slate-700" />
-              <p className="text-xs">Select an error record on the left to inspect solutions.</p>
-            </div>
-          )}
-
-          {deleteConfirmId && (
-            <div className="mt-4 p-3 bg-rose-950/80 border border-rose-900 rounded-lg space-y-2 text-xs text-rose-200">
-              <p className="font-semibold">Delete error record #{deleteConfirmId}?</p>
-              <div className="flex items-center justify-end space-x-2 pt-1">
-                <button
-                  onClick={() => setDeleteConfirmId(null)}
-                  className="px-2.5 py-1 rounded bg-slate-900/90 text-slate-300 hover:text-white border border-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={async () => {
-                    await onDeleteError(deleteConfirmId);
-                    setDeleteConfirmId(null);
-                  }}
-                  className="px-2.5 py-1 rounded bg-rose-700 text-white font-semibold hover:bg-rose-600"
-                >
-                  Confirm Delete
-                </button>
-              </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)' }}>
+              <Terminal style={{ width: 28, height: 28, opacity: 0.3 }} />
+              <span style={{ fontSize: 11 }}>Select an error to inspect</span>
             </div>
           )}
         </div>

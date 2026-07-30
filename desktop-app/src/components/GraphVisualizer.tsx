@@ -51,113 +51,70 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   const selectedError = errors.find((e) => e.id === selectedErrorId) || errors[0];
 
   return (
-    <div className="h-[calc(100vh-62px)] flex flex-col p-6 space-y-4 overflow-hidden">
-      {/* Header */}
-      <div className="pro-panel p-3.5 rounded-xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-blue-950 text-blue-400 border border-blue-800">
-            <Network className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-white">Cross-Project Error Graph & Network Topology</h2>
-            <p className="text-xs text-slate-400 font-mono">
-              In-memory Graph adjacency index with BFS traversals & Jaccard/Levenshtein pattern clustering
-            </p>
-          </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+
+      {/* Toolbar */}
+      <div className="tool-toolbar">
+        <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
+        <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>BFS · Jaccard/Levenshtein clustering</span>
+
+        <div className="vert-divider" style={{ height: 18, margin: '0 4px' }} />
+
+        {/* Layout selector */}
+        <div style={{ display: 'flex', gap: 2 }}>
+          {(['force', 'circular', 'grid'] as const).map((l) => (
+            <button key={l} onClick={() => setGraphLayout(l)}
+              className={`btn btn-sm ${graphLayout === l ? 'btn-primary' : 'btn-ghost'}`}>
+              {l === 'force' ? 'Force' : l === 'circular' ? 'Circular' : 'Radial'}
+            </button>
+          ))}
         </div>
 
-        <div className="flex items-center space-x-3">
-          {/* Graph Layout Mode Selector */}
-          <div className="flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 text-xs">
-            <Layers className="h-3.5 w-3.5 text-slate-400 ml-1.5" />
-            <button
-              onClick={() => setGraphLayout('force')}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium ${
-                graphLayout === 'force' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Force Layout
-            </button>
-            <button
-              onClick={() => setGraphLayout('circular')}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium ${
-                graphLayout === 'circular' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Circular Ring
-            </button>
-            <button
-              onClick={() => setGraphLayout('grid')}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium ${
-                graphLayout === 'grid' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Radial Ring
-            </button>
-          </div>
+        <div className="vert-divider" style={{ height: 18, margin: '0 4px' }} />
 
-          {/* Edge Filter Toggle */}
-          <div className="flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 text-xs">
-            <Filter className="h-3.5 w-3.5 text-slate-400 ml-1.5" />
-            <button
-              onClick={() => setEdgeFilter('all')}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium ${
-                edgeFilter === 'all' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              All Edges
+        {/* Edge filter */}
+        <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          {(['all', 'patterns', 'tags'] as const).map((f) => (
+            <button key={f} onClick={() => setEdgeFilter(f)}
+              className={`btn btn-sm ${edgeFilter === f ? 'btn-primary' : 'btn-ghost'}`}>
+              {f === 'all' ? 'All' : f === 'patterns' ? `Clusters (${patterns.length})` : 'Tags'}
             </button>
-            <button
-              onClick={() => setEdgeFilter('patterns')}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium ${
-                edgeFilter === 'patterns' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Patterns ({patterns.length})
-            </button>
-            <button
-              onClick={() => setEdgeFilter('tags')}
-              className={`px-2.5 py-1 rounded text-[11px] font-medium ${
-                edgeFilter === 'tags' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Shared Tags
-            </button>
-          </div>
+          ))}
+        </div>
 
-          <button
-            onClick={onOpenLinkModal}
-            disabled={errors.length === 0}
-            className="flex items-center space-x-2 pro-button-primary text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow transition disabled:opacity-50"
-          >
-            <Link className="h-4 w-4" />
-            <span>Link Errors Manually</span>
+        <div style={{ marginLeft: 'auto' }}>
+          <button onClick={onOpenLinkModal} disabled={errors.length === 0} className="btn btn-primary">
+            <Link style={{ width: 12, height: 12 }} />
+            Link Errors
           </button>
         </div>
       </div>
 
-      {/* Main Split Content */}
-      <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
-        {/* Interactive ECharts Network Graph (7 cols) */}
-        <div className="col-span-7 pro-panel p-4 rounded-xl flex flex-col justify-between overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-            <h3 className="text-xs font-bold text-white flex items-center space-x-2">
-              <Share2 className="h-4 w-4 text-blue-400" />
-              <span>Interactive Graph Topology ({graphLayout.toUpperCase()})</span>
-            </h3>
-            <div className="flex items-center space-x-2 text-[10px] font-mono text-slate-400">
-              <span className="flex items-center space-x-1">
-                <span className="w-2.5 h-0.5 bg-blue-500 inline-block"></span>
-                <span>Patterns</span>
+      {/* Main: Graph + Inspector */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+
+        {/* Graph (main) */}
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Share2 style={{ width: 12, height: 12, color: 'var(--text-dim)' }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>Graph Topology</span>
+              <span className="badge badge-muted mono">{graphLayout.toUpperCase()}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 10, fontSize: 10 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
+                <span style={{ width: 16, height: 2, background: '#388bfd', display: 'inline-block' }} />
+                Patterns
               </span>
-              <span className="flex items-center space-x-1">
-                <span className="w-2.5 h-0.5 bg-emerald-500 inline-block"></span>
-                <span>Tags</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
+                <span style={{ width: 16, height: 2, background: '#3fb950', display: 'inline-block' }} />
+                Tags
               </span>
             </div>
           </div>
-
-          <div className="flex-1 min-h-0 mt-2">
+          <div style={{ flex: 1, minHeight: 0 }}>
             <ErrorGraphEChart
               patterns={patterns}
               errors={errors}
@@ -168,93 +125,78 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
           </div>
         </div>
 
-        {/* BFS Neighborhood & Node Detail Inspector (5 cols) */}
-        <div className="col-span-5 pro-panel p-4 rounded-xl flex flex-col space-y-4 overflow-y-auto">
+        {/* Inspector panel */}
+        <div style={{ width: 300, flexShrink: 0, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {selectedError ? (
-            <div className="space-y-4">
-              <div className="border-b border-slate-700 pb-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-blue-400 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-700">
-                    Selected Node #{selectedError.id}
-                  </span>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Project: {selectedError.project}
-                  </span>
+            <>
+              <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span className="badge badge-blue">#{selectedError.id}</span>
+                  <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
+                  {loadingRelated && <RefreshCw style={{ width: 10, height: 10, color: 'var(--primary)' }} className="spin" />}
                 </div>
-                <h3 className="font-mono text-xs font-bold text-white mt-1.5">
+                <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#58a6ff', wordBreak: 'break-all' }}>
                   {selectedError.signature}
-                </h3>
+                </div>
               </div>
 
-              {/* BFS Graph Neighborhood */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                    <GitCommit className="h-3.5 w-3.5 text-blue-400" />
-                    <span>BFS Traversal Neighborhood (Depth ≤ 2)</span>
-                  </h4>
-                  {loadingRelated && <RefreshCw className="h-3 w-3 animate-spin text-blue-400" />}
+                <div className="section-label" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <GitCommit style={{ width: 11, height: 11 }} />
+                  BFS Neighborhood (depth ≤ 2)
                 </div>
-
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {relatedErrors.length > 0 ? (
                     relatedErrors.map((rel) => (
                       <div
                         key={rel.id}
                         onClick={() => handleNodeClick(rel.id)}
-                        className="bg-slate-900/90 p-3 rounded-lg border border-slate-700 cursor-pointer hover:border-blue-500 transition"
+                        className="tool-card"
+                        style={{ padding: '10px 12px', cursor: 'pointer' }}
                       >
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-mono font-semibold text-blue-300">
-                            #{rel.id} {rel.signature}
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">
-                            {rel.project}
-                          </span>
+                        <div className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: '#58a6ff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
+                          #{rel.id} {rel.signature}
                         </div>
-                        <p className="text-xs text-slate-400 font-mono mt-1 line-clamp-1">
+                        <div style={{ fontSize: 10, color: 'var(--text-dim)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {rel.message}
-                        </p>
+                        </div>
                       </div>
                     ))
                   ) : (
-                    <div className="bg-slate-900/90 p-4 rounded text-center text-xs text-slate-400 border border-slate-700">
-                      No direct graph edges linked to this node yet. Click "Link Errors Manually" above to create an edge.
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                      No direct edges. Use "Link Errors" to connect nodes.
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Pattern Clusters Summary */}
               <div>
-                <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  Cross-Project Pattern Clusters ({patterns.length})
-                </h4>
-                {patterns.length > 0 ? (
-                  patterns.map((pat) => (
-                    <div key={pat.id} className="pro-card p-3 rounded-lg space-y-1 mb-2">
-                      <div className="flex items-center justify-between text-xs font-semibold text-white">
-                        <span>{pat.name}</span>
-                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                          {pat.projectCount} Projects
-                        </span>
+                <div className="section-label" style={{ marginBottom: 8 }}>
+                  Pattern Clusters ({patterns.length})
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {patterns.length > 0 ? (
+                    patterns.map((pat) => (
+                      <div key={pat.id} className="tool-card" style={{ padding: '10px 12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>{pat.name}</span>
+                          <span className="badge badge-green">{pat.projectCount}p</span>
+                        </div>
+                        <p style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>{pat.description}</p>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {pat.description}
-                      </p>
+                    ))
+                  ) : (
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                      No clusters yet. Log errors across 2+ projects to auto-cluster.
                     </div>
-                  ))
-                ) : (
-                  <div className="text-xs text-slate-400 bg-slate-900/90 p-3 rounded border border-slate-700">
-                    No multi-project pattern clusters registered. Log errors across 2 different projects with similar signatures or manual links to auto-cluster.
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2 text-slate-500 text-xs">
-              <Network className="h-8 w-8 text-blue-900" />
-              <p>Click any node in the graph to inspect its BFS traversal neighborhood.</p>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 40 }}>
+              <Network style={{ width: 28, height: 28, opacity: 0.2 }} />
+              <span style={{ fontSize: 11, textAlign: 'center' }}>Click a node to inspect its BFS neighborhood</span>
             </div>
           )}
         </div>

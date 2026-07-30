@@ -5,12 +5,12 @@ import {
   GitFork,
   History,
   PlusCircle,
-  Activity,
   RefreshCw,
   Server,
   Layers,
   Database,
   Trash2,
+  Activity,
 } from 'lucide-react';
 import { HealthStatus } from '../types/api';
 
@@ -36,122 +36,125 @@ export const Header: React.FC<HeaderProps> = ({
   isRebuilding,
 }) => {
   const tabs = [
-    { id: 'explorer', label: 'Error Explorer', icon: FolderSearch, badge: 'AVL Index' },
-    { id: 'solutions', label: 'Solution Ranker', icon: Award, badge: 'MaxHeap' },
-    { id: 'patterns', label: 'Cross-Project Graph', icon: GitFork, badge: 'Topology' },
-    { id: 'sessions', label: 'Debug Sessions', icon: History, badge: 'Journal' },
+    { id: 'explorer',  label: 'Error Explorer',       icon: FolderSearch, badge: 'AVL' },
+    { id: 'solutions', label: 'Solution Ranker',      icon: Award,        badge: 'Heap' },
+    { id: 'patterns',  label: 'Pattern Graph',        icon: GitFork,      badge: 'Graph' },
+    { id: 'sessions',  label: 'Debug Sessions',       icon: History,      badge: 'Log' },
+  ];
+
+  const isOnline = health.status === 'ok';
+
+  return (
+    <>
+      {/* ── Title Bar ─────────────────────────────────────────────── */}
+      <div className="tool-titlebar">
+        {/* Brand */}
+        <div className="h-6 w-6 rounded bg-gradient-to-br from-blue-500 to-blue-900 flex items-center justify-center border border-blue-500/40 flex-shrink-0">
+          <Layers className="h-3.5 w-3.5 text-white" />
+        </div>
+        <span className="text-xs font-bold text-white tracking-tight">Recall</span>
+        <span className="text-[9px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 select-none">
+          R1
+        </span>
+
+        <div className="flex-1" />
+
+        {/* Actions */}
+        <div className="flex items-center gap-1.5">
+          {onSeedData && (
+            <button onClick={onSeedData} title="Seed sample data" className="btn btn-success btn-sm">
+              <Database className="h-3 w-3" />
+              Seed
+            </button>
+          )}
+          {onClearData && (
+            <button onClick={onClearData} title="Clear all data" className="btn btn-danger btn-sm">
+              <Trash2 className="h-3 w-3" />
+              Clear
+            </button>
+          )}
+
+          <div className="vert-divider mx-1" style={{ height: '18px' }} />
+
+          {/* Status */}
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--card)] border border-[var(--border)]">
+            <Server className="h-3 w-3 text-[var(--text-dim)]" />
+            <span className={`status-dot ${isOnline ? 'online' : 'offline'}`} />
+            <span className="mono text-[10px] text-[var(--text-muted)] uppercase">
+              {isOnline ? 'online' : 'offline'}
+            </span>
+            {health.indexStale && (
+              <button
+                onClick={onRebuildIndex}
+                disabled={isRebuilding}
+                title="Index stale – click to rebuild"
+                className="btn btn-warning btn-sm ml-1"
+              >
+                {isRebuilding
+                  ? <RefreshCw className="h-3 w-3 spin" />
+                  : <Activity className="h-3 w-3 pulse" />
+                }
+                Stale
+              </button>
+            )}
+          </div>
+
+          <div className="vert-divider mx-1" style={{ height: '18px' }} />
+
+          {/* Log Error CTA */}
+          <button
+            onClick={onOpenLogError}
+            className="btn btn-primary"
+          >
+            <PlusCircle className="h-3.5 w-3.5" />
+            Log Error
+          </button>
+        </div>
+      </div>
+
+      {/* ── Sidebar nav is rendered inside App layout, but tab data lives here ─ */}
+      {/* Sidebar is provided via the `tabs` export below */}
+    </>
+  );
+};
+
+/* ── Sidebar Nav ──────────────────────────────────────────────────── */
+
+interface SidebarProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  errorCount: number;
+  health: HealthStatus;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+  const items = [
+    { id: 'explorer',  label: 'Error Explorer',  icon: FolderSearch, badge: 'AVL' },
+    { id: 'solutions', label: 'Solution Ranker', icon: Award,        badge: 'Heap' },
+    { id: 'patterns',  label: 'Pattern Graph',   icon: GitFork,      badge: 'Graph' },
+    { id: 'sessions',  label: 'Debug Sessions',  icon: History,      badge: 'Log' },
   ];
 
   return (
-    <header className="h-14 bg-slate-900 border-b border-slate-700 px-5 flex items-center justify-between shadow-xl relative z-40 flex-nowrap shrink-0 overflow-hidden">
-      {/* Brand / Logo */}
-      <div className="flex items-center space-x-2.5 shrink-0">
-        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-600 to-slate-900 border border-blue-400/50 flex items-center justify-center shadow-md shadow-blue-500/30 shrink-0">
-          <Layers className="h-4.5 w-4.5 text-white" />
-        </div>
-        <div className="shrink-0">
-          <div className="flex items-center space-x-2">
-            <h1 className="font-bold text-sm tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-300">
-              Recall
-            </h1>
-            <span className="text-[9px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-700/60 shadow-sm whitespace-nowrap">
-              R1 Engine
-            </span>
+    <div className="tool-sidebar">
+      <div className="sidebar-section-label">Views</div>
+
+      {items.map((item) => {
+        const Icon = item.icon;
+        const isActive = activeTab === item.id;
+        return (
+          <div
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`sidebar-item ${isActive ? 'active' : ''}`}
+          >
+            <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="truncate">{item.label}</span>
+            <span className={`item-badge ${isActive ? 'active' : ''}`}>{item.badge}</span>
           </div>
-        </div>
-      </div>
+        );
+      })}
 
-      {/* Navigation Pages */}
-      <nav className="flex items-center space-x-1 bg-slate-950/70 p-1 rounded-xl border border-slate-700 shadow-inner shrink-0">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-md shadow-blue-500/40 border border-blue-400/50'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-              <span>{tab.label}</span>
-              {isActive && (
-                <span className="text-[9px] font-mono uppercase bg-blue-950 text-blue-200 px-1 py-0.5 rounded border border-blue-700/60">
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Status & Primary Actions */}
-      <div className="flex items-center space-x-2.5 shrink-0">
-        {/* Seed & Clear Data Action Buttons */}
-        <div className="flex items-center space-x-1.5 shrink-0">
-          {onSeedData && (
-            <button
-              onClick={onSeedData}
-              title="Populate database with rich multi-project sample errors, fix strategies & debug logs"
-              className="flex items-center space-x-1 text-xs text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-700/60 hover:bg-emerald-900 transition font-medium whitespace-nowrap"
-            >
-              <Database className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Seed DB</span>
-            </button>
-          )}
-
-          {onClearData && (
-            <button
-              onClick={onClearData}
-              title="Clear all error records, solutions, relations, and debug sessions"
-              className="flex items-center space-x-1 text-xs text-rose-300 bg-rose-950/80 px-2.5 py-1 rounded-lg border border-rose-800/80 hover:bg-rose-900 transition font-medium whitespace-nowrap"
-            >
-              <Trash2 className="h-3.5 w-3.5 text-rose-400" />
-              <span>Clear DB</span>
-            </button>
-          )}
-        </div>
-
-        {/* Backend Status Badge */}
-        <div className="flex items-center space-x-1.5 bg-slate-950/60 px-2.5 py-1 rounded-xl border border-slate-700/50 text-xs shadow-inner shrink-0">
-          <Server className="h-3.5 w-3.5 text-slate-400" />
-          <div className="flex items-center space-x-1">
-            <span
-              className={`inline-block h-2 w-2 rounded-full ${
-                health.status === 'ok' ? 'bg-emerald-400 shadow-sm shadow-emerald-400' : 'bg-rose-500'
-              }`}
-            />
-            <span className="font-mono text-[11px] text-slate-300 uppercase whitespace-nowrap">
-              {health.status === 'ok' ? 'Online' : 'Offline'}
-            </span>
-          </div>
-          
-          {health.indexStale && (
-            <button
-              onClick={onRebuildIndex}
-              disabled={isRebuilding}
-              title="In-memory AVL/Graph index is stale. Click to rebuild."
-              className="ml-1.5 flex items-center space-x-1 text-[10px] text-amber-300 bg-amber-950/80 px-1.5 py-0.5 rounded-md border border-amber-800/80 hover:bg-amber-900/80 transition whitespace-nowrap"
-            >
-              <Activity className="h-3 w-3 animate-pulse" />
-              <span>Stale Index</span>
-              <RefreshCw className={`h-3 w-3 ${isRebuilding ? 'animate-spin' : ''}`} />
-            </button>
-          )}
-        </div>
-
-        {/* Log Error Primary Button */}
-        <button
-          onClick={onOpenLogError}
-          className="flex items-center space-x-2 pro-button-primary text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-md transition"
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span>Log Error</span>
-        </button>
-      </div>
-    </header>
+    </div>
   );
 };

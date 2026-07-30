@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Plus, Calendar, CheckCircle } from 'lucide-react';
+import { Clock, Plus, Calendar, CheckCircle, History } from 'lucide-react';
 import { DebugSession, ErrorRecord, CreateSessionRequest } from '../types/api';
 
 interface SessionLoggerProps {
@@ -24,7 +24,6 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !notes.trim()) return;
-
     setIsSubmitting(true);
     try {
       await onCreateSession({
@@ -52,40 +51,36 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
   };
 
   return (
-    <div className="h-[calc(100vh-62px)] flex flex-col p-6 space-y-4 overflow-hidden">
-      {/* Header */}
-      <div className="pro-panel p-3.5 rounded-xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-sky-950 text-sky-400 border border-sky-800">
-            <Clock className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-white">Debug Session Logs</h2>
-            <p className="text-xs text-slate-400">
-              Track investigative debugging work, duration, notes, and link associated error records
-            </p>
-          </div>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center space-x-2 pro-button-primary text-xs font-semibold px-3 py-1.5 rounded-lg shadow transition"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Log Debug Session</span>
-        </button>
+      {/* Toolbar */}
+      <div className="tool-toolbar">
+        <History style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Debug Sessions</span>
+        <span className="badge badge-muted" style={{ marginLeft: 4 }}>{sessions.length}</span>
+        <div style={{ marginLeft: 'auto' }}>
+          <button onClick={() => setShowModal(true)} className="btn btn-primary">
+            <Plus style={{ width: 12, height: 12 }} />
+            Log Session
+          </button>
+        </div>
       </div>
 
-      {/* Sessions Grid */}
-      <div className="grid grid-cols-12 gap-5 flex-1 min-h-0 overflow-y-auto pr-1">
+      {/* Session List */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {sessions.length === 0 ? (
-          <div className="col-span-12 pro-panel p-10 rounded-xl text-center text-xs text-slate-500">
-            No debugging sessions logged in backend database yet.
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 60 }}>
+            <Clock style={{ width: 28, height: 28, opacity: 0.3 }} />
+            <span style={{ fontSize: 11 }}>No sessions logged yet</span>
+            <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: 4 }}>
+              <Plus style={{ width: 12, height: 12 }} />
+              Log First Session
+            </button>
           </div>
         ) : (
           sessions.map((session) => {
-            const sessionTitle = session.title || session.actionsPerformed || `Debug Session #${session.id}`;
-            const sessionNotes = session.notes || session.feedback || session.actionsPerformed || 'No session notes provided.';
+            const sessionTitle = session.title || session.actionsPerformed || `Session #${session.id}`;
+            const sessionNotes = session.notes || session.feedback || session.actionsPerformed || '—';
             const sessionDateStr = session.timestamp || session.sessionDate;
             const formattedDate = sessionDateStr
               ? new Date(sessionDateStr).toLocaleDateString()
@@ -93,37 +88,37 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
             const linkedCount = session.errorRecordIds?.length ?? (session.errorRecordId ? 1 : 0);
 
             return (
-              <div
-                key={session.id}
-                className="col-span-6 pro-panel p-4 rounded-xl flex flex-col justify-between space-y-3"
-              >
-                <div className="space-y-2.5">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-mono text-sky-400 bg-sky-950 px-2 py-0.5 rounded border border-sky-800">
-                        Session #{session.id} • {session.project || 'General'}
-                      </span>
-                      <h3 className="text-xs font-bold text-white mt-1">{sessionTitle}</h3>
+              <div key={session.id} className="tool-card" style={{ padding: '12px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                      <span className="badge badge-blue">#{session.id}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{session.project || 'General'}</span>
                     </div>
-                    <div className="flex items-center space-x-1 font-mono text-xs text-sky-300 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                      <Clock className="h-3 w-3" />
-                      <span>{session.durationMinutes || 30}m</span>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {sessionTitle}
                     </div>
                   </div>
-
-                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/90 p-2.5 rounded border border-slate-700">
-                    {sessionNotes}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                    <Clock style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+                    <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      {session.durationMinutes || 30}m
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-700 text-xs text-slate-400 font-mono">
-                  <div className="flex items-center space-x-1 text-[11px]">
-                    <Calendar className="h-3 w-3 text-slate-400" />
-                    <span>{formattedDate}</span>
+                <div className="code-block" style={{ fontSize: 11, marginBottom: 10 }}>
+                  {sessionNotes}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Calendar style={{ width: 10, height: 10, color: 'var(--text-dim)' }} />
+                    <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>{formattedDate}</span>
                   </div>
-                  <div className="text-[11px] text-blue-400">
-                    Linked Errors: {linkedCount}
-                  </div>
+                  <span className="mono" style={{ fontSize: 10, color: linkedCount > 0 ? '#58a6ff' : 'var(--text-dim)' }}>
+                    {linkedCount} linked error{linkedCount !== 1 ? 's' : ''}
+                  </span>
                 </div>
               </div>
             );
@@ -131,70 +126,100 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
         )}
       </div>
 
-      {/* Log Session Modal */}
+      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="pro-panel w-full max-w-lg rounded-xl shadow-2xl p-5 space-y-4">
-            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Clock className="h-4 w-4 text-blue-400" />
-              <span>Log Debugging Session</span>
-            </h3>
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 50,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(1,4,9,0.75)', backdropFilter: 'blur(4px)',
+        }}
+          className="fade-in"
+        >
+          <div className="tool-panel" style={{ width: '100%', maxWidth: 520, padding: '20px 24px', borderRadius: 8 }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
+              <Clock style={{ width: 14, height: 14, color: 'var(--primary)' }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Log Debug Session</span>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Session Title *</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  Session Title *
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Investigating User Auth Null Pointer"
+                  placeholder="e.g. Investigating Auth Null Pointer"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="pro-input w-full px-3 py-2 rounded-lg text-xs"
+                  className="tool-input"
+                  style={{ width: '100%' }}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Duration (Minutes) *</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                    Duration (min) *
+                  </label>
                   <input
                     type="number"
                     required
-                    min={5}
-                    max={480}
+                    min={5} max={480}
                     value={duration}
                     onChange={(e) => setDuration(Number(e.target.value))}
-                    className="pro-input w-full px-3 py-2 rounded-lg text-xs font-mono"
+                    className="tool-input mono"
+                    style={{ width: '100%' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Project Name *</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                    Project *
+                  </label>
                   <input
                     type="text"
                     required
                     value={project}
                     onChange={(e) => setProject(e.target.value)}
-                    className="pro-input w-full px-3 py-2 rounded-lg text-xs"
+                    className="tool-input"
+                    style={{ width: '100%' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Investigation Notes *</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  Investigation Notes *
+                </label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="Steps taken, root cause identified, fix applied..."
+                  placeholder="Steps taken, root cause, fix applied..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="pro-input w-full px-3 py-2 rounded-lg text-xs"
+                  className="tool-input"
+                  style={{ width: '100%', resize: 'vertical' }}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Link Error Records</label>
-                <div className="max-h-24 overflow-y-auto space-y-1 p-2 bg-slate-900/90 rounded-lg border border-slate-700">
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  Link Error Records
+                </label>
+                <div style={{
+                  maxHeight: 100,
+                  overflowY: 'auto',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 5,
+                  padding: '4px 6px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 3,
+                }}>
                   {errors.length === 0 ? (
-                    <div className="text-[11px] text-slate-400">No error records available</div>
+                    <span style={{ fontSize: 11, color: 'var(--text-dim)', padding: '4px 0' }}>No error records available</span>
                   ) : (
                     errors.map((err) => {
                       const isChecked = selectedErrorIds.includes(err.id);
@@ -202,12 +227,19 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                         <div
                           key={err.id}
                           onClick={() => toggleErrorSelect(err.id)}
-                          className={`p-1.5 rounded text-xs font-mono cursor-pointer flex items-center justify-between ${
-                            isChecked ? 'bg-blue-900/50 text-blue-200 border border-blue-600' : 'text-slate-300 hover:bg-slate-800'
-                          }`}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '3px 6px',
+                            borderRadius: 4,
+                            cursor: 'pointer',
+                            background: isChecked ? 'rgba(56,139,253,0.12)' : 'transparent',
+                            border: `1px solid ${isChecked ? 'rgba(56,139,253,0.3)' : 'transparent'}`,
+                          }}
                         >
-                          <span className="truncate max-w-xs">#{err.id} {err.signature}</span>
-                          {isChecked && <CheckCircle className="h-3.5 w-3.5 text-sky-400" />}
+                          <span className="mono" style={{ fontSize: 10, color: isChecked ? '#58a6ff' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                            #{err.id} {err.signature}
+                          </span>
+                          {isChecked && <CheckCircle style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />}
                         </div>
                       );
                     })
@@ -215,20 +247,14 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-3.5 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white"
-                >
+              <div className="tool-divider" />
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="pro-button-primary text-xs font-semibold px-4 py-2 rounded-lg"
-                >
-                  {isSubmitting ? 'Saving...' : 'Save Session'}
+                <button type="submit" disabled={isSubmitting} className="btn btn-primary">
+                  {isSubmitting ? 'Saving…' : 'Save Session'}
                 </button>
               </div>
             </form>
