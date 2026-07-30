@@ -98,8 +98,8 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
       {activeTab === 'ranker' ? (
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
           {/* Error Selector List */}
-          <div style={{ width: 270, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
-            <div className="section-label" style={{ padding: '12px 14px 6px' }}>Error Record</div>
+          <div style={{ width: 300, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div className="section-label" style={{ padding: '18px 20px 10px' }}>Error Record</div>
             {errors.length === 0 ? (
               <div className="text-xs text-slate-500 p-4 text-center">
                 No error records found in database.
@@ -112,7 +112,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                     key={err.id}
                     onClick={() => setSelectedErrorId(err.id)}
                     style={{
-                      padding: '10px 14px',
+                      padding: '14px 18px',
                       borderBottom: '1px solid var(--border-subtle)',
                       borderLeft: `3px solid ${isSelected ? 'var(--primary)' : 'transparent'}`,
                       background: isSelected ? 'rgba(56,139,253,0.06)' : 'transparent',
@@ -135,22 +135,22 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
           {/* Solutions & Feedback Panel */}
           <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             {selectedError ? (
-              <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+              <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                   <div className="section-label" style={{ marginBottom: 4 }}>Selected Signature</div>
                   <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#58a6ff', wordBreak: 'break-all' }}>
                     {selectedError.signature}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {activeSolutions && activeSolutions.length > 0 ? (
                     activeSolutions.map((sol, index) => {
                       const math = recallApi.calculateDecayScore(sol);
 
                       return (
-                        <div key={sol.id} className="tool-card" style={{ padding: '12px 14px' }}>
-                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <div key={sol.id} className="tool-card" style={{ padding: '18px 22px' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                               <span className="badge badge-blue mono" style={{ flexShrink: 0 }}>#{index + 1}</span>
                               <div style={{ flex: 1, minWidth: 0 }}>
@@ -171,7 +171,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                             </div>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px', marginBottom: 10 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '14px 18px', marginBottom: 14 }}>
                             <div>
                               <div className="section-label" style={{ marginBottom: 4 }}>Success Rate</div>
                               <div className="mono" style={{ fontSize: 11, color: 'var(--success)', fontWeight: 600 }}>{(math.successRate * 100).toFixed(0)}%</div>
@@ -186,7 +186,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, borderTop: '1px solid var(--border)', paddingTop: 14 }}>
                             <button onClick={() => onFeedback(sol.id, { success: false })} className="btn btn-danger btn-sm">
                               <XCircle style={{ width: 11, height: 11 }} />
                               Failed
@@ -216,7 +216,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
       ) : (
         /* Simulator */
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <div style={{ width: 300, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: '16px 16px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Sliders style={{ width: 13, height: 13, color: 'var(--primary)' }} />
               <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Controls</span>
@@ -293,8 +293,8 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
           </div>
 
           {/* ECharts Decay Plot */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '16px 18px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 14 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '24px 28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 14, marginBottom: 18 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Calculator style={{ width: 13, height: 13, color: 'var(--primary)' }} />
                 <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Trajectory</span>

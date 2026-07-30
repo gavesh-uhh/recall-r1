@@ -108,7 +108,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
         {/* Error List */}
         <div style={{
-          width: 340,
+          width: 380,
           flexShrink: 0,
           borderRight: '1px solid var(--border)',
           overflowY: 'auto',
@@ -144,7 +144,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   key={err.id}
                   onClick={() => onSelectError(err)}
                   style={{
-                    padding: '11px 14px',
+                    padding: '16px 20px',
                     borderBottom: '1px solid var(--border-subtle)',
                     cursor: 'pointer',
                     background: isSelected ? 'rgba(56,139,253,0.06)' : 'transparent',
@@ -155,7 +155,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
                 >
                   {/* Signature row */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 8 }}>
                     <Terminal style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />
                     <span className="mono" style={{
                       fontSize: 11,
@@ -178,13 +178,13 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    marginBottom: 6,
+                    marginBottom: 8,
                   }}>
                     {err.message}
                   </div>
 
                   {/* Meta row */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{err.project}</span>
                     {err.tags.slice(0, 2).map((t) => (
                       <span key={t} className="badge badge-muted" style={{ fontSize: 9 }}>#{t}</span>
@@ -210,10 +210,10 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
         {/* Detail Pane */}
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {selectedError ? (
-            <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* Detail Header */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                     <span className="badge badge-blue">#{selectedError.id}</span>
@@ -264,7 +264,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
               {/* Solutions */}
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <Zap style={{ width: 11, height: 11, color: 'var(--success)' }} />
                     Ranked Fix Strategies
@@ -276,10 +276,10 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {selectedError.solutions && selectedError.solutions.length > 0 ? (
                     selectedError.solutions.map((sol, index) => (
-                      <div key={sol.id} className="tool-card" style={{ padding: '12px 14px' }}>
+                      <div key={sol.id} className="tool-card" style={{ padding: '16px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span className="badge badge-green">#{index + 1}</span>

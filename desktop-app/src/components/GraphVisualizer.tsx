@@ -97,7 +97,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
 
         {/* Graph (main) */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Share2 style={{ width: 12, height: 12, color: 'var(--text-dim)' }} />
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>Graph Topology</span>
@@ -126,10 +126,10 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
         </div>
 
         {/* Inspector panel */}
-        <div style={{ width: 300, flexShrink: 0, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ width: 340, flexShrink: 0, overflowY: 'auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           {selectedError ? (
             <>
-              <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+              <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <span className="badge badge-blue">#{selectedError.id}</span>
                   <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
@@ -141,18 +141,18 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
               </div>
 
               <div>
-                <div className="section-label" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div className="section-label" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                   <GitCommit style={{ width: 11, height: 11 }} />
                   BFS Neighborhood (depth ≤ 2)
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {relatedErrors.length > 0 ? (
                     relatedErrors.map((rel) => (
                       <div
                         key={rel.id}
                         onClick={() => handleNodeClick(rel.id)}
                         className="tool-card"
-                        style={{ padding: '10px 12px', cursor: 'pointer' }}
+                        style={{ padding: '14px 16px', cursor: 'pointer' }}
                       >
                         <div className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: '#58a6ff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
                           #{rel.id} {rel.signature}
@@ -171,13 +171,13 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
               </div>
 
               <div>
-                <div className="section-label" style={{ marginBottom: 8 }}>
+                <div className="section-label" style={{ marginBottom: 10 }}>
                   Pattern Clusters ({patterns.length})
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {patterns.length > 0 ? (
                     patterns.map((pat) => (
-                      <div key={pat.id} className="tool-card" style={{ padding: '10px 12px' }}>
+                      <div key={pat.id} className="tool-card" style={{ padding: '14px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
                           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>{pat.name}</span>
                           <span className="badge badge-green">{pat.projectCount}p</span>
