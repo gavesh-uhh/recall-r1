@@ -57,7 +57,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
       <div className="tool-toolbar">
         <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
-        <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>BFS · Jaccard/Levenshtein clustering</span>
 
         <div className="vert-divider" style={{ height: 18, margin: '0 4px' }} />
 

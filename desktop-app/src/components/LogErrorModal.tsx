@@ -83,9 +83,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
             <div>
               <div className="flex items-center space-x-2">
                 <h1 className="text-sm font-bold text-white tracking-tight">Log Error & Fix Strategy</h1>
-                <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-700">
-                  AVL O(log n)
-                </span>
               </div>
             </div>
           </div>
@@ -218,9 +215,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     <span>Initial Fix Strategy (Optional)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                    MaxHeap
-                  </span>
                 </div>
 
                 <div className="flex-1 flex flex-col min-h-0">

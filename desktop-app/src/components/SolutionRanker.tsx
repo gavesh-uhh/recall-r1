@@ -74,9 +74,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
       <div className="tool-toolbar">
         <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
-        <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>
-          score = (successRate·w₁ + usageFreq·w₂ + feedbackNorm·w₃) · e^(−λ·days)
-        </span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
           <button
             onClick={() => setActiveTab('ranker')}
@@ -299,7 +296,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                 <Calculator style={{ width: 13, height: 13, color: 'var(--primary)' }} />
                 <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Trajectory</span>
               </div>
-              <span className="badge badge-blue mono">λ = 0.05</span>
             </div>
 
             <div className="flex-1 min-h-0 mt-2">
