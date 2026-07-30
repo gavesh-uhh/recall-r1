@@ -111,17 +111,17 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-950 p-2.5 rounded border border-slate-800">
+                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/90 p-2.5 rounded border border-slate-700">
                     {sessionNotes}
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs text-slate-400 font-mono">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-700 text-xs text-slate-400 font-mono">
                   <div className="flex items-center space-x-1 text-[11px]">
-                    <Calendar className="h-3 w-3 text-slate-500" />
+                    <Calendar className="h-3 w-3 text-slate-400" />
                     <span>{formattedDate}</span>
                   </div>
-                  <div className="text-[11px] text-sky-400">
+                  <div className="text-[11px] text-blue-400">
                     Linked Errors: {linkedCount}
                   </div>
                 </div>
@@ -133,10 +133,10 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
 
       {/* Log Session Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-fade-in">
           <div className="pro-panel w-full max-w-lg rounded-xl shadow-2xl p-5 space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Clock className="h-4 w-4 text-sky-400" />
+              <Clock className="h-4 w-4 text-blue-400" />
               <span>Log Debugging Session</span>
             </h3>
 
@@ -192,9 +192,9 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Link Error Records</label>
-                <div className="max-h-24 overflow-y-auto space-y-1 p-2 bg-slate-950 rounded-lg border border-slate-800">
+                <div className="max-h-24 overflow-y-auto space-y-1 p-2 bg-slate-900/90 rounded-lg border border-slate-700">
                   {errors.length === 0 ? (
-                    <div className="text-[11px] text-slate-500">No error records available</div>
+                    <div className="text-[11px] text-slate-400">No error records available</div>
                   ) : (
                     errors.map((err) => {
                       const isChecked = selectedErrorIds.includes(err.id);
@@ -203,7 +203,7 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                           key={err.id}
                           onClick={() => toggleErrorSelect(err.id)}
                           className={`p-1.5 rounded text-xs font-mono cursor-pointer flex items-center justify-between ${
-                            isChecked ? 'bg-sky-950 text-sky-200 border border-sky-800' : 'text-slate-400 hover:bg-slate-900'
+                            isChecked ? 'bg-blue-900/50 text-blue-200 border border-blue-600' : 'text-slate-300 hover:bg-slate-800'
                           }`}
                         >
                           <span className="truncate max-w-xs">#{err.id} {err.signature}</span>

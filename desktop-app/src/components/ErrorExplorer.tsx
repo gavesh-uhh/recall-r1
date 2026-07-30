@@ -69,32 +69,32 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
         {/* Filters */}
         <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2 bg-black px-3 py-1.5 rounded-lg border border-blue-950">
+          <div className="flex items-center space-x-2 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700">
             <Filter className="h-3.5 w-3.5 text-slate-400" />
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
               className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-black text-slate-200">All Projects ({projects.length})</option>
+              <option value="" className="bg-slate-900/90 text-slate-200">All Projects ({projects.length})</option>
               {projects.map((p) => (
-                <option key={p} value={p} className="bg-black text-slate-200">
+                <option key={p} value={p} className="bg-slate-900/90 text-slate-200">
                   {p}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center space-x-2 bg-black px-3 py-1.5 rounded-lg border border-blue-950">
+          <div className="flex items-center space-x-2 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700">
             <Code className="h-3.5 w-3.5 text-blue-400" />
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
               className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer uppercase font-mono"
             >
-              <option value="" className="bg-black text-slate-200">All Languages</option>
+              <option value="" className="bg-slate-900/90 text-slate-200">All Languages</option>
               {languages.map((l) => (
-                <option key={l} value={l} className="bg-black text-slate-200">
+                <option key={l} value={l} className="bg-slate-900/90 text-slate-200">
                   {l}
                 </option>
               ))}
@@ -141,7 +141,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   key={err.id}
                   onClick={() => onSelectError(err)}
                   className={`pro-card p-4 rounded-xl cursor-pointer ${
-                    isSelected ? 'border-blue-500 bg-blue-950/40 shadow-md shadow-blue-950' : ''
+                    isSelected ? 'border-blue-500 bg-slate-900/90 shadow-md shadow-blue-950' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -156,13 +156,13 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-300 mt-2 font-mono line-clamp-2 bg-black p-2 rounded border border-blue-950">
+                  <p className="text-xs text-slate-300 mt-2 font-mono line-clamp-2 bg-slate-900/90 p-2 rounded border border-slate-700">
                     {err.message}
                   </p>
 
                   <div className="flex items-center justify-between mt-3 text-xs text-slate-400">
                     <div className="flex items-center space-x-2">
-                      <span className="px-2 py-0.5 rounded bg-blue-950/80 text-blue-200 border border-blue-900/60 text-[11px]">
+                      <span className="px-2 py-0.5 rounded bg-slate-900/90 text-blue-200 border border-slate-700 text-[11px]">
                         Project: {err.project}
                       </span>
                       {err.tags.slice(0, 2).map((t) => (
@@ -178,7 +178,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                         <span>{err.solutions?.length || 0} fixes</span>
                       </span>
                       {topSolution?.decayScore !== undefined && (
-                        <span className="text-blue-300 bg-blue-950 px-1.5 py-0.5 rounded border border-blue-900">
+                        <span className="text-blue-300 bg-slate-900/90 px-1.5 py-0.5 rounded border border-slate-700">
                           Score: {topSolution.decayScore.toFixed(3)}
                         </span>
                       )}
@@ -194,7 +194,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
         <div className="col-span-5 pro-panel rounded-xl p-5 flex flex-col justify-between overflow-y-auto">
           {selectedError ? (
             <div className="space-y-4">
-              <div className="border-b border-blue-950 pb-3">
+              <div className="border-b border-slate-700 pb-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-blue">
                     ID #{selectedError.id}
@@ -202,14 +202,14 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => onLinkError(selectedError.id)}
-                      className="p-1 text-slate-400 hover:text-blue-400 hover:bg-blue-950 rounded transition"
+                      className="p-1 text-slate-400 hover:text-blue-400 hover:bg-slate-900/90 rounded transition"
                       title="Link to another error"
                     >
                       <Link className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setDeleteConfirmId(selectedError.id)}
-                      className="p-1 text-slate-400 hover:text-rose-400 hover:bg-blue-950 rounded transition"
+                      className="p-1 text-slate-400 hover:text-rose-400 hover:bg-slate-900/90 rounded transition"
                       title="Delete Error Record"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -231,7 +231,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                 <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
                   Exception Message
                 </h4>
-                <div className="bg-black p-3 rounded-lg border border-blue-950 font-mono text-xs text-slate-200 leading-relaxed">
+                <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-700 font-mono text-xs text-slate-200 leading-relaxed">
                   {selectedError.message}
                 </div>
               </div>
@@ -259,7 +259,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   </h4>
                   <button
                     onClick={() => onAddSolution(selectedError.id)}
-                    className="flex items-center space-x-1 text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950 px-2 py-1 rounded border border-emerald-900 transition"
+                    className="flex items-center space-x-1 text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950 px-2 py-1 rounded border border-emerald-800 transition"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Attach Fix</span>
@@ -271,7 +271,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     selectedError.solutions.map((sol, index) => (
                       <div
                         key={sol.id}
-                        className="bg-black p-3 rounded-lg border border-blue-950 space-y-1.5"
+                        className="bg-slate-900/90 p-3 rounded-lg border border-slate-700 space-y-1.5"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded badge-emerald">
@@ -284,14 +284,14 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                         <p className="text-xs text-slate-200 font-sans leading-relaxed">
                           {sol.description}
                         </p>
-                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono border-t border-blue-950 pt-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono border-t border-slate-700 pt-1.5">
                           <span>Successes: {sol.successCount}</span>
                           <span>Rating: ⭐ {sol.feedbackScore?.toFixed(1) ?? 'N/A'}</span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="bg-black p-4 rounded text-center text-xs text-slate-500 border border-blue-950">
+                    <div className="bg-slate-900/90 p-4 rounded text-center text-xs text-slate-500 border border-slate-700">
                       No solutions attached yet. Click "Attach Fix" to log one.
                     </div>
                   )}
@@ -300,7 +300,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2 text-slate-400">
-              <Terminal className="h-8 w-8 text-blue-900" />
+              <Terminal className="h-8 w-8 text-slate-700" />
               <p className="text-xs">Select an error record on the left to inspect solutions.</p>
             </div>
           )}
@@ -311,7 +311,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
               <div className="flex items-center justify-end space-x-2 pt-1">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="px-2.5 py-1 rounded bg-black text-slate-300 hover:text-white border border-blue-950"
+                  className="px-2.5 py-1 rounded bg-slate-900/90 text-slate-300 hover:text-white border border-slate-700"
                 >
                   Cancel
                 </button>

@@ -105,8 +105,8 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                     onClick={() => setSelectedErrorId(err.id)}
                     className={`p-3 rounded-lg cursor-pointer border transition ${
                       isSelected
-                        ? 'bg-blue-950 border-blue-600'
-                        : 'bg-black border-blue-955 hover:bg-blue-950/40'
+                        ? 'bg-slate-800 border-blue-500'
+                        : 'bg-slate-900/90 border-slate-700 hover:bg-slate-800'
                     }`}
                   >
                     <h4 className="font-mono text-xs font-semibold text-blue-200 line-clamp-1">
@@ -128,7 +128,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
           <div className="col-span-8 pro-panel p-5 rounded-xl flex flex-col space-y-4 overflow-y-auto">
             {selectedError ? (
               <>
-                <div className="border-b border-blue-950 pb-3">
+                <div className="border-b border-slate-700 pb-3">
                   <div className="text-[10px] font-mono text-blue-400 uppercase">Selected Signature</div>
                   <h3 className="font-mono text-xs font-bold text-white mt-0.5">
                     {selectedError.signature}
@@ -144,7 +144,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                         <div key={sol.id} className="pro-card p-4 rounded-xl space-y-3">
                           <div className="flex items-start justify-between">
                             <div className="flex items-center space-x-3">
-                              <div className="h-7 w-7 rounded bg-blue-950 text-blue-300 border border-blue-800 font-bold font-mono text-xs flex items-center justify-center">
+                              <div className="h-7 w-7 rounded bg-slate-800 text-blue-300 border border-slate-700 font-bold font-mono text-xs flex items-center justify-center">
                                 #{index + 1}
                               </div>
                               <div>
@@ -171,7 +171,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                           </div>
 
                           {/* Formula Breakdown Progress Bars */}
-                          <div className="grid grid-cols-4 gap-2 bg-black p-2.5 rounded-lg border border-blue-955 text-xs font-mono">
+                          <div className="grid grid-cols-4 gap-2 bg-slate-900/90 p-2.5 rounded-lg border border-slate-700 text-xs font-mono">
                             <div>
                               <div className="text-[10px] text-slate-400">Success Rate</div>
                               <div className="font-semibold text-emerald-400">
