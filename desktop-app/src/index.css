@@ -404,3 +404,30 @@ textarea.tool-input {
 .badge-amber  { background: rgba(210,153,34,0.12);  color: #d29922;  border: 1px solid rgba(210,153,34,0.3); }
 .badge-dark   { background: var(--card); color: var(--text-muted); border: 1px solid var(--border); }
 .animate-fade-in { animation: fadeIn 0.15s ease-out forwards; }
+
+/* ─── Modal Layout Centering ─────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(1, 4, 9, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 16px;
+}
+
+.modal-content {
+  background: var(--surface, #0d1117);
+  border: 1px solid var(--border, #30363d);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 440px;
+  margin: auto;
+}

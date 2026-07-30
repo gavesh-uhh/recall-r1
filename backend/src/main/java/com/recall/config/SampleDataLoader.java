@@ -241,11 +241,100 @@ public class SampleDataLoader implements CommandLineRunner {
                 17, 1, LocalDateTime.now().minusDays(2), 4.9
         ));
 
+        // 9. auth-service in TypeScript
+        ErrorRecord e9 = new ErrorRecord();
+        e9.setSignature("InvalidTokenError: Token signature mismatch in AuthMiddleware");
+        e9.setMessage("JsonWebTokenError: invalid signature at JWTVerifier.verify (auth/jwt.ts:45) in auth-service node worker process");
+        e9.setProject("auth-service");
+        e9.setLanguage("TypeScript");
+        e9.setTags(Arrays.asList("jwt", "typescript", "auth-service", "security", "node"));
+        e9 = errorRecordService.create(e9);
+
+        solutionService.create(e9.getId(), new SolutionRequest(
+                "Ensure standard base64 secret encoding matches across AuthMiddleware and JWT Token Provider microservices.",
+                21, 0, LocalDateTime.now().minusHours(8), 4.9
+        ));
+
+        // 10. api-gateway in Go
+        ErrorRecord e10 = new ErrorRecord();
+        e10.setSignature("context deadline exceeded in GatewayProxy.Forward");
+        e10.setMessage("net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers) in proxy/main.go:120");
+        e10.setProject("api-gateway");
+        e10.setLanguage("Go");
+        e10.setTags(Arrays.asList("go", "api-gateway", "timeout", "http", "concurrency"));
+        e10 = errorRecordService.create(e10);
+
+        solutionService.create(e10.getId(), new SolutionRequest(
+                "Configure custom http.Transport with MaxIdleConnsPerHost=100 and IdleConnTimeout=90s in Go gateway client.",
+                19, 1, LocalDateTime.now().minusDays(1), 4.85
+        ));
+
+        // 11. payment-processor in Python
+        ErrorRecord e11 = new ErrorRecord();
+        e11.setSignature("StripeAPIError: IdempotencyKeyReused in PaymentWorker");
+        e11.setMessage("stripe.error.IdempotencyError: Keys for idempotent requests can only be used with the same parameters. at workers/stripe_client.py:88");
+        e11.setProject("payment-processor");
+        e11.setLanguage("Python");
+        e11.setTags(Arrays.asList("python", "stripe", "payment-processor", "api", "idempotency"));
+        e11 = errorRecordService.create(e11);
+
+        solutionService.create(e11.getId(), new SolutionRequest(
+                "Generate UUIDv4 string for idempotency keys scoped per unique checkout transaction payload.",
+                25, 0, LocalDateTime.now().minusHours(18), 4.95
+        ));
+
+        // 12. desktop-app in C++
+        ErrorRecord e12 = new ErrorRecord();
+        e12.setSignature("SegmentationFault (SIGSEGV) in NativeBridge.dll");
+        e12.setMessage("Process terminated with status 139 (SIGSEGV) accessing address 0x00000008 in C++ addon buffer allocation at native/bridge.cpp:142");
+        e12.setProject("desktop-app");
+        e12.setLanguage("C++");
+        e12.setTags(Arrays.asList("cpp", "electron", "native", "segfault", "memory"));
+        e12 = errorRecordService.create(e12);
+
+        solutionService.create(e12.getId(), new SolutionRequest(
+                "Wrap Node-API Napi::Buffer::Copy pointer initialization with std::nothrow and non-null check before dereferencing.",
+                16, 2, LocalDateTime.now().minusDays(3), 4.8
+        ));
+
+        // 13. analytics-engine in Rust
+        ErrorRecord e13 = new ErrorRecord();
+        e13.setSignature("Panic: index out of bounds in StreamProcessor");
+        e13.setMessage("thread 'tokio-runtime-worker' panicked at 'index out of bounds: the len is 16 but the index is 16' at src/stream.rs:204");
+        e13.setProject("analytics-engine");
+        e13.setLanguage("Rust");
+        e13.setTags(Arrays.asList("rust", "analytics-engine", "panic", "tokio", "performance"));
+        e13 = errorRecordService.create(e13);
+
+        solutionService.create(e13.getId(), new SolutionRequest(
+                "Use slice get() method with safe Option pattern matching instead of direct indexing vector bounds.",
+                28, 0, LocalDateTime.now().minusDays(1), 5.0
+        ));
+
+        // 14. notification-service in Python
+        ErrorRecord e14 = new ErrorRecord();
+        e14.setSignature("RedisConnectionError: Max connections exceeded in CeleryWorker");
+        e14.setMessage("redis.exceptions.ConnectionError: Too many clients connected to Redis server at 127.0.0.1:6379 in tasks/notifier.py:32");
+        e14.setProject("notification-service");
+        e14.setLanguage("Python");
+        e14.setTags(Arrays.asList("python", "redis", "celery", "notification-service", "queue"));
+        e14 = errorRecordService.create(e14);
+
+        solutionService.create(e14.getId(), new SolutionRequest(
+                "Reuse global redis.ConnectionPool instance across Celery task workers instead of instantiating new StrictRedis objects per task.",
+                22, 1, LocalDateTime.now().minusDays(2), 4.9
+        ));
+
         // Seed manual relations if not present
         try {
             errorRelationRepository.save(new ErrorRelation(e1.getId(), e2.getId(), "MANUAL"));
             errorRelationRepository.save(new ErrorRelation(e3.getId(), e8.getId(), "MANUAL"));
             errorRelationRepository.save(new ErrorRelation(e4.getId(), e7.getId(), "MANUAL"));
+            errorRelationRepository.save(new ErrorRelation(e9.getId(), e2.getId(), "MANUAL"));
+            errorRelationRepository.save(new ErrorRelation(e10.getId(), e3.getId(), "MANUAL"));
+            errorRelationRepository.save(new ErrorRelation(e11.getId(), e3.getId(), "MANUAL"));
+            errorRelationRepository.save(new ErrorRelation(e12.getId(), e7.getId(), "MANUAL"));
+            errorRelationRepository.save(new ErrorRelation(e13.getId(), e5.getId(), "MANUAL"));
         } catch (Exception ex) {
             log.warn("Manual relations seeding note: {}", ex.getMessage());
         }

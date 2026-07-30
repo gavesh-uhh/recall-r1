@@ -99,12 +99,12 @@ export const App: React.FC = () => {
         recallApi.getProjects(),
         recallApi.getLanguages(),
       ]);
-      if (backendProjects.length > 0) {
-        setCustomProjects((prev) => Array.from(new Set([...prev, ...backendProjects])));
-      }
-      if (backendLanguages.length > 0) {
-        setCustomLanguages((prev) => Array.from(new Set([...prev, ...backendLanguages])));
-      }
+      setCustomProjects(backendProjects);
+      setCustomLanguages(backendLanguages);
+      try {
+        localStorage.setItem('recall_custom_projects', JSON.stringify(backendProjects));
+        localStorage.setItem('recall_custom_languages', JSON.stringify(backendLanguages));
+      } catch {}
     } catch (err) {
       console.warn('Backend metadata load offline, using local cache:', err);
     }
@@ -115,33 +115,41 @@ export const App: React.FC = () => {
   }, [loadBackendMetadata]);
 
   const handleAddProject = async (name: string) => {
-    if (!customProjects.includes(name)) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const exists = customProjects.some((p) => p.toLowerCase() === trimmed.toLowerCase());
+    if (!exists) {
       setCustomProjects((prev) => {
-        const next = Array.from(new Set([...prev, name]));
+        const next = Array.from(new Set([...prev, trimmed]));
         try { localStorage.setItem('recall_custom_projects', JSON.stringify(next)); } catch {}
         return next;
       });
       try {
-        await recallApi.createProject(name);
-        showToast(`Persisted project "${name}" to backend database!`);
+        await recallApi.createProject(trimmed);
+        showToast(`Persisted project "${trimmed}" to backend database!`);
+        await loadBackendMetadata();
       } catch (err) {
-        showToast(`Saved project "${name}" locally`);
+        showToast(`Saved project "${trimmed}" locally`);
       }
     }
   };
 
   const handleAddLanguage = async (name: string) => {
-    if (!customLanguages.includes(name)) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const exists = customLanguages.some((l) => l.toLowerCase() === trimmed.toLowerCase());
+    if (!exists) {
       setCustomLanguages((prev) => {
-        const next = Array.from(new Set([...prev, name]));
+        const next = Array.from(new Set([...prev, trimmed]));
         try { localStorage.setItem('recall_custom_languages', JSON.stringify(next)); } catch {}
         return next;
       });
       try {
-        await recallApi.createLanguage(name);
-        showToast(`Persisted language "${name}" to backend database!`);
+        await recallApi.createLanguage(trimmed);
+        showToast(`Persisted language "${trimmed}" to backend database!`);
+        await loadBackendMetadata();
       } catch (err) {
-        showToast(`Registered language "${name}" locally`);
+        showToast(`Registered language "${trimmed}" locally`);
       }
     }
   };
@@ -308,6 +316,7 @@ export const App: React.FC = () => {
       setSelectedError(null);
       await loadErrors();
       await loadSessions();
+      await loadBackendMetadata();
     } catch (err) {
       showToast('Error: Failed to seed sample data');
     }
@@ -318,11 +327,18 @@ export const App: React.FC = () => {
     try {
       showToast('Clearing all database records...');
       await recallApi.clearDatabase();
-      showToast('Cleared all errors, solutions, and debug sessions!');
+      setCustomProjects([]);
+      setCustomLanguages([]);
+      try {
+        localStorage.removeItem('recall_custom_projects');
+        localStorage.removeItem('recall_custom_languages');
+      } catch {}
+      showToast('Cleared all errors, projects, languages & sessions!');
       setSelectedError(null);
       setIsClearConfirmOpen(false);
       await loadErrors();
       await loadSessions();
+      await loadBackendMetadata();
     } catch (err) {
       showToast('Error: Failed to clear database');
     } finally {

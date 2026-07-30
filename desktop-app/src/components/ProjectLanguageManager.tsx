@@ -67,9 +67,10 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
 
     // Seed default projects from errors
     errors.forEach((err) => {
-      const proj = err.project || 'Uncategorized';
-      if (!map.has(proj)) {
-        map.set(proj, {
+      const proj = err.project ? err.project.trim() : 'Uncategorized';
+      const key = proj.toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, {
           name: proj,
           errorCount: 0,
           solutionCount: 0,
@@ -78,7 +79,7 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
           lastTimestamp: err.timestamp,
         });
       }
-      const stat = map.get(proj)!;
+      const stat = map.get(key)!;
       stat.errorCount += 1;
       stat.solutionCount += err.solutions?.length || 0;
       if (err.language && !stat.languages.includes(err.language)) {
@@ -91,9 +92,11 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
 
     // Add custom created projects that don't have errors yet
     customProjects.forEach((projName) => {
-      if (!map.has(projName)) {
-        map.set(projName, {
-          name: projName,
+      if (!projName) return;
+      const key = projName.trim().toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, {
+          name: projName.trim(),
           errorCount: 0,
           solutionCount: 0,
           languages: [],
@@ -110,9 +113,10 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
     const map = new Map<string, LanguageStat>();
 
     errors.forEach((err) => {
-      const lang = err.language || 'Unknown';
-      if (!map.has(lang)) {
-        map.set(lang, {
+      const lang = err.language ? err.language.trim() : 'Unknown';
+      const key = lang.toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, {
           name: lang,
           errorCount: 0,
           solutionCount: 0,
@@ -120,7 +124,7 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
           tags: [],
         });
       }
-      const stat = map.get(lang)!;
+      const stat = map.get(key)!;
       stat.errorCount += 1;
       stat.solutionCount += err.solutions?.length || 0;
       if (err.project && !stat.projects.includes(err.project)) {
@@ -133,9 +137,11 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
 
     // Add custom created languages
     customLanguages.forEach((langName) => {
-      if (!map.has(langName)) {
-        map.set(langName, {
-          name: langName,
+      if (!langName) return;
+      const key = langName.trim().toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, {
+          name: langName.trim(),
           errorCount: 0,
           solutionCount: 0,
           projects: [],
@@ -162,22 +168,51 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
     0
   );
 
-  const handleCreateProject = (e: React.FormEvent) => {
+  const [isSubmittingProject, setIsSubmittingProject] = useState(false);
+  const [isSubmittingLanguage, setIsSubmittingLanguage] = useState(false);
+
+  const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProjectName.trim()) return;
-    const name = newProjectName.trim();
-    onAddProject(name);
-    setNewProjectName('');
-    setIsAddProjectOpen(false);
+    setIsSubmittingProject(true);
+    try {
+      const names = newProjectName
+        .split(',')
+        .map((n) => n.trim())
+        .filter(Boolean);
+      for (const name of names) {
+        await onAddProject(name);
+      }
+      setNewProjectName('');
+      setIsAddProjectOpen(false);
+      setSubTab('projects');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmittingProject(false);
+    }
   };
 
-  const handleCreateLanguage = (e: React.FormEvent) => {
+  const handleCreateLanguage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newLanguageName.trim()) return;
-    const name = newLanguageName.trim();
-    onAddLanguage(name);
-    setNewLanguageName('');
-    setIsAddLanguageOpen(false);
+    setIsSubmittingLanguage(true);
+    try {
+      const names = newLanguageName
+        .split(',')
+        .map((n) => n.trim())
+        .filter(Boolean);
+      for (const name of names) {
+        await onAddLanguage(name);
+      }
+      setNewLanguageName('');
+      setIsAddLanguageOpen(false);
+      setSubTab('languages');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmittingLanguage(false);
+    }
   };
 
   const navigateToExplorerWithProject = (proj: string) => {
@@ -221,9 +256,9 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
           </button>
         </div>
 
-        {/* Search */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="tool-search" style={{ width: 220 }}>
+        {/* Search & Actions */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="tool-search" style={{ width: 200 }}>
             <Search className="search-icon" />
             <input
               type="text"
@@ -234,11 +269,19 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
           </div>
 
           <button
-            onClick={() => (subTab === 'projects' ? setIsAddProjectOpen(true) : setIsAddLanguageOpen(true))}
+            onClick={() => setIsAddProjectOpen(true)}
+            className="btn btn-ghost btn-sm"
+          >
+            <Plus style={{ width: 12, height: 12 }} />
+            <span>Add Project</span>
+          </button>
+
+          <button
+            onClick={() => setIsAddLanguageOpen(true)}
             className="btn btn-primary btn-sm"
           >
             <Plus style={{ width: 12, height: 12 }} />
-            <span>Add {subTab === 'projects' ? 'Project' : 'Language'}</span>
+            <span>Add Language</span>
           </button>
         </div>
       </div>
@@ -464,24 +507,16 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
             <form onSubmit={handleCreateProject} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <label className="section-label" style={{ marginBottom: 6, display: 'block' }}>
-                  Project Identifier / Name
+                  Project Identifier / Name (comma separated for multiple)
                 </label>
                 <input
                   type="text"
                   required
+                  autoFocus
                   placeholder="e.g. backend-api, PaymentGateway, CLI-Tool"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    borderRadius: 6,
-                    background: 'var(--bg-input, #090f1e)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text)',
-                    fontSize: 12,
-                    fontFamily: 'JetBrains Mono',
-                  }}
+                  className="pro-input w-full px-3.5 py-2.5 rounded-xl text-xs font-mono text-white placeholder-slate-500"
                 />
               </div>
 
@@ -489,8 +524,8 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
                 <button type="button" onClick={() => setIsAddProjectOpen(false)} className="btn btn-ghost btn-sm">
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary btn-sm">
-                  Create Project
+                <button type="submit" disabled={isSubmittingProject} className="btn btn-primary btn-sm">
+                  {isSubmittingProject ? 'Creating...' : 'Create Project'}
                 </button>
               </div>
             </form>
@@ -515,24 +550,16 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
             <form onSubmit={handleCreateLanguage} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <label className="section-label" style={{ marginBottom: 6, display: 'block' }}>
-                  Language / Stack Name
+                  Language / Stack Name (comma separated for multiple)
                 </label>
                 <input
                   type="text"
                   required
+                  autoFocus
                   placeholder="e.g. TypeScript, Python, Rust, Go, Java"
                   value={newLanguageName}
                   onChange={(e) => setNewLanguageName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    borderRadius: 6,
-                    background: 'var(--bg-input, #090f1e)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text)',
-                    fontSize: 12,
-                    fontFamily: 'JetBrains Mono',
-                  }}
+                  className="pro-input w-full px-3.5 py-2.5 rounded-xl text-xs font-mono text-white placeholder-slate-500"
                 />
               </div>
 
@@ -540,8 +567,8 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
                 <button type="button" onClick={() => setIsAddLanguageOpen(false)} className="btn btn-ghost btn-sm">
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary btn-sm">
-                  Register Language
+                <button type="submit" disabled={isSubmittingLanguage} className="btn btn-primary btn-sm">
+                  {isSubmittingLanguage ? 'Registering...' : 'Register Language'}
                 </button>
               </div>
             </form>
