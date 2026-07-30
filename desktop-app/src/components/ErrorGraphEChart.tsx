@@ -134,6 +134,7 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     graphLayout === 'circular' ? 'circular' : graphLayout === 'grid' ? 'none' : 'force';
 
   const option: echarts.EChartsOption = {
+    animation: false,
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'item',
@@ -168,6 +169,7 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
         name: 'Error Graph Topology',
         type: 'graph',
         layout: echartsLayoutMode,
+        animation: false,
         data: nodesList,
         links: links,
         categories: categories,
@@ -190,10 +192,10 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
           distance: 8,
         },
         force: {
-          repulsion: 500,
-          edgeLength: [120, 200],
-          gravity: 0.1,
-          friction: 0.1,
+          repulsion: 300,
+          edgeLength: [100, 160],
+          gravity: 0.2,
+          friction: 0.6,
           layoutAnimation: false,
         },
         emphasis: {
