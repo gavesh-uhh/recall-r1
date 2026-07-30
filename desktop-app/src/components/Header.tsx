@@ -26,9 +26,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = () => {
-  return (
-    <div className="tool-titlebar" />
-  );
+  return null;
 };
 
 /* ── Sidebar Nav ──────────────────────────────────────────────────── */

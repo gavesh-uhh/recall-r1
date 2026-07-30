@@ -241,18 +241,6 @@ export const App: React.FC = () => {
       {/* Splash Screen */}
       {showSplash && <SplashScreen onFinished={() => setShowSplash(false)} />}
 
-      {/* Title Bar */}
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        health={health}
-        onOpenLogError={() => setIsLogErrorOpen(true)}
-        onRebuildIndex={handleRebuildIndex}
-        onSeedData={handleSeedData}
-        onClearData={handleClearData}
-        isRebuilding={isRebuilding}
-      />
-
       {/* Body: Sidebar + Content */}
       <div className="tool-body">
         <Sidebar
