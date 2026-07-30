@@ -260,6 +260,11 @@ export const App: React.FC = () => {
           setActiveTab={setActiveTab}
           errorCount={errors.length}
           health={health}
+          onOpenLogError={() => setIsLogErrorOpen(true)}
+          onRebuildIndex={handleRebuildIndex}
+          onSeedData={handleSeedData}
+          onClearData={handleClearData}
+          isRebuilding={isRebuilding}
         />
 
         <div className="tool-content">
