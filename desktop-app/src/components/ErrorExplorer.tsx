@@ -129,7 +129,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
               <Database style={{ width: 24, height: 24, color: 'var(--text-dim)' }} />
               <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text)' }}>No Records</div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>No errors match this filter</div>
-              <button onClick={onOpenLogError} className="btn btn-primary" style={{ marginTop: 4 }}>
+              <button onClick={onOpenLogError} className="btn btn-success btn-sm" style={{ marginTop: 4 }}>
                 <Plus style={{ width: 12, height: 12 }} />
                 Log Error
               </button>

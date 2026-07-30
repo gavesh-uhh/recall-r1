@@ -4,6 +4,7 @@ import {
   Award,
   GitFork,
   History,
+  Plus,
   PlusCircle,
   RefreshCw,
   Server,
@@ -104,9 +105,9 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Log Error CTA */}
           <button
             onClick={onOpenLogError}
-            className="btn btn-primary"
+            className="btn btn-success btn-sm"
           >
-            <PlusCircle className="h-3.5 w-3.5" />
+            <Plus className="h-3 w-3" />
             Log Error
           </button>
         </div>
