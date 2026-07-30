@@ -253,8 +253,12 @@ export const App: React.FC = () => {
         isRebuilding={isRebuilding}
       />
 
+      {/* Ambient Background Blur Glow Matching Splash Screen */}
+      <div className="absolute top-1/4 left-1/3 h-96 w-96 rounded-full bg-blue-600/10 blur-3xl pointer-events-none animate-pulse z-0" />
+      <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-sky-500/10 blur-3xl pointer-events-none z-0" />
+
       {/* Main View */}
-      <main className="flex-1 min-h-0 relative">
+      <main className="flex-1 min-h-0 relative z-10">
         <TabErrorBoundary key={activeTab}>
           {activeTab === 'explorer' && (
             <ErrorExplorer

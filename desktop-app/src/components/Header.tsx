@@ -46,12 +46,12 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="h-14 bg-slate-900 border-b border-slate-700 px-5 flex items-center justify-between shadow-xl relative z-40 flex-nowrap shrink-0 overflow-hidden">
       {/* Brand / Logo */}
       <div className="flex items-center space-x-2.5 shrink-0">
-        <div className="h-8 w-8 rounded-xl bg-blue-950 border border-blue-600/40 flex items-center justify-center shadow-md shrink-0">
-          <Layers className="h-4.5 w-4.5 text-blue-400" />
+        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-600 to-slate-900 border border-blue-400/50 flex items-center justify-center shadow-md shadow-blue-500/30 shrink-0">
+          <Layers className="h-4.5 w-4.5 text-white" />
         </div>
         <div className="shrink-0">
           <div className="flex items-center space-x-2">
-            <h1 className="font-bold text-sm tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-200">
+            <h1 className="font-bold text-sm tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-300">
               Recall
             </h1>
             <span className="text-[9px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-700/60 shadow-sm whitespace-nowrap">
@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
                 isActive
-                  ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30 border border-blue-400/50'
+                  ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-md shadow-blue-500/40 border border-blue-400/50'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >

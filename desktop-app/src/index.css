@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0F172A;
-  --surface: #1E293B;
-  --card: #334155;
+  --bg: #020617;
+  --surface: #0F172A;
+  --card: #1E293B;
 
   --primary: #3B82F6;
   --primary-hover: #2563EB;
@@ -15,7 +15,7 @@
   --text: #F8FAFC;
   --text-secondary: #94A3B8;
 
-  --border: #475569;
+  --border: #334155;
 }
 
 @layer base {
@@ -68,8 +68,8 @@
 }
 
 .pro-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 6px 20px -4px rgba(59, 130, 246, 0.3);
+  border-color: #3B82F6;
+  box-shadow: 0 6px 20px -4px rgba(59, 130, 246, 0.35);
   transform: translateY(-1px);
 }
 
@@ -83,29 +83,29 @@
 .pro-input:focus {
   outline: none;
   background-color: #334155;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
 }
 
 .pro-button-primary {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: #ffffff;
-  border: 1px solid var(--primary-hover);
+  border: 1px solid rgba(96, 165, 250, 0.4);
   transition: all 0.15s ease-in-out;
-  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 16px 0 rgba(59, 130, 246, 0.4);
 }
 
 .pro-button-primary:hover {
-  background-color: var(--primary-hover);
-  box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.5);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  box-shadow: 0 6px 22px 0 rgba(59, 130, 246, 0.55);
   transform: translateY(-1px);
 }
 
 /* Badges */
 .badge-blue, .badge-indigo, .badge-sky {
-  background-color: var(--surface);
-  color: var(--primary);
-  border: 1px solid var(--border);
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #60A5FA;
+  border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 .badge-emerald {
