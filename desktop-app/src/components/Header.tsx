@@ -50,13 +50,15 @@ export const Header: React.FC<HeaderProps> = ({
       {/* ── Title Bar ─────────────────────────────────────────────── */}
       <div className="tool-titlebar">
         {/* Brand */}
-        <div className="h-6 w-6 rounded bg-gradient-to-br from-blue-500 to-blue-900 flex items-center justify-center border border-blue-500/40 flex-shrink-0">
-          <Layers className="h-3.5 w-3.5 text-white" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <div className="h-7.5 w-7.5 rounded-lg bg-gradient-to-br from-blue-500 via-blue-600 to-blue-900 flex items-center justify-center border border-blue-400/50 shadow-md shadow-blue-500/20 flex-shrink-0">
+            <Layers className="h-4.5 w-4.5 text-white" />
+          </div>
+          <span className="text-sm font-extrabold text-white tracking-tight">Recall</span>
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-950 text-blue-300 border border-blue-700 select-none">
+            R1
+          </span>
         </div>
-        <span className="text-xs font-bold text-white tracking-tight">Recall</span>
-        <span className="text-[9px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 select-none">
-          R1
-        </span>
 
         <div className="flex-1" />
 
