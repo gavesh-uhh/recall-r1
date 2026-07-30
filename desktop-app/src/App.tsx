@@ -7,6 +7,7 @@ import { SessionLogger } from './components/SessionLogger';
 import { LogErrorModal } from './components/LogErrorModal';
 import { AddSolutionModal } from './components/AddSolutionModal';
 import { LinkErrorModal } from './components/LinkErrorModal';
+import { ConfirmModal } from './components/ConfirmModal';
 import { SplashScreen } from './components/SplashScreen';
 import {
   ErrorRecord,
@@ -76,6 +77,8 @@ export const App: React.FC = () => {
   const [isLogErrorOpen, setIsLogErrorOpen] = useState(false);
   const [addSolutionErrorId, setAddSolutionErrorId] = useState<number | null>(null);
   const [linkErrorSourceId, setLinkErrorSourceId] = useState<number | null>(null);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [isRebuilding, setIsRebuilding] = useState(false);
 
   // Toast notification
@@ -224,15 +227,19 @@ export const App: React.FC = () => {
   };
 
   const handleClearData = async () => {
+    setIsClearing(true);
     try {
       showToast('Clearing all database records...');
       await recallApi.clearDatabase();
       showToast('Cleared all errors, solutions, and debug sessions!');
       setSelectedError(null);
+      setIsClearConfirmOpen(false);
       await loadErrors();
       await loadSessions();
     } catch (err) {
       showToast('Error: Failed to clear database');
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -251,7 +258,7 @@ export const App: React.FC = () => {
           onOpenLogError={() => setIsLogErrorOpen(true)}
           onRebuildIndex={handleRebuildIndex}
           onSeedData={handleSeedData}
-          onClearData={handleClearData}
+          onClearData={() => setIsClearConfirmOpen(true)}
           isRebuilding={isRebuilding}
         />
 
@@ -321,6 +328,17 @@ export const App: React.FC = () => {
         errors={errors}
         onClose={() => setLinkErrorSourceId(null)}
         onSubmit={handleLinkErrors}
+      />
+      <ConfirmModal
+        isOpen={isClearConfirmOpen}
+        title="Clear Database"
+        message="Are you sure you want to delete all indexed error records, solution strategies, and debug sessions? This action cannot be undone."
+        confirmText="Clear All Data"
+        cancelText="Cancel"
+        variant="danger"
+        isSubmitting={isClearing}
+        onConfirm={handleClearData}
+        onClose={() => setIsClearConfirmOpen(false)}
       />
     </div>
   );
