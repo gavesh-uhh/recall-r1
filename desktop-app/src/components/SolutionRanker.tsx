@@ -74,7 +74,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
       <div className="tool-toolbar">
         <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <button
             onClick={() => setActiveTab('ranker')}
             className={`btn btn-sm ${activeTab === 'ranker' ? 'btn-primary' : 'btn-ghost'}`}

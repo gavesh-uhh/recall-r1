@@ -58,10 +58,10 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
         <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
 
-        <div className="vert-divider" style={{ height: 18, margin: '0 4px' }} />
+        <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
 
         {/* Layout selector */}
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
           {(['force', 'circular', 'grid'] as const).map((l) => (
             <button key={l} onClick={() => setGraphLayout(l)}
               className={`btn btn-sm ${graphLayout === l ? 'btn-primary' : 'btn-ghost'}`}>
@@ -70,11 +70,11 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
           ))}
         </div>
 
-        <div className="vert-divider" style={{ height: 18, margin: '0 4px' }} />
+        <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
 
         {/* Edge filter */}
-        <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)', marginRight: 2 }} />
           {(['all', 'patterns', 'tags'] as const).map((f) => (
             <button key={f} onClick={() => setEdgeFilter(f)}
               className={`btn btn-sm ${edgeFilter === f ? 'btn-primary' : 'btn-ghost'}`}>

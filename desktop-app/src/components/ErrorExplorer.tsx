@@ -70,10 +70,10 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           />
         </div>
 
-        <div className="vert-divider" style={{ height: 18 }} />
+        <div className="vert-divider" style={{ height: 18, margin: '0 8px' }} />
 
         {/* Project filter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
           <select
             value={selectedProject}
@@ -86,7 +86,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
         </div>
 
         {/* Language filter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <Code style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
           <select
             value={selectedLanguage}
