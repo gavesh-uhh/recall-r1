@@ -11,6 +11,7 @@ import {
   Database,
   AlertCircle,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { ErrorRecord } from '../types/api';
 import { ConfirmModal } from './ConfirmModal';
@@ -72,12 +73,32 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           <Search style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, color: 'var(--text-dim)' }} />
           <input
             type="text"
-            placeholder="Search signatures…"
+            placeholder="Search signatures, messages, projects, tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="tool-input mono"
-            style={{ width: '100%', paddingLeft: 24 }}
+            style={{ width: '100%', paddingLeft: 24, paddingRight: searchQuery ? 24 : 8 }}
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute',
+                right: 6,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                padding: 2,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <X style={{ width: 12, height: 12 }} />
+            </button>
+          )}
         </div>
 
         <div className="vert-divider" style={{ height: 18, margin: '0 8px' }} />

@@ -227,11 +227,6 @@ export class RecallApiService {
    * 5. GET /api/errors?project=&language=
    */
   public async getErrors(query = '', project = '', language = ''): Promise<ErrorRecord[]> {
-    if (query.trim()) {
-      const single = await this.searchBySignature(query.trim());
-      if (single) return [single];
-    }
-
     let endpoint = '/errors';
     const params = new URLSearchParams();
     if (project) params.append('project', project);
@@ -239,12 +234,27 @@ export class RecallApiService {
     if (params.toString()) endpoint += `?${params.toString()}`;
 
     const res = await this.executeRequest<ErrorRecord[]>(endpoint);
+    let list: ErrorRecord[] = [];
+
     if (res.ok && res.data) {
       this.isOnline = true;
-      return res.data.map((err) => this.attachDecayScores(err));
+      list = res.data.map((err) => this.attachDecayScores(err));
     }
 
-    return [];
+    // Comprehensive case-insensitive search across signature, message, project, language & tags
+    if (query.trim()) {
+      const q = query.trim().toLowerCase();
+      list = list.filter(
+        (err) =>
+          err.signature?.toLowerCase().includes(q) ||
+          err.message?.toLowerCase().includes(q) ||
+          err.project?.toLowerCase().includes(q) ||
+          err.language?.toLowerCase().includes(q) ||
+          err.tags?.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+
+    return list;
   }
 
   /**
