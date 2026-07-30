@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { ErrorRecord } from '../types/api';
+import { ConfirmModal } from './ConfirmModal';
 
 interface ErrorExplorerProps {
   errors: ErrorRecord[];
@@ -48,6 +49,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
   isOnline,
 }) => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const projects = Array.from(new Set(errors.map((e) => e.project)));
   const languages = Array.from(new Set(errors.map((e) => e.language)));
@@ -309,23 +311,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                 </div>
               </div>
 
-              {/* Delete Confirm */}
-              {deleteConfirmId && (
-                <div style={{ background: 'rgba(248,81,73,0.08)', border: '1px solid rgba(248,81,73,0.3)', borderRadius: 7, padding: '14px 16px' }}>
-                  <p style={{ fontSize: 11.5, color: '#f85149', fontWeight: 600, marginBottom: 10 }}>
-                    Delete error record #{deleteConfirmId}?
-                  </p>
-                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                    <button onClick={() => setDeleteConfirmId(null)} className="btn btn-ghost btn-sm">Cancel</button>
-                    <button
-                      onClick={async () => { await onDeleteError(deleteConfirmId); setDeleteConfirmId(null); }}
-                      className="btn btn-danger btn-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)' }}>
@@ -335,6 +320,27 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={deleteConfirmId !== null}
+        title="Delete Error Record"
+        message={`Are you sure you want to delete Error #${deleteConfirmId}${selectedError ? ` (${selectedError.signature})` : ''}? All attached fix strategies and pattern linkages for this error will be permanently removed.`}
+        confirmText="Delete Error"
+        cancelText="Cancel"
+        variant="danger"
+        isSubmitting={isDeleting}
+        onConfirm={async () => {
+          if (!deleteConfirmId) return;
+          setIsDeleting(true);
+          try {
+            await onDeleteError(deleteConfirmId);
+            setDeleteConfirmId(null);
+          } finally {
+            setIsDeleting(false);
+          }
+        }}
+        onClose={() => setDeleteConfirmId(null)}
+      />
     </div>
   );
 };
