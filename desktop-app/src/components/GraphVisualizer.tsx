@@ -84,8 +84,8 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
         </div>
 
         <div style={{ marginLeft: 'auto' }}>
-          <button onClick={onOpenLinkModal} disabled={errors.length === 0} className="btn btn-primary">
-            <Link style={{ width: 12, height: 12 }} />
+          <button onClick={onOpenLinkModal} disabled={errors.length === 0} className="btn btn-primary btn-sm">
+            <Link style={{ width: 11, height: 11 }} />
             Link Errors
           </button>
         </div>
