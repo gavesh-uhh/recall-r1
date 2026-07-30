@@ -61,7 +61,7 @@ const createWindow = (): void => {
     height: 720,
     minWidth: 1280,
     minHeight: 720,
-    title: 'Recall — Error Memory Hub',
+    title: 'Recall',
     backgroundColor: '#000000',
     autoHideMenuBar: true,
     show: false, // Show when ready to avoid visual flicker

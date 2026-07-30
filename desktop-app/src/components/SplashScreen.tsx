@@ -45,9 +45,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center select-none transition-opacity duration-300 ${
-        isFading ? 'opacity-0 pointer-events-none' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center select-none transition-opacity duration-300 ${isFading ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
     >
       {/* Background Subtle Gradient Glow */}
       <div className="absolute h-96 w-96 rounded-full bg-blue-600/10 blur-3xl animate-pulse pointer-events-none" />
@@ -58,7 +57,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
         <div className="relative flex items-center justify-center">
           {/* Outer Pulsing Ring */}
           <div className="absolute h-20 w-20 rounded-2xl bg-blue-500/20 animate-ping" />
-          
+
           <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-600 to-slate-900 border border-blue-400/50 flex items-center justify-center shadow-2xl shadow-blue-500/30">
             <Layers className="h-8 w-8 text-white animate-bounce" />
           </div>
