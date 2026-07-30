@@ -30,6 +30,8 @@ interface ErrorExplorerProps {
   onLinkError: (errorId: number) => void;
   onOpenLogError: () => void;
   isOnline: boolean;
+  availableProjects?: string[];
+  availableLanguages?: string[];
 }
 
 export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
@@ -47,12 +49,18 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
   onLinkError,
   onOpenLogError,
   isOnline,
+  availableProjects = [],
+  availableLanguages = [],
 }) => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const projects = Array.from(new Set(errors.map((e) => e.project)));
-  const languages = Array.from(new Set(errors.map((e) => e.language)));
+  const projects = Array.from(
+    new Set([...errors.map((e) => e.project).filter(Boolean), ...availableProjects])
+  );
+  const languages = Array.from(
+    new Set([...errors.map((e) => e.language).filter(Boolean), ...availableLanguages])
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>

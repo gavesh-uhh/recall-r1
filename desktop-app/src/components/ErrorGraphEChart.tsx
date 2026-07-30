@@ -119,19 +119,27 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
 
   const nodesList = Array.from(nodesMap.values());
 
-  // Calculate position coordinates for Grid / Concentric radial layout
+  // Calculate position coordinates for Grid / Concentric radial layout or Force static layout
+  const total = nodesList.length;
   if (graphLayout === 'grid') {
-    const total = nodesList.length;
     const radius = Math.max(180, total * 30);
     nodesList.forEach((node, idx) => {
       const angle = (idx / (total || 1)) * 2 * Math.PI;
       node.x = Math.cos(angle) * radius + 400;
       node.y = Math.sin(angle) * radius + 300;
     });
+  } else if (graphLayout === 'force') {
+    // Golden angle spiral distribution to give deterministic static initial positions
+    nodesList.forEach((node, idx) => {
+      const angle = idx * 137.5 * (Math.PI / 180);
+      const r = Math.sqrt(idx + 1) * 60 + 40;
+      node.x = Math.cos(angle) * r + 400;
+      node.y = Math.sin(angle) * r + 300;
+    });
   }
 
   const echartsLayoutMode =
-    graphLayout === 'circular' ? 'circular' : graphLayout === 'grid' ? 'none' : 'force';
+    graphLayout === 'circular' ? 'circular' : graphLayout === 'grid' ? 'none' : 'none';
 
   const option: echarts.EChartsOption = {
     animation: false,
@@ -146,7 +154,7 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
           return `<div class="font-mono p-1">
             <div class="text-blue-400 font-bold">${params.data.fullName || params.data.name}</div>
             <div class="text-slate-300 text-xs mt-1">${params.data.value}</div>
-            <div class="text-blue-400/80 text-[10px] mt-1">Click node to inspect BFS neighborhood</div>
+            <div class="text-blue-400/80 text-[10px] mt-1">Click node to inspect related error network</div>
           </div>`;
         } else if (params.dataType === 'edge') {
           return `<div class="font-mono text-xs text-sky-300 p-1">
@@ -194,8 +202,8 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
         force: {
           repulsion: 300,
           edgeLength: [100, 160],
-          gravity: 0.2,
-          friction: 0.6,
+          gravity: 0,
+          friction: 1.0,
           layoutAnimation: false,
         },
         emphasis: {

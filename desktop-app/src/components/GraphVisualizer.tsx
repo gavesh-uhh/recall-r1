@@ -142,7 +142,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
               <div>
                 <div className="section-label" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                   <GitCommit style={{ width: 11, height: 11 }} />
-                  BFS Neighborhood (depth ≤ 2)
+                  Related Error Network
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {relatedErrors.length > 0 ? (
@@ -168,13 +168,11 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                   )}
                 </div>
               </div>
-
-              </div>
             </>
           ) : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 40 }}>
               <Network style={{ width: 28, height: 28, opacity: 0.2 }} />
-              <span style={{ fontSize: 11, textAlign: 'center' }}>Click a node to inspect its BFS neighborhood</span>
+              <span style={{ fontSize: 11, textAlign: 'center' }}>Click a node to inspect its related error network</span>
             </div>
           )}
         </div>

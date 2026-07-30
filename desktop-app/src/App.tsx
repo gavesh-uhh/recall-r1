@@ -4,6 +4,7 @@ import { ErrorExplorer } from './components/ErrorExplorer';
 import { SolutionRanker } from './components/SolutionRanker';
 import { GraphVisualizer } from './components/GraphVisualizer';
 import { SessionLogger } from './components/SessionLogger';
+import { ProjectLanguageManager } from './components/ProjectLanguageManager';
 import { LogErrorModal } from './components/LogErrorModal';
 import { AddSolutionModal } from './components/AddSolutionModal';
 import { LinkErrorModal } from './components/LinkErrorModal';
@@ -73,10 +74,96 @@ export const App: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
 
+  // Custom added projects & languages (synced with backend DB & localStorage fallback)
+  const [customProjects, setCustomProjects] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('recall_custom_projects');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [customLanguages, setCustomLanguages] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('recall_custom_languages');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const loadBackendMetadata = useCallback(async () => {
+    try {
+      const [backendProjects, backendLanguages] = await Promise.all([
+        recallApi.getProjects(),
+        recallApi.getLanguages(),
+      ]);
+      if (backendProjects.length > 0) {
+        setCustomProjects((prev) => Array.from(new Set([...prev, ...backendProjects])));
+      }
+      if (backendLanguages.length > 0) {
+        setCustomLanguages((prev) => Array.from(new Set([...prev, ...backendLanguages])));
+      }
+    } catch (err) {
+      console.warn('Backend metadata load offline, using local cache:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBackendMetadata();
+  }, [loadBackendMetadata]);
+
+  const handleAddProject = async (name: string) => {
+    if (!customProjects.includes(name)) {
+      setCustomProjects((prev) => {
+        const next = Array.from(new Set([...prev, name]));
+        try { localStorage.setItem('recall_custom_projects', JSON.stringify(next)); } catch {}
+        return next;
+      });
+      try {
+        await recallApi.createProject(name);
+        showToast(`Persisted project "${name}" to backend database!`);
+      } catch (err) {
+        showToast(`Saved project "${name}" locally`);
+      }
+    }
+  };
+
+  const handleAddLanguage = async (name: string) => {
+    if (!customLanguages.includes(name)) {
+      setCustomLanguages((prev) => {
+        const next = Array.from(new Set([...prev, name]));
+        try { localStorage.setItem('recall_custom_languages', JSON.stringify(next)); } catch {}
+        return next;
+      });
+      try {
+        await recallApi.createLanguage(name);
+        showToast(`Persisted language "${name}" to backend database!`);
+      } catch (err) {
+        showToast(`Registered language "${name}" locally`);
+      }
+    }
+  };
+
+  const availableProjects = Array.from(
+    new Set([...errors.map((e) => e.project).filter(Boolean), ...customProjects])
+  );
+
+  const availableLanguages = Array.from(
+    new Set([...errors.map((e) => e.language).filter(Boolean), ...customLanguages])
+  );
+
   // Modals
   const [isLogErrorOpen, setIsLogErrorOpen] = useState(false);
+  const [logErrorPreset, setLogErrorPreset] = useState<{ project?: string; language?: string }>({});
   const [addSolutionErrorId, setAddSolutionErrorId] = useState<number | null>(null);
   const [linkErrorSourceId, setLinkErrorSourceId] = useState<number | null>(null);
+
+  const handleOpenLogErrorWithPreset = (project?: string, language?: string) => {
+    setLogErrorPreset({ project, language });
+    setIsLogErrorOpen(true);
+  };
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [isRebuilding, setIsRebuilding] = useState(false);
@@ -136,11 +223,11 @@ export const App: React.FC = () => {
   const handleCreateError = async (req: CreateErrorRequest) => {
     try {
       const created = await recallApi.createError(req);
-      showToast(`Logged error "${created.signature}" in backend AVL index!`);
+      showToast(`Logged error "${created.signature}" successfully!`);
       await loadErrors();
       setSelectedError(created);
     } catch (err) {
-      showToast('Error: Failed to connect to Spring Boot backend');
+      showToast('Error: Failed to connect to backend');
       console.error(err);
     }
   };
@@ -192,7 +279,7 @@ export const App: React.FC = () => {
   const handleLinkErrors = async (sourceId: number, targetId: number) => {
     try {
       await recallApi.linkErrors(sourceId, targetId);
-      showToast(`Linked Error #${sourceId} ↔ Error #${targetId} in Graph index`);
+      showToast(`Linked Error #${sourceId} ↔ Error #${targetId}`);
       await loadErrors();
     } catch (err) {
       showToast('Error: Link failed');
@@ -203,7 +290,7 @@ export const App: React.FC = () => {
     setIsRebuilding(true);
     try {
       await recallApi.rebuildIndex();
-      showToast('Rebuilt in-memory AVL & Graph indexes from storage!');
+      showToast('Rebuilt in-memory search index from storage!');
       await checkHealthStatus();
       await loadErrors();
     } catch (err) {
@@ -280,6 +367,22 @@ export const App: React.FC = () => {
                 onLinkError={(id) => setLinkErrorSourceId(id)}
                 onOpenLogError={() => setIsLogErrorOpen(true)}
                 isOnline={health.status === 'ok'}
+                availableProjects={availableProjects}
+                availableLanguages={availableLanguages}
+              />
+            )}
+
+            {activeTab === 'projects' && (
+              <ProjectLanguageManager
+                errors={errors}
+                setActiveTab={setActiveTab}
+                setSelectedProject={setSelectedProject}
+                setSelectedLanguage={setSelectedLanguage}
+                onOpenLogError={handleOpenLogErrorWithPreset}
+                customProjects={customProjects}
+                customLanguages={customLanguages}
+                onAddProject={handleAddProject}
+                onAddLanguage={handleAddLanguage}
               />
             )}
 
@@ -313,8 +416,15 @@ export const App: React.FC = () => {
       {/* Modals */}
       <LogErrorModal
         isOpen={isLogErrorOpen}
-        onClose={() => setIsLogErrorOpen(false)}
+        onClose={() => {
+          setIsLogErrorOpen(false);
+          setLogErrorPreset({});
+        }}
         onSubmit={handleCreateError}
+        initialProject={logErrorPreset.project}
+        initialLanguage={logErrorPreset.language}
+        availableProjects={availableProjects}
+        availableLanguages={availableLanguages}
       />
       <AddSolutionModal
         isOpen={addSolutionErrorId !== null}

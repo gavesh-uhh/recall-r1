@@ -248,6 +248,50 @@ export class RecallApiService {
   }
 
   /**
+   * GET /api/projects - fetch all distinct projects from backend DB
+   */
+  public async getProjects(): Promise<string[]> {
+    const res = await this.executeRequest<string[]>('/projects');
+    if (res.ok && res.data) {
+      return res.data;
+    }
+    return [];
+  }
+
+  /**
+   * POST /api/projects - save custom project entity in backend DB
+   */
+  public async createProject(name: string): Promise<boolean> {
+    const res = await this.executeRequest('/projects', {
+      method: 'POST',
+      body: { name },
+    });
+    return res.ok;
+  }
+
+  /**
+   * GET /api/languages - fetch all distinct languages from backend DB
+   */
+  public async getLanguages(): Promise<string[]> {
+    const res = await this.executeRequest<string[]>('/languages');
+    if (res.ok && res.data) {
+      return res.data;
+    }
+    return [];
+  }
+
+  /**
+   * POST /api/languages - save custom language entity in backend DB
+   */
+  public async createLanguage(name: string): Promise<boolean> {
+    const res = await this.executeRequest('/languages', {
+      method: 'POST',
+      body: { name },
+    });
+    return res.ok;
+  }
+
+  /**
    * 6. DELETE /api/errors/{id}
    */
   public async deleteError(id: number): Promise<boolean> {

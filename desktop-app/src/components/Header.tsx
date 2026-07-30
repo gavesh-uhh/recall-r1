@@ -11,6 +11,7 @@ import {
   Database,
   Trash2,
   Activity,
+  Boxes,
 } from 'lucide-react';
 import { HealthStatus } from '../types/api';
 
@@ -54,10 +55,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isRebuilding,
 }) => {
   const items = [
-    { id: 'explorer',  label: 'Error Explorer',  icon: FolderSearch, badge: 'AVL' },
-    { id: 'solutions', label: 'Solution Ranker', icon: Award,        badge: 'Heap' },
-    { id: 'patterns',  label: 'Pattern Graph',   icon: GitFork,      badge: 'Graph' },
-    { id: 'sessions',  label: 'Debug Sessions',  icon: History,      badge: 'Log' },
+    { id: 'explorer',  label: 'Error Explorer',       icon: FolderSearch },
+    { id: 'projects',  label: 'Projects & Stack',     icon: Boxes },
+    { id: 'solutions', label: 'Solution Ranker',      icon: Award },
+    { id: 'patterns',  label: 'Pattern Graph',        icon: GitFork },
+    { id: 'sessions',  label: 'Debug Sessions',       icon: History },
   ];
 
   const isOnline = health.status === 'ok';
@@ -106,7 +108,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Icon className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="truncate">{item.label}</span>
-            <span className={`item-badge ${isActive ? 'active' : ''}`}>{item.badge}</span>
           </div>
         );
       })}

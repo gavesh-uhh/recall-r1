@@ -4,9 +4,13 @@ import com.recall.dto.DebugSessionRequest;
 import com.recall.dto.SolutionRequest;
 import com.recall.entity.ErrorRecord;
 import com.recall.entity.ErrorRelation;
+import com.recall.entity.Language;
+import com.recall.entity.Project;
 import com.recall.repository.DebugSessionRepository;
 import com.recall.repository.ErrorRecordRepository;
 import com.recall.repository.ErrorRelationRepository;
+import com.recall.repository.LanguageRepository;
+import com.recall.repository.ProjectRepository;
 import com.recall.repository.SolutionRepository;
 import com.recall.service.DebugSessionService;
 import com.recall.service.ErrorRecordService;
@@ -34,6 +38,8 @@ public class SampleDataLoader implements CommandLineRunner {
     private final ErrorRelationRepository errorRelationRepository;
     private final SolutionRepository solutionRepository;
     private final DebugSessionRepository debugSessionRepository;
+    private final ProjectRepository projectRepository;
+    private final LanguageRepository languageRepository;
     private final ErrorRecordService errorRecordService;
     private final SolutionService solutionService;
     private final DebugSessionService debugSessionService;
@@ -43,6 +49,8 @@ public class SampleDataLoader implements CommandLineRunner {
                             ErrorRelationRepository errorRelationRepository,
                             SolutionRepository solutionRepository,
                             DebugSessionRepository debugSessionRepository,
+                            ProjectRepository projectRepository,
+                            LanguageRepository languageRepository,
                             ErrorRecordService errorRecordService,
                             SolutionService solutionService,
                             DebugSessionService debugSessionService,
@@ -51,6 +59,8 @@ public class SampleDataLoader implements CommandLineRunner {
         this.errorRelationRepository = errorRelationRepository;
         this.solutionRepository = solutionRepository;
         this.debugSessionRepository = debugSessionRepository;
+        this.projectRepository = projectRepository;
+        this.languageRepository = languageRepository;
         this.errorRecordService = errorRecordService;
         this.solutionService = solutionService;
         this.debugSessionService = debugSessionService;
@@ -69,11 +79,13 @@ public class SampleDataLoader implements CommandLineRunner {
 
     @Transactional
     public synchronized void clearAllData() {
-        log.info("Clearing all records, solutions, relations, and sessions from database...");
+        log.info("Clearing all records, solutions, relations, sessions, projects, and languages from database...");
         solutionRepository.deleteAll();
         errorRelationRepository.deleteAll();
         debugSessionRepository.deleteAll();
         errorRecordRepository.deleteAll();
+        projectRepository.deleteAll();
+        languageRepository.deleteAll();
         indexBootstrapService.rebuild();
         log.info("Database and in-memory indexes cleared successfully.");
     }
@@ -85,6 +97,21 @@ public class SampleDataLoader implements CommandLineRunner {
 
     public synchronized void seedData() {
         log.info("Starting sample data population...");
+
+        // 0. Seed Projects & Languages
+        Arrays.asList("auth-service", "api-gateway", "payment-processor", "desktop-app", "analytics-engine", "notification-service", "billing-api")
+                .forEach(name -> {
+                    if (!projectRepository.existsByNameIgnoreCase(name)) {
+                        projectRepository.save(new Project(name));
+                    }
+                });
+
+        Arrays.asList("TypeScript", "JavaScript", "Java", "Python", "Go", "Rust", "C#", "C++")
+                .forEach(name -> {
+                    if (!languageRepository.existsByNameIgnoreCase(name)) {
+                        languageRepository.save(new Language(name));
+                    }
+                });
 
         // 1. UserAuthService NPE
         ErrorRecord e1 = new ErrorRecord();
