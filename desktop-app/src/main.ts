@@ -57,10 +57,10 @@ ipcMain.handle(
 const createWindow = (): void => {
   // Create the browser window with dark theme styling.
   const mainWindow = new BrowserWindow({
-    width: 1380,
-    height: 820,
-    minWidth: 1080,
-    minHeight: 680,
+    width: 1280,
+    height: 720,
+    minWidth: 1280,
+    minHeight: 720,
     title: 'Recall — Error Memory Hub',
     backgroundColor: '#000000',
     autoHideMenuBar: true,
