@@ -106,7 +106,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
       {/* Main Content Split Pane */}
       <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
         {/* Error Cards List (7 Cols) */}
-        <div className="col-span-7 flex flex-col space-y-2.5 overflow-y-auto pr-1">
+        <div className="col-span-7 flex flex-col space-y-3 overflow-y-auto pt-1 px-1 pr-2">
           {!isOnline ? (
             <div className="pro-panel p-10 rounded-xl text-center flex flex-col items-center justify-center space-y-3">
               <AlertCircle className="h-8 w-8 text-rose-400" />

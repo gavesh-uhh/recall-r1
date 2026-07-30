@@ -88,18 +88,17 @@ export const App: React.FC = () => {
     try {
       const data = await recallApi.getErrors(searchQuery, selectedProject, selectedLanguage);
       setErrors(data);
-      if (selectedError) {
-        const updated = data.find((e) => e.id === selectedError.id);
-        if (updated) setSelectedError(updated);
-      } else if (data.length > 0) {
-        setSelectedError(data[0]);
-      } else {
-        setSelectedError(null);
-      }
+      setSelectedError((prev) => {
+        if (prev) {
+          const updated = data.find((e) => e.id === prev.id);
+          return updated || (data.length > 0 ? data[0] : null);
+        }
+        return data.length > 0 ? data[0] : null;
+      });
     } catch (err) {
       console.error('Failed to load errors:', err);
     }
-  }, [searchQuery, selectedProject, selectedLanguage, selectedError]);
+  }, [searchQuery, selectedProject, selectedLanguage]);
 
   const loadSessions = useCallback(async () => {
     try {

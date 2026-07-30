@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Code, Terminal, Tag, FileText, CheckCircle2, Layers } from 'lucide-react';
+import { X, Code, Terminal, Tag, FileText, CheckCircle2, Layers, Zap, ArrowLeft } from 'lucide-react';
 import { CreateErrorRequest } from '../types/api';
 
 interface LogErrorModalProps {
@@ -56,139 +56,230 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
     }
   };
 
+  const parsedTags = tagsInput
+    .split(',')
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="pro-panel w-full max-w-xl rounded-xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-900">
-          <div className="flex items-center space-x-2">
-            <div className="p-1.5 rounded bg-sky-950 text-sky-400 border border-sky-800">
+    <div className="fixed inset-0 z-50 bg-slate-900 text-slate-100 flex flex-col h-screen w-screen overflow-hidden select-none animate-fade-in">
+      {/* Top Compact Navigation Header */}
+      <header className="bg-slate-900 border-b border-slate-700/80 px-6 py-3 flex items-center justify-between shadow-xl flex-shrink-0">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={onClose}
+            className="flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-700 transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Workspace</span>
+          </button>
+
+          <div className="h-5 w-[1px] bg-slate-700" />
+
+          <div className="flex items-center space-x-3">
+            <div className="p-1.5 rounded-xl bg-blue-950 text-blue-400 border border-blue-600/40 shadow-md">
               <Layers className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white">Log Error & Fix Strategy</h2>
-              <p className="text-xs text-slate-400">Save error signature for indexing into O(log n) AVL Tree</p>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-sm font-bold text-white tracking-tight">Log Error & Fix Strategy</h1>
+                <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-700">
+                  AVL O(log n)
+                </span>
+              </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-3.5 max-h-[80vh] overflow-y-auto">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center space-x-1">
-              <Terminal className="h-3.5 w-3.5 text-sky-400" />
-              <span>Error Signature *</span>
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. NullPointerException:userService.load"
-              value={signature}
-              onChange={(e) => setSignature(e.target.value)}
-              className="pro-input w-full px-3 py-2 rounded-lg text-xs font-mono"
-            />
-            <p className="text-[11px] text-slate-500 mt-1">Signature indexed in backend AVL Tree.</p>
-          </div>
+        <button
+          onClick={onClose}
+          className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition"
+          title="Close Full Screen"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </header>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center space-x-1">
-              <FileText className="h-3.5 w-3.5 text-slate-400" />
-              <span>Detailed Exception Message *</span>
-            </label>
-            <textarea
-              required
-              rows={2}
-              placeholder="e.g. Cannot invoke getName() because user is null"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="pro-input w-full px-3 py-2 rounded-lg text-xs font-mono"
-            />
-          </div>
+      {/* Main Screen-Fitting Form Workspace */}
+      <div className="flex-1 min-h-0 p-5 overflow-hidden flex flex-col justify-center">
+        <form onSubmit={handleSubmit} className="max-w-7xl mx-auto w-full grid grid-cols-12 gap-5 h-full min-h-0 items-stretch">
+          {/* Left Column: Exception Details & Context (7 Cols) */}
+          <div className="col-span-7 flex flex-col space-y-4 min-h-0">
+            {/* Step 1: Exception Info */}
+            <div className="pro-panel p-5 rounded-2xl space-y-3 flex-1 flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-2">
+                  <Terminal className="h-3.5 w-3.5 text-blue-400" />
+                  <span>1. Exception Signature & Stack Trace</span>
+                </h3>
+                <span className="text-[10px] font-mono text-blue-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                  Required
+                </span>
+              </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center space-x-1">
-                <Code className="h-3.5 w-3.5 text-sky-400" />
-                <span>Language / Framework *</span>
-              </label>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="pro-input w-full px-3 py-2 rounded-lg text-xs bg-slate-900"
-              >
-                <option value="java">Java (Spring Boot)</option>
-                <option value="typescript">TypeScript / Node</option>
-                <option value="python">Python</option>
-                <option value="go">Go</option>
-                <option value="rust">Rust</option>
-                <option value="csharp">C# / .NET</option>
-              </select>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  Error Signature *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. NullPointerException in UserAuthService.authenticate"
+                  value={signature}
+                  onChange={(e) => setSignature(e.target.value)}
+                  className="pro-input w-full px-3 py-2 rounded-xl text-xs font-mono text-white placeholder-slate-500"
+                />
+              </div>
+
+              <div className="flex-1 flex flex-col">
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center space-x-1.5">
+                  <FileText className="h-3.5 w-3.5 text-slate-400" />
+                  <span>Detailed Exception Message & Stack Trace *</span>
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="e.g. java.lang.NullPointerException: Cannot invoke getPasswordHash() because user is null at UserAuthService.java:42"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="pro-input w-full flex-1 px-3 py-2 rounded-xl text-xs font-mono text-white placeholder-slate-500 leading-relaxed resize-none"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Project Name *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. user-service-v2"
-                value={project}
-                onChange={(e) => setProject(e.target.value)}
-                className="pro-input w-full px-3 py-2 rounded-lg text-xs"
-              />
+            {/* Step 2: Categorization */}
+            <div className="pro-panel p-5 rounded-2xl space-y-3 flex-shrink-0">
+              <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-2">
+                  <Code className="h-3.5 w-3.5 text-blue-400" />
+                  <span>2. Project & Categorization</span>
+                </h3>
+                <span className="text-[10px] font-mono text-blue-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                  Metadata
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    Language / Framework *
+                  </label>
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    className="pro-input w-full px-3 py-2 rounded-xl text-xs font-medium cursor-pointer"
+                  >
+                    <option value="java">Java (Spring Boot)</option>
+                    <option value="typescript">TypeScript / Node</option>
+                    <option value="python">Python</option>
+                    <option value="go">Go</option>
+                    <option value="rust">Rust</option>
+                    <option value="csharp">C# / .NET</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    Project Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. auth-service"
+                    value={project}
+                    onChange={(e) => setProject(e.target.value)}
+                    className="pro-input w-full px-3 py-2 rounded-xl text-xs font-mono text-white placeholder-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center space-x-1.5">
+                  <Tag className="h-3.5 w-3.5 text-slate-400" />
+                  <span>Search Tags (comma separated)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. null-pointer, auth, spring-boot, security"
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  className="pro-input w-full px-3 py-2 rounded-xl text-xs font-mono text-white placeholder-slate-500"
+                />
+              </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center space-x-1">
-              <Tag className="h-3.5 w-3.5 text-slate-400" />
-              <span>Tags (comma separated)</span>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. npe, auth, spring-boot"
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-              className="pro-input w-full px-3 py-2 rounded-lg text-xs"
-            />
-          </div>
+          {/* Right Column: Initial Solution & Realtime Preview (5 Cols) */}
+          <div className="col-span-5 flex flex-col h-full min-h-0">
+            <div className="pro-panel p-5 rounded-2xl flex-1 flex flex-col justify-between space-y-3 min-h-0">
+              <div className="space-y-3 flex-1 flex flex-col min-h-0">
+                <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+                  <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span>Initial Fix Strategy (Optional)</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                    MaxHeap
+                  </span>
+                </div>
 
-          <div className="pt-2 border-t border-slate-800">
-            <label className="block text-xs font-semibold text-emerald-400 mb-1 flex items-center space-x-1">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Initial Successful Fix Strategy (Optional)</span>
-            </label>
-            <textarea
-              rows={2}
-              placeholder="What fix worked?"
-              value={initialSolution}
-              onChange={(e) => setInitialSolution(e.target.value)}
-              className="pro-input w-full px-3 py-2 rounded-lg text-xs text-slate-200"
-            />
-          </div>
+                <div className="flex-1 flex flex-col min-h-0">
+                  <textarea
+                    rows={4}
+                    placeholder="e.g. Add null check on user repository lookup before attempting password verification. Return Optional.empty() for unknown users."
+                    value={initialSolution}
+                    onChange={(e) => setInitialSolution(e.target.value)}
+                    className="pro-input w-full flex-1 px-3 py-2.5 rounded-xl text-xs text-slate-100 placeholder-slate-500 leading-relaxed resize-none"
+                  />
+                </div>
 
-          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3.5 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="pro-button-primary text-xs font-semibold px-4 py-2 rounded-lg disabled:opacity-50"
-            >
-              {isSubmitting ? 'Indexing...' : 'Log & Index Error'}
-            </button>
+                {/* Realtime Live Preview Card */}
+                <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2 flex-shrink-0">
+                  <div className="text-[10px] font-mono text-blue-400 uppercase tracking-wider font-bold">
+                    Indexing Live Preview
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-bold text-white font-mono truncate">
+                      {signature || 'Signature Preview'}
+                    </div>
+                    <div className="flex items-center space-x-2 text-[11px] text-slate-400 font-mono">
+                      <span>Project: {project || 'project-name'}</span>
+                      <span>•</span>
+                      <span className="uppercase text-blue-400">{language}</span>
+                    </div>
+                  </div>
+
+                  {parsedTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                      {parsedTags.map((tag) => (
+                        <span key={tag} className="text-[10px] badge-dark px-1.5 py-0.5 rounded font-mono">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Primary Form Action Buttons */}
+              <div className="flex items-center space-x-3 pt-3 border-t border-slate-700 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition border border-slate-700 text-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 pro-button-primary py-2 rounded-xl text-xs font-bold shadow-lg transition disabled:opacity-50 flex items-center justify-center space-x-2"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>{isSubmitting ? 'Indexing...' : 'Log & Index Error'}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
