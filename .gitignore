@@ -44,6 +44,7 @@ build/
 .claude/
 logs/
 *.log
+*.cmd
 .cache/
 .env
 .env.local
