@@ -24,7 +24,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
   const [activeTab, setActiveTab] = useState<'ranker' | 'simulator'>('ranker');
   const [fetchedSolutions, setFetchedSolutions] = useState<Solution[]>([]);
 
-  // Simulator state
   const [simSuccessCount, setSimSuccessCount] = useState<number>(10);
   const [simFailureCount, setSimFailureCount] = useState<number>(1);
   const [simDaysAgo, setSimDaysAgo] = useState<number>(4);
@@ -52,7 +51,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
     }
   }, [selectedErrorId]);
 
-  // Use freshly fetched solutions if available, else immediately render in-memory solutions with ZERO flicker
   const activeSolutions = fetchedSolutions.length > 0
     ? fetchedSolutions
     : (selectedError?.solutions || []);
@@ -70,7 +68,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* Toolbar */}
       <div className="tool-toolbar">
         <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
@@ -94,7 +91,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
 
       {activeTab === 'ranker' ? (
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          {/* Error Selector List */}
           <div style={{ width: 300, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
             <div className="section-label" style={{ padding: '18px 20px 10px' }}>Error Record</div>
             {errors.length === 0 ? (
@@ -129,7 +125,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
             )}
           </div>
 
-          {/* Solutions & Feedback Panel */}
           <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             {selectedError ? (
               <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -211,7 +206,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
           </div>
         </div>
       ) : (
-        /* Simulator */
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
           <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -289,7 +283,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
             </div>
           </div>
 
-          {/* ECharts Decay Plot */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '24px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 14, marginBottom: 18 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

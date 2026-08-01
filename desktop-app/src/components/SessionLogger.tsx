@@ -53,7 +53,6 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      {/* Toolbar */}
       <div className="tool-toolbar">
         <History style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Debug Sessions</span>
@@ -66,7 +65,6 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
         </div>
       </div>
 
-      {/* Session List */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {sessions.length === 0 ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 60 }}>
@@ -126,7 +124,6 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
         )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 50,
@@ -136,7 +133,6 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
           className="fade-in"
         >
           <div className="tool-panel" style={{ width: '100%', maxWidth: 520, padding: '20px 24px', borderRadius: 8 }}>
-            {/* Modal Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
               <Clock style={{ width: 14, height: 14, color: 'var(--primary)' }} />
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Log Debug Session</span>

@@ -90,7 +90,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-[var(--bg)] text-[var(--text)] flex flex-col h-screen w-screen overflow-hidden select-none animate-fade-in">
-      {/* Top Compact Navigation Header */}
       <header className="bg-[var(--surface)] border-b border-[var(--border)] px-6 py-3.5 flex items-center justify-between shadow-xl flex-shrink-0">
         <div className="flex items-center space-x-4">
           <button
@@ -127,12 +126,9 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
         </button>
       </header>
 
-      {/* Main Screen-Fitting Form Workspace */}
       <div className="flex-1 min-h-0 p-6 overflow-y-auto flex flex-col justify-center">
         <form onSubmit={handleSubmit} className="max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 h-full min-h-0 items-stretch">
-          {/* Left Column: Exception Details & Context (7 Cols) */}
           <div className="col-span-7 flex flex-col space-y-5 min-h-0">
-            {/* Step 1: Exception Info */}
             <div className="pro-panel p-5 rounded-2xl space-y-3.5 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5">
                 <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center space-x-2">
@@ -174,7 +170,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
               </div>
             </div>
 
-            {/* Step 2: Categorization */}
             <div className="pro-panel p-5 rounded-2xl space-y-3.5 flex-shrink-0">
               <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5">
                 <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center space-x-2">
@@ -196,7 +191,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                     onChange={(e) => setLanguage(e.target.value)}
                     className="pro-input w-full px-3.5 py-2.5 rounded-xl text-xs font-medium cursor-pointer capitalize"
                   >
-                    {/* Standard Presets */}
                     <option value="typescript">TypeScript / Node.js</option>
                     <option value="javascript">JavaScript / React</option>
                     <option value="java">Java (Spring Boot)</option>
@@ -208,7 +202,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                     <option value="php">PHP</option>
                     <option value="ruby">Ruby</option>
                     <option value="kotlin">Kotlin</option>
-                    {/* Custom registered languages */}
                     {availableLanguages
                       .filter(
                         (l) =>
@@ -243,7 +236,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                     ))}
                   </datalist>
 
-                  {/* Quick Project Select Pills */}
                   {availableProjects.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2 items-center">
                       <span className="text-[10px] text-slate-400 font-mono">Quick Pick:</span>
@@ -284,7 +276,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Initial Solution & Realtime Preview (5 Cols) */}
           <div className="col-span-5 flex flex-col h-full min-h-0">
             <div className="pro-panel p-5 rounded-2xl flex-1 flex flex-col justify-between space-y-4 min-h-0">
               <div className="space-y-3.5 flex-1 flex flex-col min-h-0">
@@ -305,7 +296,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                   />
                 </div>
 
-                {/* Realtime Live Preview Card */}
                 <div className="bg-[var(--bg)] p-3.5 rounded-xl border border-[var(--border)] space-y-2 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-blue-400 uppercase tracking-wider font-bold">
@@ -336,7 +326,6 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                 </div>
               </div>
 
-              {/* Primary Form Action Buttons */}
               <div className="flex items-center space-x-3 pt-3 border-t border-[var(--border)] flex-shrink-0">
                 <button
                   type="button"

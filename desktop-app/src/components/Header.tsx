@@ -30,8 +30,6 @@ export const Header: React.FC<HeaderProps> = () => {
   return null;
 };
 
-/* ── Sidebar Nav ──────────────────────────────────────────────────── */
-
 export interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -66,7 +64,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <div className="tool-sidebar">
-      {/* Prominent Sidebar Brand Header */}
       <div style={{ padding: '14px 14px 12px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-900 flex items-center justify-center border border-blue-400/50 shadow-lg shadow-blue-500/25 flex-shrink-0">
           <Layers className="h-5 w-5 text-white" />
@@ -82,7 +79,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Primary Log Error Action */}
       <div style={{ padding: '12px 12px 4px' }}>
         <button
           onClick={onOpenLogError}
@@ -94,7 +90,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Navigation Views */}
       <div className="sidebar-section-label">Views</div>
 
       {items.map((item) => {
@@ -112,7 +107,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         );
       })}
 
-      {/* Data Tools */}
       {(onSeedData || onClearData) && (
         <>
           <div className="sidebar-section-label" style={{ marginTop: 12 }}>Data Tools</div>
@@ -133,7 +127,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </>
       )}
 
-      {/* Sidebar Footer Status */}
       <div className="sidebar-footer" style={{ marginTop: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

@@ -53,14 +53,12 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      {/* Toolbar */}
       <div className="tool-toolbar">
         <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
 
         <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
 
-        {/* Layout selector */}
         <div style={{ display: 'flex', gap: 8 }}>
           {(['force', 'circular', 'grid'] as const).map((l) => (
             <button key={l} onClick={() => setGraphLayout(l)}
@@ -72,7 +70,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
 
         <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
 
-        {/* Edge filter */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)', marginRight: 2 }} />
           {(['all', 'tags'] as const).map((f) => (
@@ -91,10 +88,8 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
         </div>
       </div>
 
-      {/* Main: Graph + Inspector */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
-        {/* Graph (main) */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -124,7 +119,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
           </div>
         </div>
 
-        {/* Inspector panel */}
         <div style={{ width: 340, flexShrink: 0, overflowY: 'auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           {selectedError ? (
             <>
