@@ -55,10 +55,14 @@ public class RecallProperties {
     }
 
     public static class Graph {
-        /** Token-overlap similarity at or above which two signatures auto-link. */
-        private double fuzzyThreshold = 0.6;
+        /**
+         * Minimum common-prefix character count required to auto-link signatures in BST neighbor matching.
+         * Default is 30 characters: long enough to prevent accidental cross-linking of distinct error types
+         * while matching near-identical error headers and messages.
+         */
+        private int prefixThreshold = 30;
 
-        public double getFuzzyThreshold() { return fuzzyThreshold; }
-        public void setFuzzyThreshold(double fuzzyThreshold) { this.fuzzyThreshold = fuzzyThreshold; }
+        public int getPrefixThreshold() { return prefixThreshold; }
+        public void setPrefixThreshold(int prefixThreshold) { this.prefixThreshold = prefixThreshold; }
     }
 }

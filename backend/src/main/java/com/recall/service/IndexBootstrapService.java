@@ -28,13 +28,16 @@ public class IndexBootstrapService {
     private final ErrorRecordRepository errorRecordRepository;
     private final ErrorRelationRepository errorRelationRepository;
     private final IndexRegistry indexRegistry;
+    private final FuzzyMatchService fuzzyMatchService;
 
     public IndexBootstrapService(ErrorRecordRepository errorRecordRepository,
                                  ErrorRelationRepository errorRelationRepository,
-                                 IndexRegistry indexRegistry) {
+                                 IndexRegistry indexRegistry,
+                                 FuzzyMatchService fuzzyMatchService) {
         this.errorRecordRepository = errorRecordRepository;
         this.errorRelationRepository = errorRelationRepository;
         this.indexRegistry = indexRegistry;
+        this.fuzzyMatchService = fuzzyMatchService;
     }
 
     @PostConstruct
@@ -43,7 +46,7 @@ public class IndexBootstrapService {
     }
 
     /**
-     * Clears and repopulates the AVL signature index and the error graph from the database.
+     * Clears and repopulates the AVL signature index, BST signature index, and the error graph from the database.
      * Read-only transaction: nothing here writes.
      */
     @Transactional(readOnly = true)
@@ -56,6 +59,7 @@ public class IndexBootstrapService {
         indexRegistry.write(() -> {
             indexRegistry.getSignatureIndex().clear();
             indexRegistry.getErrorGraph().clear();
+            fuzzyMatchService.clear();
 
             for (ErrorRecord record : records) {
                 Long id = record.getId();
@@ -79,6 +83,7 @@ public class IndexBootstrapService {
                             signature, existing, id);
                 }
                 indexRegistry.getSignatureIndex().insert(signature, id);
+                fuzzyMatchService.getTree().insert(signature, id);
                 counters[0]++;
             }
 

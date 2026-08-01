@@ -93,7 +93,7 @@ on *now* — a cached ordering would silently rot.
 
 **Relations.** Edges are undirected and stored in `error_relation`, so the graph survives a
 restart. Three rules create them: same project plus a fuzzy signature match
-(`max(jaccard, levenshteinRatio) ≥ recall.graph.fuzzy-threshold`, no external NLP), a shared tag,
+(common prefix length `≥ recall.graph.prefix-threshold` via BST neighbor search), a shared tag,
 or a manual link. `/api/patterns` reports connected components spanning two or more projects.
 
 **Staying in sync.** Writes go to H2 first, then to the in-memory index. If the second step fails
@@ -110,7 +110,7 @@ Set in `src/main/resources/application.properties`.
 | `recall.decay.lambda` | `0.05` | decay per day since last success |
 | `recall.heap.weights.w1/w2/w3` | `0.5/0.3/0.2` | success rate / frequency / feedback |
 | `recall.heap.frequency-saturation` | `10.0` | attempts at which frequency hits 1.0 |
-| `recall.graph.fuzzy-threshold` | `0.6` | similarity needed to auto-link |
+| `recall.graph.prefix-threshold` | `30` | minimum common-prefix character count needed to auto-link |
 
 ## Layout
 

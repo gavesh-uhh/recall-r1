@@ -45,17 +45,20 @@ public class ErrorRecordService {
     private final DebugSessionRepository debugSessionRepository;
     private final IndexRegistry indexRegistry;
     private final RecallProperties recallProperties;
+    private final FuzzyMatchService fuzzyMatchService;
 
     public ErrorRecordService(ErrorRecordRepository repository,
                               ErrorRelationRepository errorRelationRepository,
                               DebugSessionRepository debugSessionRepository,
                               IndexRegistry indexRegistry,
-                              RecallProperties recallProperties) {
+                              RecallProperties recallProperties,
+                              FuzzyMatchService fuzzyMatchService) {
         this.repository = repository;
         this.errorRelationRepository = errorRelationRepository;
         this.debugSessionRepository = debugSessionRepository;
         this.indexRegistry = indexRegistry;
         this.recallProperties = recallProperties;
+        this.fuzzyMatchService = fuzzyMatchService;
     }
 
     /**
@@ -204,8 +207,8 @@ public class ErrorRecordService {
      * Creates edges from {@code saved} to existing records and returns how many were persisted.
      *
      * <ul>
-     *   <li>SIGNATURE_MATCH — same non-blank project and
-     *       {@code SignatureSimilarity.similarity >= recall.graph.fuzzy-threshold}.</li>
+     *   <li>SIGNATURE_MATCH — same non-blank project and common prefix length
+     *       {@code >= recall.graph.prefix-threshold} via BST neighbor matching.</li>
      *   <li>TAG_MATCH — at least one shared non-blank tag, compared case-insensitively.</li>
      * </ul>
      *
@@ -217,7 +220,6 @@ public class ErrorRecordService {
             return 0;
         }
         Long selfId = saved.getId();
-        double threshold = recallProperties.getGraph().getFuzzyThreshold();
 
         // Candidate -> edge type. LinkedHashMap keeps the outcome deterministic, and the first
         // rule to claim a candidate wins (signature similarity is the stronger signal).
@@ -225,17 +227,9 @@ public class ErrorRecordService {
 
         String project = blankToNull(saved.getProject());
         if (project != null && saved.getSignature() != null && !saved.getSignature().isBlank()) {
-            for (ErrorRecord other : repository.findByProject(project)) {
-                if (other.getId() == null || other.getId().equals(selfId)) {
-                    continue; // never self-link
-                }
-                if (other.getSignature() == null || other.getSignature().isBlank()) {
-                    continue;
-                }
-                double sim = SignatureSimilarity.similarity(saved.getSignature(), other.getSignature());
-                if (sim >= threshold) {
-                    candidates.put(other.getId(), ErrorRelation.SIGNATURE_MATCH);
-                }
+            MatchResult match = fuzzyMatchService.processNewError(saved.getSignature(), selfId);
+            if (match.isLinked() && !selfId.equals(match.getErrorId())) {
+                candidates.put(match.getErrorId(), ErrorRelation.SIGNATURE_MATCH);
             }
         }
 
