@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --bg:       #0b0a05; /* warmer, very dark */
+  --bg:       #0b0a05; 
   --surface:  #13100b;
   --panel:    #191412;
   --card:     #1e1713;
@@ -371,7 +371,6 @@ textarea.tool-input {
 .pro-button-primary:hover { background: #fdad00; }
 .badge-blue   { background: rgba(253,173,0,0.12);  color: #fdad00;  border: 1px solid rgba(253,173,0,0.3); }
 
-/* Override common Tailwind blue utilities to the yellow theme for cohesive look */
 .bg-blue-500, .from-blue-500 { background-color: #fdad00 !important; }
 .bg-blue-600, .from-blue-600 { background-color: #f09d00 !important; }
 .bg-blue-900, .to-blue-900 { background-color: #3d2b00 !important; }
