@@ -48,14 +48,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
       className={`fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center select-none transition-opacity duration-300 ${isFading ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
     >
-      {/* Background Subtle Gradient Glow */}
       <div className="absolute h-96 w-96 rounded-full bg-blue-600/10 blur-3xl animate-pulse pointer-events-none" />
 
-      {/* Main Center Content */}
       <div className="relative z-10 flex flex-col items-center space-y-6 max-w-sm w-full px-6">
-        {/* Animated Brand Logo Icon */}
         <div className="relative flex items-center justify-center">
-          {/* Outer Pulsing Ring */}
           <div className="absolute h-20 w-20 rounded-2xl bg-blue-500/20 animate-ping" />
 
           <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-600 to-slate-900 border border-blue-400/50 flex items-center justify-center shadow-2xl shadow-blue-500/30">
@@ -63,7 +59,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
           </div>
         </div>
 
-        {/* Brand Titles */}
         <div className="text-center space-y-1">
           <div className="flex items-center justify-center space-x-2">
             <h1 className="text-2xl font-extrabold tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-300">
@@ -76,7 +71,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
           <p className="text-xs font-mono text-slate-400">Error Memory & Solution Hub</p>
         </div>
 
-        {/* Animated Progress Bar */}
         <div className="w-full space-y-2 pt-2">
           <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
             <div
@@ -94,7 +88,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
           </div>
         </div>
 
-        {/* System Capability Badges */}
         <div className="flex items-center justify-center space-x-3 text-[10px] font-mono text-slate-400 pt-4 border-t border-slate-900 w-full">
           <span className="flex items-center space-x-1 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
             <Cpu className="h-3 w-3 text-blue-400" />

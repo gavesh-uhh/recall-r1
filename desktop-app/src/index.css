@@ -50,8 +50,6 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 }
 
-/* ─── Layout Primitives ─────────────────────────────────────────── */
-
 .tool-root {
   display: flex;
   flex-direction: column;
@@ -61,7 +59,6 @@
   overflow: hidden;
 }
 
-/* Title Bar */
 .tool-titlebar {
   height: var(--header-h);
   background: var(--surface);
@@ -76,7 +73,6 @@
 }
 .tool-titlebar > * { -webkit-app-region: no-drag; }
 
-/* Body = sidebar + content */
 .tool-body {
   display: flex;
   flex: 1;
@@ -84,7 +80,6 @@
   overflow: hidden;
 }
 
-/* Sidebar */
 .tool-sidebar {
   width: var(--sidebar-w);
   background: var(--surface);
@@ -143,7 +138,6 @@
   border-color: rgba(56, 139, 253, 0.3);
 }
 
-/* Tool Pane Content */
 .tool-content {
   flex: 1;
   min-width: 0;
@@ -151,8 +145,6 @@
   display: flex;
   flex-direction: column;
 }
-
-/* ─── Panels & Cards ────────────────────────────────────────────── */
 
 .tool-panel {
   background: var(--panel);
@@ -172,8 +164,6 @@
   background: rgba(56, 139, 253, 0.06);
 }
 
-/* ─── Toolbar Row ───────────────────────────────────────────────── */
-
 .tool-toolbar {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -183,8 +173,6 @@
   gap: 10px;
   flex-shrink: 0;
 }
-
-/* ─── Inputs ────────────────────────────────────────────────────── */
 
 .tool-input {
   background: var(--bg);
@@ -220,8 +208,6 @@ textarea.tool-input {
   resize: vertical;
   min-height: 60px;
 }
-
-/* ─── Buttons ───────────────────────────────────────────────────── */
 
 .btn {
   display: inline-flex;
@@ -277,8 +263,6 @@ textarea.tool-input {
 .btn-sm { padding: 5px 11px; font-size: 10.5px; }
 .btn-icon { padding: 7px; }
 
-/* ─── Badges ────────────────────────────────────────────────────── */
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -298,8 +282,6 @@ textarea.tool-input {
 .badge-red    { background: rgba(248,81,73,0.12);   color: #f85149;  border-color: rgba(248,81,73,0.3); }
 .badge-muted  { background: var(--card);            color: var(--text-muted); border-color: var(--border); }
 
-/* ─── Divider / separator ───────────────────────────────────────── */
-
 .tool-divider {
   height: 1px;
   background: var(--border);
@@ -312,8 +294,6 @@ textarea.tool-input {
   align-self: stretch;
 }
 
-/* ─── Section Headers ───────────────────────────────────────────── */
-
 .section-label {
   font-size: 10px;
   font-weight: 600;
@@ -321,8 +301,6 @@ textarea.tool-input {
   text-transform: uppercase;
   color: var(--text-dim);
 }
-
-/* ─── Code Block ────────────────────────────────────────────────── */
 
 .code-block {
   background: var(--bg);
@@ -337,8 +315,6 @@ textarea.tool-input {
   word-break: break-all;
 }
 
-/* ─── Status Dot ────────────────────────────────────────────────── */
-
 .status-dot {
   width: 7px;
   height: 7px;
@@ -347,8 +323,6 @@ textarea.tool-input {
 }
 .status-dot.online  { background: #3fb950; box-shadow: 0 0 5px rgba(63,185,80,0.5); }
 .status-dot.offline { background: #f85149; }
-
-/* ─── Animations ────────────────────────────────────────────────── */
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(3px); }
@@ -362,8 +336,6 @@ textarea.tool-input {
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 .pulse { animation: pulse 2s ease-in-out infinite; }
 
-/* ─── Sidebar Bottom Status ─────────────────────────────────────── */
-
 .sidebar-footer {
   margin-top: auto;
   padding: 16px 16px;
@@ -372,8 +344,6 @@ textarea.tool-input {
   flex-direction: column;
   gap: 10px;
 }
-
-/* ─── Toast ─────────────────────────────────────────────────────── */
 
 .toast {
   position: fixed;
@@ -391,7 +361,6 @@ textarea.tool-input {
   max-width: 360px;
 }
 
-/* ─── Compatibility shims for Tailwind classes still in components ─ */
 .pro-panel   { background: var(--panel); border: 1px solid var(--border); }
 .pro-card    { background: var(--card);  border: 1px solid var(--border); transition: border-color 0.12s; }
 .pro-card:hover { border-color: rgba(56,139,253,0.4); }
@@ -405,7 +374,6 @@ textarea.tool-input {
 .badge-dark   { background: var(--card); color: var(--text-muted); border: 1px solid var(--border); }
 .animate-fade-in { animation: fadeIn 0.15s ease-out forwards; }
 
-/* ─── Modal Layout Centering ─────────────────────────────────────── */
 .modal-backdrop {
   position: fixed;
   top: 0;

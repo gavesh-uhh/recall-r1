@@ -52,7 +52,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           gap: 16,
         }}
       >
-        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div
@@ -84,7 +83,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </button>
         </div>
 
-        {/* Message */}
         <div
           className="code-block"
           style={{
@@ -98,7 +96,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           {message}
         </div>
 
-        {/* Actions */}
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
           <button onClick={onClose} disabled={isSubmitting} className="btn btn-ghost">
             {cancelText}

@@ -69,12 +69,10 @@ export const App: React.FC = () => {
   const [sessions, setSessions] = useState<DebugSession[]>([]);
   const [selectedError, setSelectedError] = useState<ErrorRecord | null>(null);
 
-  // Filters & Searches
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
 
-  // Custom added projects & languages (synced with backend DB & localStorage fallback)
   const [customProjects, setCustomProjects] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('recall_custom_projects');
@@ -162,7 +160,6 @@ export const App: React.FC = () => {
     new Set([...errors.map((e) => e.language).filter(Boolean), ...customLanguages])
   );
 
-  // Modals
   const [isLogErrorOpen, setIsLogErrorOpen] = useState(false);
   const [logErrorPreset, setLogErrorPreset] = useState<{ project?: string; language?: string }>({});
   const [addSolutionErrorId, setAddSolutionErrorId] = useState<number | null>(null);
@@ -176,7 +173,6 @@ export const App: React.FC = () => {
   const [isClearing, setIsClearing] = useState(false);
   const [isRebuilding, setIsRebuilding] = useState(false);
 
-  // Toast notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -348,10 +344,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="tool-root select-none">
-      {/* Splash Screen */}
       {showSplash && <SplashScreen onFinished={() => setShowSplash(false)} />}
 
-      {/* Body: Sidebar + Content */}
       <div className="tool-body">
         <Sidebar
           activeTab={activeTab}
@@ -424,12 +418,10 @@ export const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Toast */}
       {toastMessage && (
         <div className="toast fade-in">{toastMessage}</div>
       )}
 
-      {/* Modals */}
       <LogErrorModal
         isOpen={isLogErrorOpen}
         onClose={() => {

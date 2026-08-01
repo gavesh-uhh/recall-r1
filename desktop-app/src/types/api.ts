@@ -6,9 +6,9 @@ export interface Solution {
   failureCount: number;
   totalAttempts?: number;
   lastSuccessDate: string | null;
-  feedbackScore: number; // 0-5
-  decayScore?: number;   // Calculated score returned from server or calculated locally
-  successRate?: number;  // Normalised rate 0-1
+  feedbackScore: number;
+  decayScore?: number;
+  successRate?: number;
   usageFrequency?: number;
 }
 
@@ -41,7 +41,7 @@ export interface CreateSolutionRequest {
 
 export interface SolutionFeedbackRequest {
   success: boolean;
-  rating?: number; // 1-5
+  rating?: number;
 }
 
 export interface DebugSession {

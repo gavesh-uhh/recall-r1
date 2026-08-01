@@ -34,9 +34,6 @@ export class RecallApiService {
     this.config = { ...this.config, ...newConfig };
   }
 
-  /**
-   * Universal HTTP Request Executor using IPC bridge (or standard fetch fallback)
-   */
   private async executeRequest<T>(
     url: string,
     options: {
@@ -49,7 +46,6 @@ export class RecallApiService {
     const bodyStr = options.body ? JSON.stringify(options.body) : undefined;
     const headers = options.headers || { 'Content-Type': 'application/json' };
 
-    // Method 1: Electron Native IPC Request (Bypasses browser CORS & IPv6 resolution)
     if (window.electronAPI?.apiRequest) {
       try {
         const res = await window.electronAPI.apiRequest({
@@ -64,7 +60,6 @@ export class RecallApiService {
       }
     }
 
-    // Method 2: Standard Fetch Fallback
     try {
       const res = await fetch(fullUrl, {
         method: options.method || 'GET',
@@ -84,10 +79,6 @@ export class RecallApiService {
     }
   }
 
-  /**
-   * Calculates solution decay score based on Recall formula:
-   * score = (successRate*w1 + usageFreq*w2 + feedbackNorm*w3) * exp(-lambda * days)
-   */
   public calculateDecayScore(solution: Solution, config = this.config): {
     totalScore: number;
     successRate: number;
@@ -125,13 +116,6 @@ export class RecallApiService {
     };
   }
 
-  // =========================================================================
-  // BACKEND REST API ENDPOINTS
-  // =========================================================================
-
-  /**
-   * 1. GET /api/health
-   */
   public async checkHealth(): Promise<HealthStatus> {
     const res = await this.executeRequest<{ status: string; indexStale: boolean }>('/health');
     if (res.ok && res.data) {
@@ -139,7 +123,6 @@ export class RecallApiService {
       return { status: 'ok', indexStale: !!res.data.indexStale };
     }
     
-    // Also try direct localhost fallback
     const res2 = await this.executeRequest<{ status: string; indexStale: boolean }>(
       'http://localhost:8080/api/health'
     );
@@ -156,9 +139,6 @@ export class RecallApiService {
     return this.isOnline;
   }
 
-  /**
-   * Seed rich sample data into the database
-   */
   public async seedSampleData(): Promise<boolean> {
     const res = await this.executeRequest<string>('/errors/seed', {
       method: 'POST',
@@ -166,9 +146,6 @@ export class RecallApiService {
     return res.ok;
   }
 
-  /**
-   * Clear all errors, solutions, relations, and debug sessions from the database
-   */
   public async clearDatabase(): Promise<boolean> {
     const res = await this.executeRequest<string>('/errors/clear', {
       method: 'POST',
@@ -176,9 +153,6 @@ export class RecallApiService {
     return res.ok;
   }
 
-  /**
-   * 2. POST /api/errors
-   */
   public async createError(req: CreateErrorRequest): Promise<ErrorRecord> {
     const res = await this.executeRequest<ErrorRecord>('/errors', {
       method: 'POST',
@@ -199,9 +173,6 @@ export class RecallApiService {
     return this.attachDecayScores(created);
   }
 
-  /**
-   * 3. GET /api/errors/{id}
-   */
   public async getErrorById(id: number): Promise<ErrorRecord | null> {
     const res = await this.executeRequest<ErrorRecord>(`/errors/${id}`);
     if (res.ok && res.data) {
@@ -210,9 +181,6 @@ export class RecallApiService {
     return null;
   }
 
-  /**
-   * 4. GET /api/errors/search?signature=
-   */
   public async searchBySignature(signature: string): Promise<ErrorRecord | null> {
     const res = await this.executeRequest<ErrorRecord>(
       `/errors/search?signature=${encodeURIComponent(signature)}`
@@ -223,9 +191,6 @@ export class RecallApiService {
     return null;
   }
 
-  /**
-   * 5. GET /api/errors?project=&language=
-   */
   public async getErrors(query = '', project = '', language = ''): Promise<ErrorRecord[]> {
     let endpoint = '/errors';
     const params = new URLSearchParams();
@@ -241,7 +206,6 @@ export class RecallApiService {
       list = res.data.map((err) => this.attachDecayScores(err));
     }
 
-    // Comprehensive case-insensitive search across signature, message, project, language & tags
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter(
@@ -257,9 +221,6 @@ export class RecallApiService {
     return list;
   }
 
-  /**
-   * GET /api/projects - fetch all distinct projects from backend DB
-   */
   public async getProjects(): Promise<string[]> {
     const res = await this.executeRequest<string[]>('/projects');
     if (res.ok && res.data) {
@@ -268,9 +229,6 @@ export class RecallApiService {
     return [];
   }
 
-  /**
-   * POST /api/projects - save custom project entity in backend DB
-   */
   public async createProject(name: string): Promise<boolean> {
     const res = await this.executeRequest('/projects', {
       method: 'POST',
@@ -279,9 +237,6 @@ export class RecallApiService {
     return res.ok;
   }
 
-  /**
-   * GET /api/languages - fetch all distinct languages from backend DB
-   */
   public async getLanguages(): Promise<string[]> {
     const res = await this.executeRequest<string[]>('/languages');
     if (res.ok && res.data) {
@@ -290,9 +245,6 @@ export class RecallApiService {
     return [];
   }
 
-  /**
-   * POST /api/languages - save custom language entity in backend DB
-   */
   public async createLanguage(name: string): Promise<boolean> {
     const res = await this.executeRequest('/languages', {
       method: 'POST',
@@ -301,9 +253,6 @@ export class RecallApiService {
     return res.ok;
   }
 
-  /**
-   * 6. DELETE /api/errors/{id}
-   */
   public async deleteError(id: number): Promise<boolean> {
     const res = await this.executeRequest(`/errors/${id}`, {
       method: 'DELETE',
@@ -314,9 +263,6 @@ export class RecallApiService {
     return true;
   }
 
-  /**
-   * 7. POST /api/errors/{id}/solutions
-   */
   public async addSolution(errorId: number, req: CreateSolutionRequest): Promise<Solution> {
     const res = await this.executeRequest<Solution>(`/errors/${errorId}/solutions`, {
       method: 'POST',
@@ -333,9 +279,6 @@ export class RecallApiService {
     return res.data;
   }
 
-  /**
-   * 8. GET /api/errors/{id}/solutions
-   */
   public async getRankedSolutions(errorId: number): Promise<Solution[]> {
     const res = await this.executeRequest<Solution[]>(`/errors/${errorId}/solutions`);
     if (res.ok && res.data) {
@@ -344,9 +287,6 @@ export class RecallApiService {
     return [];
   }
 
-  /**
-   * 9. PATCH /api/solutions/{id}/feedback
-   */
   public async submitSolutionFeedback(
     solutionId: number,
     feedback: SolutionFeedbackRequest
@@ -361,9 +301,6 @@ export class RecallApiService {
     return res.data;
   }
 
-  /**
-   * 10. POST /api/sessions
-   */
   public async createSession(req: CreateSessionRequest): Promise<DebugSession> {
     const payload = {
       errorId: req.errorRecordIds?.[0] || null,
@@ -395,9 +332,6 @@ export class RecallApiService {
     };
   }
 
-  /**
-   * 11. GET /api/sessions?project=&errorId=
-   */
   public async getSessions(project = '', errorId?: number): Promise<DebugSession[]> {
     let endpoint = '/sessions';
     const params = new URLSearchParams();
@@ -424,9 +358,6 @@ export class RecallApiService {
     return [];
   }
 
-  /**
-   * 12. POST /api/errors/{id}/relations
-   */
   public async linkErrors(sourceId: number, targetId: number): Promise<ErrorRelation> {
     const res = await this.executeRequest<ErrorRelation>(`/errors/${sourceId}/relations`, {
       method: 'POST',
@@ -438,9 +369,6 @@ export class RecallApiService {
     return res.data;
   }
 
-  /**
-   * 13. GET /api/errors/{id}/related?depth=
-   */
   public async getRelatedErrors(errorId: number, depth = 2): Promise<ErrorRecord[]> {
     const res = await this.executeRequest<ErrorRecord[]>(
       `/errors/${errorId}/related?depth=${depth}`
@@ -449,18 +377,12 @@ export class RecallApiService {
     return [];
   }
 
-  /**
-   * 14. GET /api/patterns
-   */
   public async getPatterns(): Promise<PatternCluster[]> {
     const res = await this.executeRequest<PatternCluster[]>('/patterns');
     if (res.ok && res.data) return res.data;
     return [];
   }
 
-  /**
-   * 15. POST /api/admin/rebuild-index
-   */
   public async rebuildIndex(): Promise<boolean> {
     const res = await this.executeRequest('/admin/rebuild-index', {
       method: 'POST',

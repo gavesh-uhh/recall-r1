@@ -5,12 +5,10 @@ import started from 'electron-squirrel-startup';
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-// Native Node.js IPC HTTP handler
 ipcMain.handle(
   'api-request',
   async (
@@ -23,7 +21,6 @@ ipcMain.handle(
     }
   ) => {
     try {
-      // Direct Node.js fetch execution (bypasses browser CORS & DNS IPv6 traps)
       const res = await fetch(options.url, {
         method: options.method || 'GET',
         headers: options.headers || { 'Content-Type': 'application/json' },
@@ -55,7 +52,6 @@ ipcMain.handle(
 );
 
 const createWindow = (): void => {
-  // Create the browser window with dark theme styling.
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
@@ -64,7 +60,7 @@ const createWindow = (): void => {
     title: 'Recall',
     backgroundColor: '#000000',
     autoHideMenuBar: true,
-    show: false, // Show when ready to avoid visual flicker
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -77,7 +73,6 @@ const createWindow = (): void => {
     mainWindow.show();
   });
 
-  // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {

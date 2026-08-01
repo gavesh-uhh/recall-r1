@@ -15,7 +15,6 @@ export const SolutionDecayChart: React.FC<SolutionDecayChartProps> = ({
   currentDaysAgo,
   currentScore,
 }) => {
-  // Generate 60-day decay curve points
   const daysData: number[] = [];
   const scoreData: number[] = [];
 

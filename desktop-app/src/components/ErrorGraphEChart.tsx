@@ -50,7 +50,6 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     }
   };
 
-  // 1. Register Error Nodes (Truncate signature on graph label to prevent text overlap)
   errors.forEach((err) => {
     const shortSig =
       err.signature.length > 18 ? `${err.signature.substring(0, 16)}…` : err.signature;
@@ -65,7 +64,6 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     });
   });
 
-  // 2. Add Edges from Pattern Clusters
   if (edgeFilter === 'all' || edgeFilter === 'patterns') {
     patterns.forEach((pat) => {
       if (pat.errorIds && pat.errorIds.length > 1) {
@@ -79,7 +77,6 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     });
   }
 
-  // 3. Add Edges from Shared Tags
   if (edgeFilter === 'all' || edgeFilter === 'tags') {
     for (let i = 0; i < errors.length; i++) {
       for (let j = i + 1; j < errors.length; j++) {
@@ -97,7 +94,6 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     }
   }
 
-  // 4. Add Edges from Same Project
   if (edgeFilter === 'all' || edgeFilter === 'projects') {
     for (let i = 0; i < errors.length; i++) {
       for (let j = i + 1; j < errors.length; j++) {
@@ -119,7 +115,6 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
 
   const nodesList = Array.from(nodesMap.values());
 
-  // Calculate position coordinates for Grid / Concentric radial layout or Force static layout
   const total = nodesList.length;
   if (graphLayout === 'grid') {
     const radius = Math.max(180, total * 30);
@@ -129,7 +124,6 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
       node.y = Math.sin(angle) * radius + 300;
     });
   } else if (graphLayout === 'force') {
-    // Golden angle spiral distribution to give deterministic static initial positions
     nodesList.forEach((node, idx) => {
       const angle = idx * 137.5 * (Math.PI / 180);
       const r = Math.sqrt(idx + 1) * 60 + 40;

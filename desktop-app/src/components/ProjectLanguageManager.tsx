@@ -54,18 +54,15 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
   const [subTab, setSubTab] = useState<'projects' | 'languages'>('projects');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Add Project / Language Modal States
   const [isAddProjectOpen, setIsAddProjectOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
 
   const [isAddLanguageOpen, setIsAddLanguageOpen] = useState(false);
   const [newLanguageName, setNewLanguageName] = useState('');
 
-  // 1. Calculate Project Stats
   const projectStatsMap = useMemo(() => {
     const map = new Map<string, ProjectStat>();
 
-    // Seed default projects from errors
     errors.forEach((err) => {
       const proj = err.project ? err.project.trim() : 'Uncategorized';
       const key = proj.toLowerCase();
@@ -90,7 +87,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
       });
     });
 
-    // Add custom created projects that don't have errors yet
     customProjects.forEach((projName) => {
       if (!projName) return;
       const key = projName.trim().toLowerCase();
@@ -108,7 +104,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
     return map;
   }, [errors, customProjects]);
 
-  // 2. Calculate Language Stats
   const languageStatsMap = useMemo(() => {
     const map = new Map<string, LanguageStat>();
 
@@ -135,7 +130,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
       });
     });
 
-    // Add custom created languages
     customLanguages.forEach((langName) => {
       if (!langName) return;
       const key = langName.trim().toLowerCase();
@@ -229,7 +223,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* Top Toolbar */}
       <div className="tool-toolbar">
         <Folder style={{ width: 14, height: 14, color: 'var(--primary)' }} />
         <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
@@ -238,7 +231,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
 
         <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
 
-        {/* Sub-Tab Selector */}
         <div style={{ display: 'flex', gap: 6 }}>
           <button
             onClick={() => setSubTab('projects')}
@@ -256,7 +248,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
           </button>
         </div>
 
-        {/* Search & Actions */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <div className="tool-search" style={{ width: 200 }}>
             <Search className="search-icon" />
@@ -286,7 +277,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
         </div>
       </div>
 
-      {/* Overview Stat Ribbon */}
       <div
         style={{
           padding: '14px 24px',
@@ -354,7 +344,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div style={{ flex: 1, overflowY: 'auto', padding: 24 }}>
         {subTab === 'projects' ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
@@ -375,7 +364,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
                   <span className="badge badge-blue mono">Project</span>
                 </div>
 
-                {/* Languages list */}
                 <div>
                   <div style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>
                     Tech Stack / Languages
@@ -394,7 +382,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
                   <button
                     onClick={() => navigateToExplorerWithProject(proj.name)}
@@ -441,7 +428,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
                   <span className="badge badge-green mono">Language</span>
                 </div>
 
-                {/* Projects using this language */}
                 <div>
                   <div style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>
                     Associated Projects
@@ -459,7 +445,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
                   <button
                     onClick={() => navigateToExplorerWithLanguage(lang.name)}
@@ -490,7 +475,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
         )}
       </div>
 
-      {/* Add Project Modal */}
       {isAddProjectOpen && (
         <div className="modal-backdrop fade-in">
           <div className="modal-content scale-in" style={{ maxWidth: 420 }}>
@@ -533,7 +517,6 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
         </div>
       )}
 
-      {/* Add Language Modal */}
       {isAddLanguageOpen && (
         <div className="modal-backdrop fade-in">
           <div className="modal-content scale-in" style={{ maxWidth: 420 }}>

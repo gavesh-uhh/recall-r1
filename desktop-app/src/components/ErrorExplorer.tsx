@@ -66,9 +66,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      {/* ── Toolbar ─────────────────────────────────────────────────── */}
       <div className="tool-toolbar">
-        {/* Search */}
         <div style={{ position: 'relative', flex: 1, maxWidth: 340 }}>
           <Search style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, color: 'var(--text-dim)' }} />
           <input
@@ -103,7 +101,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
         <div className="vert-divider" style={{ height: 18, margin: '0 8px' }} />
 
-        {/* Project filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
           <select
@@ -116,7 +113,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           </select>
         </div>
 
-        {/* Language filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <Code style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
           <select
@@ -134,10 +130,8 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
         </div>
       </div>
 
-      {/* ── Content: List + Detail ───────────────────────────────────── */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
-        {/* Error List */}
         <div style={{
           width: 380,
           flexShrink: 0,
@@ -185,7 +179,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'var(--hover)'; }}
                   onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
                 >
-                  {/* Signature row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 8 }}>
                     <Terminal style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />
                     <span className="mono" style={{
@@ -202,7 +195,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     <span className="badge badge-blue">{err.language}</span>
                   </div>
 
-                  {/* Message preview */}
                   <div className="mono" style={{
                     fontSize: 10,
                     color: 'var(--text-muted)',
@@ -214,7 +206,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     {err.message}
                   </div>
 
-                  {/* Meta row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{err.project}</span>
                     {err.tags.slice(0, 2).map((t) => (
@@ -238,12 +229,10 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           )}
         </div>
 
-        {/* Detail Pane */}
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {selectedError ? (
             <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-              {/* Detail Header */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
@@ -275,13 +264,11 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
               <div className="tool-divider" />
 
-              {/* Exception Message */}
               <div>
                 <div className="section-label" style={{ marginBottom: 5 }}>Exception Message</div>
                 <div className="code-block">{selectedError.message}</div>
               </div>
 
-              {/* Tags */}
               {selectedError.tags.length > 0 && (
                 <div>
                   <div className="section-label" style={{ marginBottom: 5 }}>Tags</div>
@@ -293,7 +280,6 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                 </div>
               )}
 
-              {/* Solutions */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
