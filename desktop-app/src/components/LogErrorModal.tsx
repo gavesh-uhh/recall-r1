@@ -103,13 +103,13 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
           <div className="h-5 w-[1px] bg-[var(--border)]" />
 
           <div className="flex items-center space-x-3">
-            <div className="p-1.5 rounded-xl bg-blue-950 text-blue-400 border border-blue-600/40 shadow-md">
+            <div className="p-1.5 rounded-xl bg-[#3b2a00] text-[#fdad00] border border-[#fdad00]/40 shadow-md">
               <Zap className="h-4 w-4" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <h1 className="text-sm font-bold text-white tracking-tight">Log Exception & Fix Strategy</h1>
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-blue-950 text-blue-300 border border-blue-800">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[#3b2a00] text-[#fdad00] border border-[#fdad00]">
                   Recall Indexer
                 </span>
               </div>
@@ -132,10 +132,10 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
             <div className="pro-panel p-5 rounded-2xl space-y-3.5 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5">
                 <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center space-x-2">
-                  <Terminal className="h-3.5 w-3.5 text-blue-400" />
+                  <Terminal className="h-3.5 w-3.5 text-[#fdad00]" />
                   <span>1. Exception Signature & Stack Trace</span>
                 </h3>
-                <span className="text-[10px] font-mono text-blue-400 bg-blue-950/60 px-2.5 py-0.5 rounded-md border border-blue-800">
+                <span className="text-[10px] font-mono text-[#fdad00] bg-[#3b2a00]/60 px-2.5 py-0.5 rounded-md border border-[#fdad00]">
                   Required
                 </span>
               </div>
@@ -173,7 +173,7 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
             <div className="pro-panel p-5 rounded-2xl space-y-3.5 flex-shrink-0">
               <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5">
                 <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider flex items-center space-x-2">
-                  <Code className="h-3.5 w-3.5 text-blue-400" />
+                  <Code className="h-3.5 w-3.5 text-[#fdad00]" />
                   <span>2. Project & Tech Stack Categorization</span>
                 </h3>
                 <span className="text-[10px] font-mono text-slate-400 bg-[var(--card)] px-2.5 py-0.5 rounded-md border border-[var(--border)]">
@@ -246,7 +246,7 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                           onClick={() => setProject(p)}
                           className={`text-[10px] font-mono px-2 py-0.5 rounded-md transition ${
                             project === p
-                              ? 'bg-blue-600 text-white border border-blue-400 font-bold'
+                              ? 'bg-[#fdad00] text-slate-950 border border-[#fdad00] font-bold'
                               : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-750'
                           }`}
                         >
@@ -298,7 +298,7 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
 
                 <div className="bg-[var(--bg)] p-3.5 rounded-xl border border-[var(--border)] space-y-2 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-blue-400 uppercase tracking-wider font-bold">
+                    <span className="text-[10px] font-mono text-[#fdad00] uppercase tracking-wider font-bold">
                       Indexing Live Preview
                     </span>
                   </div>
@@ -317,7 +317,7 @@ export const LogErrorModal: React.FC<LogErrorModalProps> = ({
                   {parsedTags.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-1">
                       {parsedTags.map((tag) => (
-                        <span key={tag} className="text-[10px] bg-slate-900 border border-slate-700 text-blue-300 px-2 py-0.5 rounded font-mono">
+                        <span key={tag} className="text-[10px] bg-slate-900 border border-slate-700 text-[#fdad00] px-2 py-0.5 rounded font-mono">
                           #{tag}
                         </span>
                       ))}

@@ -372,7 +372,7 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
               <div key={proj.name} className="tool-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div className="h-9 w-9 rounded-lg bg-blue-950/80 border border-blue-800/60 flex items-center justify-center text-blue-400">
+                    <div className="h-9 w-9 rounded-lg bg-[#3b2a00]/80 border border-[#fdad00]/60 flex items-center justify-center text-[#fdad00]">
                       <Folder style={{ width: 18, height: 18 }} />
                     </div>
                     <div>

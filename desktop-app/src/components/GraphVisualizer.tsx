@@ -139,7 +139,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
             </div>
             <div style={{ display: 'flex', gap: 10, fontSize: 10 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
-                <span style={{ width: 16, height: 2, background: '#1d4ed8', display: 'inline-block' }} />
+                <span style={{ width: 16, height: 2, background: '#d8871d', display: 'inline-block' }} />
                 Patterns
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
@@ -168,7 +168,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                   <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
                   {loadingRelated && <RefreshCw style={{ width: 10, height: 10, color: 'var(--primary)' }} className="spin" />}
                 </div>
-                <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#3b82f6', wordBreak: 'break-all' }}>
+                <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all' }}>
                   {selectedError.signature}
                 </div>
               </div>
@@ -187,7 +187,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                         className="tool-card"
                         style={{ padding: '14px 16px', cursor: 'pointer' }}
                       >
-                        <div className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: '#3b82f6', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
+                        <div className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: '#fdad00', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
                           #{rel.id} {rel.signature}
                         </div>
                         <div style={{ fontSize: 10, color: 'var(--text-dim)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

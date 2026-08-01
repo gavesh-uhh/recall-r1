@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Layers, Activity, Cpu, Database } from 'lucide-react';
+import { Activity, Cpu, Database } from 'lucide-react';
+import logoImage from '../assets/logo1.png';
 
 interface SplashScreenProps {
   onFinished: () => void;
@@ -45,26 +46,31 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center select-none transition-opacity duration-300 ${isFading ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
+      className={`fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center select-none transition-opacity duration-500 ${
+        isFading ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 visible'
+      }`}
     >
-      <div className="absolute h-96 w-96 rounded-full bg-blue-600/10 blur-3xl animate-pulse pointer-events-none" />
+      <div className="absolute h-96 w-96 rounded-full bg-[#fdad00]/10 blur-3xl animate-pulse pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center space-y-6 max-w-sm w-full px-6">
         <div className="relative flex items-center justify-center">
-          <div className="absolute h-20 w-20 rounded-2xl bg-blue-500/20 animate-ping" />
+          <div className="absolute h-36 w-36 rounded-full bg-[#fdad00]/20 animate-ping" />
 
-          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-600 to-slate-900 border border-blue-400/50 flex items-center justify-center shadow-2xl shadow-blue-500/30">
-            <Layers className="h-8 w-8 text-white animate-bounce" />
+          <div className="flex items-center justify-center">
+            <img
+              src={logoImage}
+              alt="Recall logo"
+              className="h-32 w-32"
+            />
           </div>
         </div>
 
         <div className="text-center space-y-1">
           <div className="flex items-center justify-center space-x-2">
-            <h1 className="text-2xl font-extrabold tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-300">
+            <h1 className="text-2xl font-extrabold tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-[#fdad00]">
               Recall
             </h1>
-            <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-700">
+            <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-[#3b2a00] text-[#fdad00] border border-[#fdad00]">
               R1
             </span>
           </div>
@@ -74,36 +80,21 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
         <div className="w-full space-y-2 pt-2">
           <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 via-sky-400 to-emerald-400 rounded-full transition-all duration-300 ease-out"
+              className="h-full bg-gradient-to-r from-[#fdad00] via-[#ffca3a] to-emerald-400 rounded-full transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
 
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
             <span className="flex items-center space-x-1.5 truncate pr-2">
-              <Activity className="h-3 w-3 text-blue-400 animate-spin" />
+              <Activity className="h-3 w-3 text-[#fdad00] animate-spin" />
               <span className="truncate">{statusText}</span>
             </span>
-            <span className="text-blue-400 font-bold">{progress}%</span>
+            <span className="text-[#fdad00] font-bold">{progress}%</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-center space-x-3 text-[10px] font-mono text-slate-400 pt-4 border-t border-slate-900 w-full">
-          <span className="flex items-center space-x-1 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-            <Cpu className="h-3 w-3 text-blue-400" />
-            <span>Error Index</span>
-          </span>
-          <span>•</span>
-          <span className="flex items-center space-x-1 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-            <Database className="h-3 w-3 text-emerald-400" />
-            <span>Memory Store</span>
-          </span>
-          <span>•</span>
-          <span className="flex items-center space-x-1 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-            <Layers className="h-3 w-3 text-sky-400" />
-            <span>Ranking Engine</span>
-          </span>
-        </div>
+       
       </div>
     </div>
   );
