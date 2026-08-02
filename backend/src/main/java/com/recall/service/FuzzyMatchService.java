@@ -6,9 +6,6 @@ import com.recall.datastructure.SignatureNode;
 import com.recall.datastructure.SignatureSimilarity;
 import org.springframework.stereotype.Service;
 
-/**
- * Service managing BST-based fuzzy signature matching using common prefix length.
- */
 @Service
 public class FuzzyMatchService {
 
@@ -23,14 +20,6 @@ public class FuzzyMatchService {
         return tree;
     }
 
-    /**
-     * Processes a new error signature by finding predecessor/successor neighbors in the BST
-     * and checking for a common prefix meeting the configured character count threshold.
-     *
-     * @param signature normalized signature string
-     * @param errorId   error record ID
-     * @return MatchResult indicating if linked to an existing error or inserted as new
-     */
     public synchronized MatchResult processNewError(String signature, Long errorId) {
         if (signature == null || signature.isBlank()) {
             return MatchResult.newError(errorId);
@@ -50,8 +39,8 @@ public class FuzzyMatchService {
         return MatchResult.newError(errorId);
     }
 
-    public int commonPrefixLength(String a, String b) {
-        return SignatureSimilarity.commonPrefixLength(a, b);
+    public int commonPrefixLength(String firstSignature, String secondSignature) {
+        return SignatureSimilarity.commonPrefixLength(firstSignature, secondSignature);
     }
 
     public synchronized void clear() {

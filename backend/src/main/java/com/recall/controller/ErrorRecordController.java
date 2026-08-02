@@ -23,14 +23,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-/**
- * Error record CRUD plus the sub-resources that hang off a single error
- * (its solutions, its manual relations, and its graph neighbourhood).
- *
- * <p>Missing entities are reported by throwing {@link NoSuchElementException}, which
- * {@link GlobalExceptionHandler} turns into a 404 — the same path the services use, so
- * the response shape is identical whether the miss was detected here or downstream.
- */
 @RestController
 @RequestMapping("/api/errors")
 public class ErrorRecordController {
@@ -50,33 +42,26 @@ public class ErrorRecordController {
         this.sampleDataLoader = sampleDataLoader;
     }
 
-    /** Force seeds rich sample data into the database (clears first then populates). */
     @PostMapping("/seed")
     public ResponseEntity<String> seedSampleData() {
         sampleDataLoader.forceSeedData();
         return ResponseEntity.ok("Sample data seeded successfully.");
     }
 
-    /** Clears all errors, solutions, relations, and debug sessions from the database. */
     @PostMapping("/clear")
     public ResponseEntity<String> clearAllData() {
         sampleDataLoader.clearAllData();
         return ResponseEntity.ok("All data cleared successfully.");
     }
 
-    /** 201 Created with a {@code Location} header pointing at the new record. */
     @PostMapping
-    public ResponseEntity<ErrorRecord> create(@RequestBody ErrorRecord incoming) {
-        ErrorRecord created = errorRecordService.create(incoming);
+    public ResponseEntity<ErrorRecord> create(@RequestBody ErrorRecord newErrorRecord) {
+        ErrorRecord created = errorRecordService.create(newErrorRecord);
         return ResponseEntity
                 .created(URI.create("/api/errors/" + created.getId()))
                 .body(created);
     }
 
-    /**
-     * Declared ahead of {@code /{id}} for readability; Spring would prefer the literal
-     * segment anyway, and {@code {id}} being a {@code Long} means "search" could never bind to it.
-     */
     @GetMapping("/search")
     public ErrorRecord findBySignature(@RequestParam String signature) {
         return errorRecordService.findBySignature(signature)
@@ -124,7 +109,6 @@ public class ErrorRecordController {
         return ResponseEntity.status(201).body(created);
     }
 
-    /** {@code depth} is left null when absent so the service can apply its own default. */
     @GetMapping("/{id}/related")
     public List<ErrorRecord> related(@PathVariable Long id,
                                      @RequestParam(required = false) Integer depth) {

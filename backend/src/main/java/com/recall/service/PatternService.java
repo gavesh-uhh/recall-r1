@@ -9,17 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-/**
- * Turns cross-project connected components into human-readable "patterns": recurring classes of
- * error that show up in more than one project.
- */
 @Service
 public class PatternService {
 
@@ -34,10 +31,6 @@ public class PatternService {
         this.errorRecordRepository = errorRecordRepository;
     }
 
-    /**
-     * One {@link PatternDto} per cross-project component, sorted by projectCount desc,
-     * occurrenceCount desc, then tag asc — fully deterministic.
-     */
     @Transactional(readOnly = true)
     public List<PatternDto> findPatterns() {
         List<Set<Long>> components = graphService.crossProjectComponents();
@@ -92,36 +85,22 @@ public class PatternService {
         return patterns;
     }
 
-    /**
-     * Most frequent non-blank tag across the component (grouped case-insensitively, alphabetical
-     * tie-break). With no tags at all, falls back to the shared language, else {@code "untagged"}.
-     */
     private static String dominantTag(List<ErrorRecord> records) {
-        Map<String, Integer> counts = new HashMap<>();
-        for (ErrorRecord record : records) {
-            List<String> tags = record.getTags();
-            if (tags == null) {
-                continue;
-            }
-            // De-dupe within a record so one record cannot vote twice for the same tag.
-            Set<String> seen = new HashSet<>();
-            for (String raw : tags) {
-                if (raw == null || raw.isBlank()) {
-                    continue;
-                }
-                String key = raw.trim().toLowerCase(Locale.ROOT);
-                if (seen.add(key)) {
-                    counts.merge(key, 1, Integer::sum);
-                }
-            }
-        }
+        // De-dupe within a record so one record cannot vote twice for the same tag.
+        Map<String, Long> counts = records.stream()
+                .map(ErrorRecord::getTags)
+                .filter(Objects::nonNull)
+                .flatMap(tags -> tags.stream()
+                        .filter(rawTag -> rawTag != null && !rawTag.isBlank())
+                        .map(rawTag -> rawTag.trim().toLowerCase(Locale.ROOT))
+                        .distinct())
+                .collect(Collectors.groupingBy(tag -> tag, Collectors.counting()));
 
         if (!counts.isEmpty()) {
             return counts.entrySet().stream()
-                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed()
-                            .thenComparing(Map.Entry.comparingByKey()))
+                    .max(Map.Entry.<String, Long>comparingByValue()
+                            .thenComparing(Map.Entry.comparingByKey(Comparator.reverseOrder())))
                     .map(Map.Entry::getKey)
-                    .findFirst()
                     .orElse(UNTAGGED);
         }
 

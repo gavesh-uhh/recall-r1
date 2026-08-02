@@ -12,14 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
-/** Relation management and traversal over the in-memory error graph. */
 @Service
 public class GraphService {
 
@@ -40,22 +39,16 @@ public class GraphService {
         this.indexRegistry = indexRegistry;
     }
 
-    /**
-     * Links two existing error records.
-     *
-     * @throws NoSuchElementException   when either id is unknown
-     * @throws IllegalArgumentException on a self-link, a duplicate edge, or an unrecognised type
-     */
     @Transactional
     public ErrorRelation addManualRelation(Long id, RelationRequest req) {
         if (req == null || req.relatedErrorId() == null) {
             throw new IllegalArgumentException("relatedErrorId is required");
         }
-        Long other = req.relatedErrorId();
+        Long targetErrorId = req.relatedErrorId();
         if (id == null) {
             throw new IllegalArgumentException("error id is required");
         }
-        if (id.equals(other)) {
+        if (id.equals(targetErrorId)) {
             throw new IllegalArgumentException("an error cannot be related to itself");
         }
 
@@ -63,8 +56,8 @@ public class GraphService {
         if (!errorRecordRepository.existsById(id)) {
             throw new NoSuchElementException("ErrorRecord not found: " + id);
         }
-        if (!errorRecordRepository.existsById(other)) {
-            throw new NoSuchElementException("ErrorRecord not found: " + other);
+        if (!errorRecordRepository.existsById(targetErrorId)) {
+            throw new NoSuchElementException("ErrorRecord not found: " + targetErrorId);
         }
 
         String type = (req.type() == null || req.type().isBlank())
@@ -74,29 +67,24 @@ public class GraphService {
             throw new IllegalArgumentException("unknown relation type: " + req.type());
         }
 
-        if (!errorRelationRepository.findEdge(id, other).isEmpty()) {
-            throw new IllegalArgumentException("relation already exists between " + id + " and " + other);
+        if (!errorRelationRepository.findEdge(id, targetErrorId).isEmpty()) {
+            throw new IllegalArgumentException(
+                    "relation already exists between " + id + " and " + targetErrorId);
         }
 
         // H2 first, then the graph.
-        ErrorRelation saved = errorRelationRepository.save(new ErrorRelation(id, other, type));
+        ErrorRelation saved = errorRelationRepository.save(new ErrorRelation(id, targetErrorId, type));
         final String edgeType = type;
         try {
-            indexRegistry.write(() -> indexRegistry.getErrorGraph().addEdge(id, other, edgeType));
+            indexRegistry.write(() -> indexRegistry.getErrorGraph().addEdge(id, targetErrorId, edgeType));
         } catch (RuntimeException ex) {
             log.error("Persisted relation {}<->{} but failed to update the graph; marking stale",
-                    id, other, ex);
+                    id, targetErrorId, ex);
             indexRegistry.markStale();
         }
         return saved;
     }
 
-    /**
-     * BFS-ordered neighbours of {@code id}, excluding the start node.
-     *
-     * @param depth max hops, or null for an unbounded traversal
-     * @throws NoSuchElementException when the start record does not exist
-     */
     @Transactional(readOnly = true)
     public List<ErrorRecord> findRelated(Long id, Integer depth) {
         if (id == null || !errorRecordRepository.existsById(id)) {
@@ -107,12 +95,10 @@ public class GraphService {
                 ? indexRegistry.getErrorGraph().bfs(id)
                 : indexRegistry.getErrorGraph().bfs(id, depth));
 
-        List<Long> ids = new ArrayList<>();
-        for (Long candidate : order) {
-            if (candidate != null && !candidate.equals(id)) {
-                ids.add(candidate);
-            }
-        }
+        List<Long> ids = order.stream()
+                .filter(Objects::nonNull)
+                .filter(candidate -> !candidate.equals(id))
+                .toList();
         if (ids.isEmpty()) {
             return List.of();
         }
@@ -122,17 +108,12 @@ public class GraphService {
         for (ErrorRecord record : errorRecordRepository.findAllById(ids)) {
             byId.put(record.getId(), record);
         }
-        List<ErrorRecord> out = new ArrayList<>(ids.size());
-        for (Long candidate : ids) {
-            ErrorRecord record = byId.get(candidate);
-            if (record != null) {
-                out.add(record);
-            }
-        }
-        return out;
+        return ids.stream()
+                .map(byId::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
-    /** Every connected component of the error graph, as sets of ErrorRecord ids. */
     public List<Set<Long>> connectedComponents() {
         return indexRegistry.read(() -> {
             List<Set<Long>> components = indexRegistry.getErrorGraph().connectedComponents();
@@ -147,7 +128,6 @@ public class GraphService {
         });
     }
 
-    /** Components whose records span at least two distinct non-blank projects. */
     @Transactional(readOnly = true)
     public List<Set<Long>> crossProjectComponents() {
         List<Set<Long>> components = connectedComponents();
@@ -160,19 +140,17 @@ public class GraphService {
             projectById.put(record.getId(), record.getProject());
         }
 
-        List<Set<Long>> out = new ArrayList<>();
-        for (Set<Long> component : components) {
-            Set<String> projects = new HashSet<>();
-            for (Long memberId : component) {
-                String project = projectById.get(memberId);
-                if (project != null && !project.isBlank()) {
-                    projects.add(project.trim());
-                }
-            }
-            if (projects.size() >= 2) {
-                out.add(component);
-            }
-        }
-        return out;
+        return components.stream()
+                .filter(component -> distinctProjectCount(component, projectById) >= 2)
+                .toList();
+    }
+
+    private static long distinctProjectCount(Set<Long> component, Map<Long, String> projectById) {
+        return component.stream()
+                .map(projectById::get)
+                .filter(project -> project != null && !project.isBlank())
+                .map(String::trim)
+                .distinct()
+                .count();
     }
 }
