@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Network, Link, Share2, Layers, GitCommit, Filter, Sparkles, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Network, Link, Share2, Layers, GitCommit, Filter, Sparkles, RefreshCw, Folder } from 'lucide-react';
 import { PatternCluster, ErrorRecord } from '../types/api';
 import { recallApi } from '../services/api';
 import { ErrorGraphEChart } from './ErrorGraphEChart';
@@ -12,11 +12,21 @@ interface GraphVisualizerProps {
 export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpenLinkModal }) => {
   const [patterns, setPatterns] = useState<PatternCluster[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<string>('all');
   const [edgeFilter, setEdgeFilter] = useState<'all' | 'patterns' | 'tags' | 'projects'>('all');
   const [graphLayout, setGraphLayout] = useState<'force' | 'circular' | 'grid'>('force');
   const [selectedErrorId, setSelectedErrorId] = useState<number | null>(null);
   const [relatedErrors, setRelatedErrors] = useState<ErrorRecord[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
+
+  const projectsList = useMemo(() => {
+    return Array.from(new Set(errors.map((e) => e.project).filter(Boolean)));
+  }, [errors]);
+
+  const filteredErrors = useMemo(() => {
+    if (selectedProject === 'all') return errors;
+    return errors.filter((e) => e.project.toLowerCase() === selectedProject.toLowerCase());
+  }, [errors, selectedProject]);
 
   const fetchPatterns = async () => {
     setLoading(true);
@@ -48,36 +58,65 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
     }
   };
 
-  const selectedError = errors.find((e) => e.id === selectedErrorId) || errors[0];
+  const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      <div className="tool-toolbar">
-        <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
-
-        <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
-
-        <div style={{ display: 'flex', gap: 8 }}>
-          {(['force', 'circular', 'grid'] as const).map((l) => (
-            <button key={l} onClick={() => setGraphLayout(l)}
-              className={`btn btn-sm ${graphLayout === l ? 'btn-primary' : 'btn-ghost'}`}>
-              {l === 'force' ? 'Force' : l === 'circular' ? 'Circular' : 'Radial'}
-            </button>
-          ))}
+      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
         </div>
 
-        <div className="vert-divider" style={{ height: 18, margin: '0 10px' }} />
+        <div className="vert-divider" style={{ height: 18 }} />
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)', marginRight: 2 }} />
-          {(['all', 'tags'] as const).map((f) => (
-            <button key={f} onClick={() => setEdgeFilter(f)}
-              className={`btn btn-sm ${edgeFilter === f ? 'btn-primary' : 'btn-ghost'}`}>
-              {f === 'all' ? 'All' : 'Tags'}
-            </button>
-          ))}
+        {/* Project Selection Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Folder style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Project:</span>
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            className="tool-select"
+            style={{ minWidth: 130 }}
+          >
+            <option value="all">All Projects ({errors.length})</option>
+            {projectsList.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Edge Filter Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Edges:</span>
+          <select
+            value={edgeFilter}
+            onChange={(e) => setEdgeFilter(e.target.value as any)}
+            className="tool-select"
+          >
+            <option value="all">All Connections</option>
+            <option value="patterns">Patterns Only</option>
+            <option value="tags">Shared Tags Only</option>
+            <option value="projects">Same Project Only</option>
+          </select>
+        </div>
+
+        {/* Layout Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Layers style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Layout:</span>
+          <select
+            value={graphLayout}
+            onChange={(e) => setGraphLayout(e.target.value as any)}
+            className="tool-select"
+          >
+            <option value="force">Force Directed</option>
+            <option value="circular">Circular</option>
+            <option value="grid">Radial Grid</option>
+          </select>
         </div>
 
         <div style={{ marginLeft: 'auto' }}>
@@ -95,7 +134,8 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Share2 style={{ width: 12, height: 12, color: 'var(--text-dim)' }} />
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>Graph Topology</span>
-              <span className="badge badge-muted mono">{graphLayout.toUpperCase()}</span>
+              <span className="badge badge-muted mono">{selectedProject.toUpperCase()}</span>
+              <span className="badge badge-blue mono">{graphLayout.toUpperCase()}</span>
             </div>
             <div style={{ display: 'flex', gap: 10, fontSize: 10 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
@@ -111,7 +151,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
           <div style={{ flex: 1, minHeight: 0 }}>
             <ErrorGraphEChart
               patterns={patterns}
-              errors={errors}
+              errors={filteredErrors}
               edgeFilter={edgeFilter}
               graphLayout={graphLayout}
               onNodeClick={handleNodeClick}
