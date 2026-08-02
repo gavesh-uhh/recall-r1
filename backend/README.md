@@ -14,15 +14,15 @@ mvn test              # Run unit tests
 - **Health Check**: `http://localhost:8080/api/health`
 - **H2 DB Console**: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:~/recall-db`, User: `sa`, No password)
 
-## Core Data Structures
+## Core Data Structures & Usage
 
 Custom in-memory data structures built over H2 persistence:
 
-| Structure | Purpose |
-|---|---|
-| `AVLTree` | Fast $O(\log n)$ signature lookup |
-| `MaxHeap` | Dynamic solution ranking based on recency, success rate & feedback |
-| `Graph` | Error relation mapping & cross-project pattern clustering (BFS) |
+| Structure | Purpose | Usage in Application |
+|---|---|---|
+| `AVLTree` | Fast $O(\log n)$ signature lookup | Used in `ErrorRegistry` for `/api/errors/search` and prefix neighbor search. |
+| `MaxHeap` | Dynamic solution ranking | Used in `SolutionRankingService` for decay-weighted solution ranking (`/api/errors/{id}/solutions`). |
+| `Graph` | Error relation mapping & clustering | Used in `ErrorRelationService` for BFS traversal (`/api/errors/{id}/related`) and pattern detection (`/api/patterns`). |
 
 ## API Routes
 
