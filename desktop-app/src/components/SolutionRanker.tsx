@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Zap,
   Award,
@@ -9,6 +9,10 @@ import {
   Sliders,
   Clock,
   Info,
+  Filter,
+  Code,
+  Folder,
+  X,
 } from 'lucide-react';
 import { ErrorRecord, Solution, SolutionFeedbackRequest } from '../types/api';
 import { recallApi } from '../services/api';
@@ -17,27 +21,63 @@ import { SolutionDecayChart } from './SolutionDecayChart';
 interface SolutionRankerProps {
   errors: ErrorRecord[];
   onFeedback: (solutionId: number, feedback: SolutionFeedbackRequest) => Promise<void>;
+  availableProjects?: string[];
+  availableLanguages?: string[];
 }
 
-export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedback }) => {
-  const [selectedErrorId, setSelectedErrorId] = useState<number>(errors[0]?.id || 0);
+export const SolutionRanker: React.FC<SolutionRankerProps> = ({
+  errors,
+  onFeedback,
+  availableProjects = [],
+  availableLanguages = [],
+}) => {
+  const [selectedProject, setSelectedProject] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'ranker' | 'simulator'>('ranker');
   const [fetchedSolutions, setFetchedSolutions] = useState<Solution[]>([]);
+
+  const projects = useMemo(() => {
+    return Array.from(
+      new Set([...errors.map((e) => e.project).filter(Boolean), ...availableProjects])
+    );
+  }, [errors, availableProjects]);
+
+  const languages = useMemo(() => {
+    return Array.from(
+      new Set([...errors.map((e) => e.language).filter(Boolean), ...availableLanguages])
+    );
+  }, [errors, availableLanguages]);
+
+  const filteredErrors = useMemo(() => {
+    return errors.filter((err) => {
+      const matchesProject =
+        !selectedProject || (err.project && err.project.toLowerCase() === selectedProject.toLowerCase());
+      const matchesLanguage =
+        !selectedLanguage || (err.language && err.language.toLowerCase() === selectedLanguage.toLowerCase());
+      return matchesProject && matchesLanguage;
+    });
+  }, [errors, selectedProject, selectedLanguage]);
+
+  const [selectedErrorId, setSelectedErrorId] = useState<number>(filteredErrors[0]?.id || 0);
 
   const [simSuccessCount, setSimSuccessCount] = useState<number>(10);
   const [simFailureCount, setSimFailureCount] = useState<number>(1);
   const [simDaysAgo, setSimDaysAgo] = useState<number>(4);
   const [simFeedbackScore, setSimFeedbackScore] = useState<number>(4.8);
 
-  const selectedError = errors.find((e) => e.id === selectedErrorId) || errors[0];
-
-  React.useEffect(() => {
-    if (errors.length > 0 && (!selectedErrorId || !errors.some((e) => e.id === selectedErrorId))) {
-      setSelectedErrorId(errors[0].id);
+  useEffect(() => {
+    if (filteredErrors.length > 0) {
+      if (!selectedErrorId || !filteredErrors.some((e) => e.id === selectedErrorId)) {
+        setSelectedErrorId(filteredErrors[0].id);
+      }
+    } else {
+      setSelectedErrorId(0);
     }
-  }, [errors, selectedErrorId]);
+  }, [filteredErrors, selectedErrorId]);
 
-  React.useEffect(() => {
+  const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
+
+  useEffect(() => {
     if (selectedErrorId) {
       let isMounted = true;
       recallApi.getRankedSolutions(selectedErrorId)
@@ -68,9 +108,58 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <div className="tool-toolbar">
-        <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
+      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
+        </div>
+
+        <div className="vert-divider" style={{ height: 18 }} />
+
+        {/* Project Selection Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Folder style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            className="tool-select"
+          >
+            <option value="">All Projects ({projects.length})</option>
+            {projects.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Language Selection Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Code style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <select
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+            className="tool-select mono"
+          >
+            <option value="">All Languages ({languages.length})</option>
+            {languages.map((l) => (
+              <option key={l} value={l}>{l}</option>
+            ))}
+          </select>
+        </div>
+
+        {(selectedProject || selectedLanguage) && (
+          <button
+            onClick={() => {
+              setSelectedProject('');
+              setSelectedLanguage('');
+            }}
+            className="btn btn-ghost btn-xs"
+            style={{ fontSize: 10, gap: 4 }}
+          >
+            <X style={{ width: 10, height: 10 }} />
+            Clear Filters
+          </button>
+        )}
+
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <button
             onClick={() => setActiveTab('ranker')}
@@ -92,13 +181,24 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
       {activeTab === 'ranker' ? (
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
           <div style={{ width: 300, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
-            <div className="section-label" style={{ padding: '18px 20px 10px' }}>Error Record</div>
-            {errors.length === 0 ? (
+            <div className="section-label" style={{ padding: '14px 18px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Error Records ({filteredErrors.length})</span>
+            </div>
+            {filteredErrors.length === 0 ? (
               <div className="text-xs text-slate-500 p-4 text-center">
-                No error records found in database.
+                No error records found matching filters.
+                {(selectedProject || selectedLanguage) && (
+                  <button
+                    onClick={() => { setSelectedProject(''); setSelectedLanguage(''); }}
+                    className="btn btn-ghost btn-xs block mx-auto mt-2"
+                    style={{ fontSize: 10 }}
+                  >
+                    Reset Filters
+                  </button>
+                )}
               </div>
             ) : (
-              errors.map((err) => {
+              filteredErrors.map((err) => {
                 const isSelected = err.id === (selectedError?.id || 0);
                 return (
                   <div

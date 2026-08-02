@@ -397,7 +397,12 @@ export const App: React.FC = () => {
             )}
 
             {activeTab === 'solutions' && (
-              <SolutionRanker errors={errors} onFeedback={handleSolutionFeedback} />
+              <SolutionRanker
+                errors={errors}
+                onFeedback={handleSolutionFeedback}
+                availableProjects={availableProjects}
+                availableLanguages={availableLanguages}
+              />
             )}
 
             {activeTab === 'patterns' && (
@@ -412,6 +417,8 @@ export const App: React.FC = () => {
                 sessions={sessions}
                 errors={errors}
                 onCreateSession={handleCreateSession}
+                availableProjects={availableProjects}
+                availableLanguages={availableLanguages}
               />
             )}
           </TabErrorBoundary>

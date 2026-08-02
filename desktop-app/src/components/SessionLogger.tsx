@@ -1,25 +1,53 @@
-import React, { useState } from 'react';
-import { Clock, Plus, Calendar, CheckCircle, History } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Clock, Plus, Calendar, CheckCircle, History, Filter, Folder, Search, X } from 'lucide-react';
 import { DebugSession, ErrorRecord, CreateSessionRequest } from '../types/api';
 
 interface SessionLoggerProps {
   sessions: DebugSession[];
   errors: ErrorRecord[];
   onCreateSession: (req: CreateSessionRequest) => Promise<void>;
+  availableProjects?: string[];
+  availableLanguages?: string[];
 }
 
 export const SessionLogger: React.FC<SessionLoggerProps> = ({
   sessions,
   errors,
   onCreateSession,
+  availableProjects = [],
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [duration, setDuration] = useState(30);
   const [notes, setNotes] = useState('');
-  const [project, setProject] = useState(errors[0]?.project || 'my-app');
+  const [project, setProject] = useState(errors[0]?.project || availableProjects[0] || 'my-app');
   const [selectedErrorIds, setSelectedErrorIds] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const projectsList = useMemo(() => {
+    const fromSessions = sessions.map((s) => s.project).filter(Boolean);
+    const fromErrors = errors.map((e) => e.project).filter(Boolean);
+    return Array.from(new Set([...fromSessions, ...fromErrors, ...availableProjects]));
+  }, [sessions, errors, availableProjects]);
+
+  const filteredSessions = useMemo(() => {
+    return sessions.filter((s) => {
+      const matchesProj =
+        !selectedProjectFilter ||
+        (s.project && s.project.toLowerCase() === selectedProjectFilter.toLowerCase());
+      const titleStr = s.title || s.actionsPerformed || `Session #${s.id}`;
+      const notesStr = s.notes || s.feedback || s.actionsPerformed || '';
+      const matchesSearch =
+        !searchQuery ||
+        titleStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        notesStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (s.project && s.project.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchesProj && matchesSearch;
+    });
+  }, [sessions, selectedProjectFilter, searchQuery]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,10 +81,68 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      <div className="tool-toolbar">
-        <History style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Debug Sessions</span>
-        <span className="badge badge-muted" style={{ marginLeft: 4 }}>{sessions.length}</span>
+      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <History style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Debug Sessions</span>
+          <span className="badge badge-muted" style={{ marginLeft: 4 }}>{filteredSessions.length}</span>
+        </div>
+
+        <div className="vert-divider" style={{ height: 18 }} />
+
+        {/* Project Selection Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Folder style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <select
+            value={selectedProjectFilter}
+            onChange={(e) => setSelectedProjectFilter(e.target.value)}
+            className="tool-select"
+          >
+            <option value="">All Projects ({projectsList.length})</option>
+            {projectsList.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Search input */}
+        <div style={{ position: 'relative', minWidth: 180 }}>
+          <Search style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 11, height: 11, color: 'var(--text-dim)' }} />
+          <input
+            type="text"
+            placeholder="Search sessions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="tool-input mono"
+            style={{ width: '100%', paddingLeft: 22, paddingRight: searchQuery ? 22 : 6, fontSize: 11, height: 26 }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex'
+              }}
+            >
+              <X style={{ width: 10, height: 10 }} />
+            </button>
+          )}
+        </div>
+
+        {(selectedProjectFilter || searchQuery) && (
+          <button
+            onClick={() => {
+              setSelectedProjectFilter('');
+              setSearchQuery('');
+            }}
+            className="btn btn-ghost btn-xs"
+            style={{ fontSize: 10, gap: 4 }}
+          >
+            <X style={{ width: 10, height: 10 }} />
+            Clear Filters
+          </button>
+        )}
+
         <div style={{ marginLeft: 'auto' }}>
           <button onClick={() => setShowModal(true)} className="btn btn-primary">
             <Plus style={{ width: 12, height: 12 }} />
@@ -66,17 +152,27 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {sessions.length === 0 ? (
+        {filteredSessions.length === 0 ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 60 }}>
             <Clock style={{ width: 28, height: 28, opacity: 0.3 }} />
-            <span style={{ fontSize: 11 }}>No sessions logged yet</span>
-            <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: 4 }}>
-              <Plus style={{ width: 12, height: 12 }} />
-              Log First Session
-            </button>
+            <span style={{ fontSize: 11 }}>No debug sessions found</span>
+            {(selectedProjectFilter || searchQuery) ? (
+              <button
+                onClick={() => { setSelectedProjectFilter(''); setSearchQuery(''); }}
+                className="btn btn-ghost btn-sm"
+                style={{ marginTop: 4 }}
+              >
+                Reset Filters
+              </button>
+            ) : (
+              <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: 4 }}>
+                <Plus style={{ width: 12, height: 12 }} />
+                Log First Session
+              </button>
+            )}
           </div>
         ) : (
-          sessions.map((session) => {
+          filteredSessions.map((session) => {
             const sessionTitle = session.title || session.actionsPerformed || `Session #${session.id}`;
             const sessionNotes = session.notes || session.feedback || session.actionsPerformed || '—';
             const sessionDateStr = session.timestamp || session.sessionDate;
@@ -176,11 +272,35 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                   <input
                     type="text"
                     required
+                    list="session-project-suggestions"
+                    placeholder="Select or enter project..."
                     value={project}
                     onChange={(e) => setProject(e.target.value)}
                     className="tool-input"
                     style={{ width: '100%' }}
                   />
+                  <datalist id="session-project-suggestions">
+                    {projectsList.map((p) => (
+                      <option key={p} value={p} />
+                    ))}
+                  </datalist>
+
+                  {projectsList.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4, alignItems: 'center' }}>
+                      <span style={{ fontSize: 9, color: 'var(--text-dim)' }}>Quick Pick:</span>
+                      {projectsList.slice(0, 4).map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setProject(p)}
+                          className={`btn btn-xs ${project === p ? 'btn-primary' : 'btn-ghost'}`}
+                          style={{ fontSize: 9, padding: '1px 5px', height: 'auto' }}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -260,3 +380,4 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
     </div>
   );
 };
+
