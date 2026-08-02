@@ -108,11 +108,11 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
                       padding: '14px 18px',
                       borderBottom: '1px solid var(--border-subtle)',
                       borderLeft: `3px solid ${isSelected ? 'var(--primary)' : 'transparent'}`,
-                      background: isSelected ? 'rgba(56,139,253,0.06)' : 'transparent',
+                      background: isSelected ? 'rgba(29,78,216,0.12)' : 'transparent',
                       cursor: 'pointer',
                     }}
                   >
-                    <div className="mono" style={{ fontSize: 11, fontWeight: 600, color: isSelected ? '#58a6ff' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>
+                    <div className="mono" style={{ fontSize: 11, fontWeight: 600, color: isSelected ? '#3b82f6' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>
                       {err.signature}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -130,7 +130,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({ errors, onFeedba
               <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                   <div className="section-label" style={{ marginBottom: 4 }}>Selected Signature</div>
-                  <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#58a6ff', wordBreak: 'break-all' }}>
+                  <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#3b82f6', wordBreak: 'break-all' }}>
                     {selectedError.signature}
                   </div>
                 </div>
