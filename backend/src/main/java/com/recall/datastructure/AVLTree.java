@@ -7,29 +7,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Hand-rolled AVL tree (self-balancing binary search tree) keyed by any
- * {@link Comparable}. Deliberately does <em>not</em> delegate to
- * {@code java.util.TreeMap} — the balancing is the point of the exercise, and the
- * service layer needs the observable height to prove the invariant holds.
- *
- * <p>Every mutation restores the AVL invariant {@code |height(left) - height(right)| <= 1}
- * on the way back up the recursion, using the four classic rotation cases:
- * <ul>
- *   <li>LL (left-left, balance &gt; 1 and left subtree left-heavy) → single right rotation</li>
- *   <li>RR (right-right, balance &lt; -1 and right subtree right-heavy) → single left rotation</li>
- *   <li>LR (left-right) → left rotation of the left child, then right rotation</li>
- *   <li>RL (right-left) → right rotation of the right child, then left rotation</li>
- * </ul>
- *
- * <p><strong>Not thread-safe.</strong> There is no internal locking or volatile state:
- * concurrent {@code insert}/{@code delete} will corrupt the structure. The service layer
- * owns synchronisation (e.g. a {@code ReadWriteLock} around the whole index) so that
- * callers pay for it only once rather than per node visit.
- *
- * @param <K> key type, must be comparable
- * @param <V> value type
- */
+
 public class AVLTree<K extends Comparable<K>, V> {
 
     /** Package-private only in the sense of being nested; nothing outside sees Node. */
@@ -190,7 +168,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         size = 0;
     }
 
-    // ---------------------------------------------------------------- balancing
+    // ---- balancing
 
     private int height(Node<K, V> node) {
         return node == null ? 0 : node.height;
@@ -262,7 +240,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         return y;
     }
 
-    // ------------------------------------------------- test/diagnostic helpers
+    // -- test/diagnostic helpers
 
     /** @return the root key, or {@code null} when empty. Lets tests assert rotation outcomes. */
     public K rootKey() {
