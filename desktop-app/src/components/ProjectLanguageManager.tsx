@@ -256,7 +256,28 @@ export const ProjectLanguageManager: React.FC<ProjectLanguageManagerProps> = ({
               placeholder={`Search ${subTab}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ paddingRight: searchTerm ? 26 : 10 }}
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{
+                  position: 'absolute',
+                  right: 6,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: 2
+                }}
+              >
+                <X style={{ width: 12, height: 12 }} />
+              </button>
+            )}
           </div>
 
           <button
