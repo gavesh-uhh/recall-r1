@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+// Service for discovering cross-project debugging patterns and error clusters
 @Service
 public class PatternService {
 
@@ -31,6 +32,7 @@ public class PatternService {
         this.errorRecordRepository = errorRecordRepository;
     }
 
+    // Find cross-project error clusters and format them into PatternDto results
     @Transactional(readOnly = true)
     public List<PatternDto> findPatterns() {
         List<Set<Long>> components = graphService.crossProjectComponents();
@@ -55,10 +57,10 @@ public class PatternService {
                 }
             }
 
+            // Sort examples by timestamp (newest first) with ID fallback
             records.sort(Comparator
                     .comparing(ErrorRecord::getCreatedAt,
                             Comparator.nullsLast(Comparator.reverseOrder()))
-                    // Stable tie-break so equal timestamps still produce one fixed order.
                     .thenComparing(ErrorRecord::getId, Comparator.nullsLast(Comparator.naturalOrder())));
 
             List<PatternExampleDto> examples = new ArrayList<>(Math.min(MAX_EXAMPLES, records.size()));
@@ -77,6 +79,7 @@ public class PatternService {
             patterns.add(new PatternDto(tag, projects.size(), records.size(), examples));
         }
 
+        // Rank patterns by project count, occurrence count, and tag name
         patterns.sort(Comparator
                 .comparingInt(PatternDto::projectCount).reversed()
                 .thenComparing(Comparator.comparingInt(PatternDto::occurrenceCount).reversed())
@@ -85,8 +88,9 @@ public class PatternService {
         return patterns;
     }
 
+    // Determine the most common tag across errors in a cluster
     private static String dominantTag(List<ErrorRecord> records) {
-        // De-dupe within a record so one record cannot vote twice for the same tag.
+        // Count tags (deduplicated per record so one error record only votes once)
         Map<String, Long> counts = records.stream()
                 .map(ErrorRecord::getTags)
                 .filter(Objects::nonNull)
@@ -104,11 +108,12 @@ public class PatternService {
                     .orElse(UNTAGGED);
         }
 
+        // Fallback to common language if all records share the same language
         String language = null;
         for (ErrorRecord record : records) {
             String candidate = record.getLanguage();
             if (candidate == null || candidate.isBlank()) {
-                return UNTAGGED; // not consistent across the component
+                return UNTAGGED;
             }
             String normalized = candidate.trim().toLowerCase(Locale.ROOT);
             if (language == null) {

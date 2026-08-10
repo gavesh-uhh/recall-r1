@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/** Read-only view over the cross-project clusters derived from the error graph. */
+// REST controller for fetching cross-project error patterns
 @RestController
 @RequestMapping("/api/patterns")
 public class PatternController {

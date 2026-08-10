@@ -7,22 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
-/**
- * Single owner of the two long-lived in-memory indexes:
- * <ul>
- *   <li>{@code signatureIndex} — AVL tree keyed by normalised signature, valued by ErrorRecord id.</li>
- *   <li>{@code errorGraph} — undirected graph of ErrorRecord ids, mirroring the {@code error_relation} table.</li>
- * </ul>
- *
- * <p>Neither structure is thread-safe on its own, and both are mutated from concurrent HTTP
- * request threads, so every access must go through {@link #read(Supplier)} or {@link #write(Runnable)}.
- * Callers must not leak the structures outside those callbacks (the getters exist for the
- * bootstrap/rebuild path and for use <em>inside</em> a lock callback).
- *
- * <p>The {@code stale} flag records that H2 and the in-memory view may have diverged — it is set
- * whenever a database write succeeded but the matching in-memory mutation blew up. Reads may then
- * fall back to the repository, and an operator (or the bootstrap service) can rebuild.
- */
+// Thread-safe container managing in-memory indexes (AVL tree and Error Graph)
 @Component
 public class IndexRegistry {
 
@@ -33,20 +18,17 @@ public class IndexRegistry {
 
     private volatile boolean stale;
 
-    /**
-     * Direct handle on the AVL index. Only touch this from inside {@link #read(Supplier)} /
-     * {@link #write(Runnable)} (or from the bootstrap path, which holds the write lock itself).
-     */
+    // Direct handle to AVL signature index
     public AVLTree<String, Long> getSignatureIndex() {
         return signatureIndex;
     }
 
-    /** Direct handle on the error graph. Same locking contract as {@link #getSignatureIndex()}. */
+    // Direct handle to error relationship graph
     public Graph<Long> getErrorGraph() {
         return errorGraph;
     }
 
-    /** Runs {@code fn} under the shared read lock and returns its result. */
+    // Run callback under shared read lock
     public <R> R read(Supplier<R> fn) {
         lock.readLock().lock();
         try {
@@ -56,7 +38,7 @@ public class IndexRegistry {
         }
     }
 
-    /** Runs {@code fn} under the exclusive write lock. */
+    // Run callback under exclusive write lock
     public void write(Runnable fn) {
         lock.writeLock().lock();
         try {
@@ -66,7 +48,7 @@ public class IndexRegistry {
         }
     }
 
-    /** Write-locked variant that returns a value (e.g. "did this delete actually remove anything?"). */
+    // Run callback under write lock and return result
     public <R> R writeAndGet(Supplier<R> fn) {
         lock.writeLock().lock();
         try {
@@ -76,12 +58,12 @@ public class IndexRegistry {
         }
     }
 
-    /** The lock itself, for callers that need to span several operations atomically. */
+    // Get internal lock instance
     public ReentrantReadWriteLock getLock() {
         return lock;
     }
 
-    /** Signals that the in-memory view may no longer agree with H2. */
+    // Flag that in-memory state diverged from H2 DB
     public void markStale() {
         this.stale = true;
     }
@@ -90,7 +72,7 @@ public class IndexRegistry {
         return stale;
     }
 
-    /** Called after a successful full rebuild. */
+    // Clear stale flag after full rebuild
     public void clearStale() {
         this.stale = false;
     }

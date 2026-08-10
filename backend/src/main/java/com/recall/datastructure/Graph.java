@@ -11,11 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+// In-memory undirected graph using adjacency lists to connect error records
 public class Graph<T> {
 
+    // Maps each node to its set of adjacent neighbors (preserves insertion order)
     private final Map<T, Set<T>> adjacencyList = new LinkedHashMap<>();
+    
+    // Maps unique edge keys to their relationship type (e.g. MANUAL, TAG_MATCH)
     private final Map<String, String> edgeTypes = new LinkedHashMap<>();
 
+    // Add a single node to the graph if it doesn't already exist
     public void addNode(T node) {
         if (node == null) {
             return;
@@ -23,6 +28,7 @@ public class Graph<T> {
         adjacencyList.computeIfAbsent(node, k -> new LinkedHashSet<>());
     }
 
+    // Connect two nodes with an undirected edge and record the relation type
     public void addEdge(T sourceNode, T targetNode, String type) {
         if (sourceNode == null || targetNode == null || sourceNode.equals(targetNode)) {
             return;
@@ -34,6 +40,7 @@ public class Graph<T> {
         edgeTypes.put(edgeKey(sourceNode, targetNode), type);
     }
 
+    // Get the relation type between two connected nodes
     public String edgeType(T sourceNode, T targetNode) {
         if (!hasEdge(sourceNode, targetNode)) {
             return null;
@@ -41,6 +48,7 @@ public class Graph<T> {
         return edgeTypes.get(edgeKey(sourceNode, targetNode));
     }
 
+    // Check if an edge exists between two nodes
     public boolean hasEdge(T sourceNode, T targetNode) {
         if (sourceNode == null || targetNode == null) {
             return false;
@@ -49,15 +57,18 @@ public class Graph<T> {
         return neighbours != null && neighbours.contains(targetNode);
     }
 
+    // Get an unmodifiable view of a node's immediate neighbors
     public Set<T> neighbors(T node) {
         Set<T> neighbours = node == null ? null : adjacencyList.get(node);
         return neighbours == null ? Set.of() : Collections.unmodifiableSet(neighbours);
     }
 
+    // Breadth-First Search traversal starting from startId without depth limit
     public List<T> bfs(T startId) {
         return bfs(startId, Integer.MAX_VALUE);
     }
 
+    // Breadth-First Search traversal starting from startId up to maxDepth hops
     public List<T> bfs(T startId, int maxDepth) {
         List<T> order = new ArrayList<>();
         if (startId == null || !adjacencyList.containsKey(startId) || maxDepth < 0) {
@@ -86,6 +97,7 @@ public class Graph<T> {
         return order;
     }
 
+    // Find all disjoint connected components in the graph
     public List<Set<T>> connectedComponents() {
         List<Set<T>> components = new ArrayList<>();
         Set<T> seen = new HashSet<>();
@@ -100,6 +112,7 @@ public class Graph<T> {
         return components;
     }
 
+    // Remove a node and clean up all edge references connected to it
     public void removeNode(T node) {
         if (node == null) {
             return;
@@ -117,23 +130,28 @@ public class Graph<T> {
         }
     }
 
+    // Get total number of nodes in the graph
     public int nodeCount() {
         return adjacencyList.size();
     }
 
+    // Get total number of unique undirected edges
     public int edgeCount() {
         return adjacencyList.values().stream().mapToInt(Set::size).sum() / 2;
     }
 
+    // Clear all nodes and edges
     public void clear() {
         adjacencyList.clear();
         edgeTypes.clear();
     }
 
+    // Get all node IDs
     public Set<T> nodes() {
         return Collections.unmodifiableSet(adjacencyList.keySet());
     }
 
+    // Build a consistent string key for undirected edge lookup
     private String edgeKey(T sourceNode, T targetNode) {
         String sourceIdStr = String.valueOf(sourceNode);
         String targetIdStr = String.valueOf(targetNode);

@@ -2,10 +2,7 @@ package com.recall.entity;
 
 import jakarta.persistence.*;
 
-/**
- * Backing table for graph edges so the in-memory {@code Graph} can be rebuilt on restart.
- * Edges are undirected; {@code errorAId} / {@code errorBId} ordering is not significant.
- */
+// Entity backing graph edges in H2 database
 @Entity
 @Table(name = "error_relation", indexes = {
         @Index(name = "idx_relation_a", columnList = "error_a_id"),

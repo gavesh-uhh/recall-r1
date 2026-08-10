@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
+// Business service managing error relationships, graph traversals, and cross-project clusters
 @Service
 public class GraphService {
 
@@ -39,6 +40,7 @@ public class GraphService {
         this.indexRegistry = indexRegistry;
     }
 
+    // Add a relationship between two error records (saves to DB first, then updates graph)
     @Transactional
     public ErrorRelation addManualRelation(Long id, RelationRequest req) {
         if (req == null || req.relatedErrorId() == null) {
@@ -52,7 +54,7 @@ public class GraphService {
             throw new IllegalArgumentException("an error cannot be related to itself");
         }
 
-        // Validate both endpoints before writing anything.
+        // Make sure both errors exist
         if (!errorRecordRepository.existsById(id)) {
             throw new NoSuchElementException("ErrorRecord not found: " + id);
         }
@@ -72,7 +74,7 @@ public class GraphService {
                     "relation already exists between " + id + " and " + targetErrorId);
         }
 
-        // H2 first, then the graph.
+        // Save to database first, then update the in-memory graph
         ErrorRelation saved = errorRelationRepository.save(new ErrorRelation(id, targetErrorId, type));
         final String edgeType = type;
         try {
@@ -85,6 +87,7 @@ public class GraphService {
         return saved;
     }
 
+    // Find related error records using BFS traversal, maintaining exact proximity order
     @Transactional(readOnly = true)
     public List<ErrorRecord> findRelated(Long id, Integer depth) {
         if (id == null || !errorRecordRepository.existsById(id)) {
@@ -103,7 +106,7 @@ public class GraphService {
             return List.of();
         }
 
-        // findAllById gives no ordering guarantee, so re-sequence into BFS order.
+        // Re-sequence database results back into exact BFS order
         Map<Long, ErrorRecord> byId = new HashMap<>();
         for (ErrorRecord record : errorRecordRepository.findAllById(ids)) {
             byId.put(record.getId(), record);
@@ -114,20 +117,19 @@ public class GraphService {
                 .toList();
     }
 
+    // Get all connected components from the in-memory graph
     public List<Set<Long>> connectedComponents() {
         return indexRegistry.read(() -> {
             List<Set<Long>> components = indexRegistry.getErrorGraph().connectedComponents();
-            // Copy out so callers never hold a view onto the locked structure.
             List<Set<Long>> copy = new ArrayList<>(components.size());
             for (Set<Long> component : components) {
-                // LinkedHashSet, not HashSet: Graph returns members in BFS order and callers
-                // (PatternService) rely on that order staying deterministic.
                 copy.add(new LinkedHashSet<>(component));
             }
             return copy;
         });
     }
 
+    // Find connected components that span across at least two distinct projects
     @Transactional(readOnly = true)
     public List<Set<Long>> crossProjectComponents() {
         List<Set<Long>> components = connectedComponents();
@@ -145,6 +147,7 @@ public class GraphService {
                 .toList();
     }
 
+    // Count distinct project names in a single component
     private static long distinctProjectCount(Set<Long> component, Map<Long, String> projectById) {
         return component.stream()
                 .map(projectById::get)
