@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-// REST controller for fetching cross-project error patterns
 @RestController
 @RequestMapping("/api/patterns")
 public class PatternController {
@@ -24,3 +23,5 @@ public class PatternController {
         return patternService.findPatterns();
     }
 }
+
+

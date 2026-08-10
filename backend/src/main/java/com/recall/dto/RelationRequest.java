@@ -1,5 +1,15 @@
 package com.recall.dto;
 
-/** Body of {@code POST /api/errors/{id}/relations}. Type defaults to MANUAL when omitted. */
-public record RelationRequest(Long relatedErrorId, String type) {
+import com.fasterxml.jackson.annotation.JsonAlias;
+
+public record RelationRequest(
+        @JsonAlias({"sourceId", "fromId", "errorId"}) Long sourceErrorId,
+        @JsonAlias({"targetErrorId", "toId"}) Long relatedErrorId,
+        String type
+) {
+    public RelationRequest(Long relatedErrorId, String type) {
+        this(null, relatedErrorId, type);
+    }
 }
+
+

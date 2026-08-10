@@ -12,21 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 
-// Business service managing error relationships, graph traversals, and cross-project clusters
 @Service
 public class GraphService {
 
     private static final Logger log = LoggerFactory.getLogger(GraphService.class);
-
-    private static final Set<String> ALLOWED_TYPES =
-            Set.of(ErrorRelation.SIGNATURE_MATCH, ErrorRelation.TAG_MATCH, ErrorRelation.MANUAL);
 
     private final ErrorRecordRepository errorRecordRepository;
     private final ErrorRelationRepository errorRelationRepository;
@@ -40,120 +37,142 @@ public class GraphService {
         this.indexRegistry = indexRegistry;
     }
 
-    // Add a relationship between two error records (saves to DB first, then updates graph)
     @Transactional
-    public ErrorRelation addManualRelation(Long id, RelationRequest req) {
+    public ErrorRelation addManualRelation(Long sourceId, RelationRequest req) {
         if (req == null || req.relatedErrorId() == null) {
             throw new IllegalArgumentException("relatedErrorId is required");
         }
-        Long targetErrorId = req.relatedErrorId();
-        if (id == null) {
+        if (sourceId == null) {
             throw new IllegalArgumentException("error id is required");
         }
-        if (id.equals(targetErrorId)) {
+
+        Long targetId = req.relatedErrorId();
+        if (sourceId.equals(targetId)) {
             throw new IllegalArgumentException("an error cannot be related to itself");
         }
 
-        // Make sure both errors exist
-        if (!errorRecordRepository.existsById(id)) {
-            throw new NoSuchElementException("ErrorRecord not found: " + id);
+        if (!errorRecordRepository.existsById(sourceId)) {
+            throw new NoSuchElementException("ErrorRecord not found: " + sourceId);
         }
-        if (!errorRecordRepository.existsById(targetErrorId)) {
-            throw new NoSuchElementException("ErrorRecord not found: " + targetErrorId);
+        if (!errorRecordRepository.existsById(targetId)) {
+            throw new NoSuchElementException("ErrorRecord not found: " + targetId);
         }
 
-        String type = (req.type() == null || req.type().isBlank())
-                ? ErrorRelation.MANUAL
-                : req.type().trim().toUpperCase(java.util.Locale.ROOT);
-        if (!ALLOWED_TYPES.contains(type)) {
+        String type;
+        if (req.type() == null || req.type().trim().isEmpty()) {
+            type = ErrorRelation.MANUAL;
+        } else {
+            type = req.type().trim().toUpperCase(Locale.ROOT);
+        }
+
+        if (!ErrorRelation.SIGNATURE_MATCH.equals(type)
+                && !ErrorRelation.TAG_MATCH.equals(type)
+                && !ErrorRelation.MANUAL.equals(type)) {
             throw new IllegalArgumentException("unknown relation type: " + req.type());
         }
 
-        if (!errorRelationRepository.findEdge(id, targetErrorId).isEmpty()) {
+        if (!errorRelationRepository.findEdge(sourceId, targetId).isEmpty()) {
             throw new IllegalArgumentException(
-                    "relation already exists between " + id + " and " + targetErrorId);
+                    "relation already exists between " + sourceId + " and " + targetId);
         }
 
-        // Save to database first, then update the in-memory graph
-        ErrorRelation saved = errorRelationRepository.save(new ErrorRelation(id, targetErrorId, type));
+        ErrorRelation savedRelation = errorRelationRepository.save(new ErrorRelation(sourceId, targetId, type));
+
         final String edgeType = type;
         try {
-            indexRegistry.write(() -> indexRegistry.getErrorGraph().addEdge(id, targetErrorId, edgeType));
+            indexRegistry.write(() -> indexRegistry.getErrorGraph().addEdge(sourceId, targetId, edgeType));
         } catch (RuntimeException ex) {
             log.error("Persisted relation {}<->{} but failed to update the graph; marking stale",
-                    id, targetErrorId, ex);
+                    sourceId, targetId, ex);
             indexRegistry.markStale();
         }
-        return saved;
+
+        return savedRelation;
     }
 
-    // Find related error records using BFS traversal, maintaining exact proximity order
     @Transactional(readOnly = true)
     public List<ErrorRecord> findRelated(Long id, Integer depth) {
         if (id == null || !errorRecordRepository.existsById(id)) {
             throw new NoSuchElementException("ErrorRecord not found: " + id);
         }
 
-        List<Long> order = indexRegistry.read(() -> depth == null
-                ? indexRegistry.getErrorGraph().bfs(id)
-                : indexRegistry.getErrorGraph().bfs(id, depth));
+        List<Long> traversalOrder = indexRegistry.read(() -> {
+            if (depth == null) {
+                return indexRegistry.getErrorGraph().bfs(id);
+            } else {
+                return indexRegistry.getErrorGraph().bfs(id, depth);
+            }
+        });
 
-        List<Long> ids = order.stream()
-                .filter(Objects::nonNull)
-                .filter(candidate -> !candidate.equals(id))
-                .toList();
-        if (ids.isEmpty()) {
-            return List.of();
+        List<Long> targetIds = new ArrayList<>();
+        for (Long candidateId : traversalOrder) {
+            if (candidateId != null && !candidateId.equals(id)) {
+                targetIds.add(candidateId);
+            }
         }
 
-        // Re-sequence database results back into exact BFS order
-        Map<Long, ErrorRecord> byId = new HashMap<>();
-        for (ErrorRecord record : errorRecordRepository.findAllById(ids)) {
-            byId.put(record.getId(), record);
+        if (targetIds.isEmpty()) {
+            return new ArrayList<>();
         }
-        return ids.stream()
-                .map(byId::get)
-                .filter(Objects::nonNull)
-                .toList();
+
+        Iterable<ErrorRecord> recordsFromDb = errorRecordRepository.findAllById(targetIds);
+        Map<Long, ErrorRecord> recordMap = new HashMap<>();
+        for (ErrorRecord record : recordsFromDb) {
+            recordMap.put(record.getId(), record);
+        }
+
+        List<ErrorRecord> resultList = new ArrayList<>();
+        for (Long errorId : targetIds) {
+            ErrorRecord record = recordMap.get(errorId);
+            if (record != null) {
+                resultList.add(record);
+            }
+        }
+
+        return resultList;
     }
 
-    // Get all connected components from the in-memory graph
     public List<Set<Long>> connectedComponents() {
         return indexRegistry.read(() -> {
-            List<Set<Long>> components = indexRegistry.getErrorGraph().connectedComponents();
-            List<Set<Long>> copy = new ArrayList<>(components.size());
-            for (Set<Long> component : components) {
-                copy.add(new LinkedHashSet<>(component));
+            List<Set<Long>> originalComponents = indexRegistry.getErrorGraph().connectedComponents();
+            List<Set<Long>> copyList = new ArrayList<>();
+            for (Set<Long> component : originalComponents) {
+                copyList.add(new LinkedHashSet<>(component));
             }
-            return copy;
+            return copyList;
         });
     }
 
-    // Find connected components that span across at least two distinct projects
+    // Filter connected components across 2 or more projects
     @Transactional(readOnly = true)
     public List<Set<Long>> crossProjectComponents() {
-        List<Set<Long>> components = connectedComponents();
-        if (components.isEmpty()) {
-            return List.of();
+        List<Set<Long>> allComponents = connectedComponents();
+        if (allComponents.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        Map<Long, String> projectById = new HashMap<>();
-        for (ErrorRecord record : errorRecordRepository.findAll()) {
-            projectById.put(record.getId(), record.getProject());
+        Iterable<ErrorRecord> allErrors = errorRecordRepository.findAll();
+        Map<Long, String> projectMap = new HashMap<>();
+        for (ErrorRecord error : allErrors) {
+            projectMap.put(error.getId(), error.getProject());
         }
 
-        return components.stream()
-                .filter(component -> distinctProjectCount(component, projectById) >= 2)
-                .toList();
-    }
+        List<Set<Long>> crossProjectClusters = new ArrayList<>();
+        for (Set<Long> component : allComponents) {
+            Set<String> distinctProjects = new HashSet<>();
+            for (Long errorId : component) {
+                String projectName = projectMap.get(errorId);
+                if (projectName != null && !projectName.trim().isEmpty()) {
+                    distinctProjects.add(projectName.trim());
+                }
+            }
+            if (distinctProjects.size() >= 2) {
+                crossProjectClusters.add(component);
+            }
+        }
 
-    // Count distinct project names in a single component
-    private static long distinctProjectCount(Set<Long> component, Map<Long, String> projectById) {
-        return component.stream()
-                .map(projectById::get)
-                .filter(project -> project != null && !project.isBlank())
-                .map(String::trim)
-                .distinct()
-                .count();
+        return crossProjectClusters;
     }
 }
+
+

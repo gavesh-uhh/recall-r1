@@ -11,36 +11,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// In-memory undirected graph using adjacency lists to connect error records
+// Undirected adjacency-list graph storing error relationships
 public class Graph<T> {
 
-    // Maps each node to its set of adjacent neighbors (preserves insertion order)
     private final Map<T, Set<T>> adjacencyList = new LinkedHashMap<>();
-    
-    // Maps unique edge keys to their relationship type (e.g. MANUAL, TAG_MATCH)
     private final Map<String, String> edgeTypes = new LinkedHashMap<>();
 
-    // Add a single node to the graph if it doesn't already exist
     public void addNode(T node) {
         if (node == null) {
             return;
         }
-        adjacencyList.computeIfAbsent(node, k -> new LinkedHashSet<>());
+        if (!adjacencyList.containsKey(node)) {
+            adjacencyList.put(node, new LinkedHashSet<>());
+        }
     }
 
-    // Connect two nodes with an undirected edge and record the relation type
     public void addEdge(T sourceNode, T targetNode, String type) {
         if (sourceNode == null || targetNode == null || sourceNode.equals(targetNode)) {
             return;
         }
         addNode(sourceNode);
         addNode(targetNode);
+
         adjacencyList.get(sourceNode).add(targetNode);
         adjacencyList.get(targetNode).add(sourceNode);
         edgeTypes.put(edgeKey(sourceNode, targetNode), type);
     }
 
-    // Get the relation type between two connected nodes
+    public boolean hasEdge(T sourceNode, T targetNode) {
+        if (sourceNode == null || targetNode == null) {
+            return false;
+        }
+        Set<T> neighbors = adjacencyList.get(sourceNode);
+        return neighbors != null && neighbors.contains(targetNode);
+    }
+
     public String edgeType(T sourceNode, T targetNode) {
         if (!hasEdge(sourceNode, targetNode)) {
             return null;
@@ -48,115 +53,150 @@ public class Graph<T> {
         return edgeTypes.get(edgeKey(sourceNode, targetNode));
     }
 
-    // Check if an edge exists between two nodes
-    public boolean hasEdge(T sourceNode, T targetNode) {
-        if (sourceNode == null || targetNode == null) {
-            return false;
-        }
-        Set<T> neighbours = adjacencyList.get(sourceNode);
-        return neighbours != null && neighbours.contains(targetNode);
-    }
-
-    // Get an unmodifiable view of a node's immediate neighbors
     public Set<T> neighbors(T node) {
-        Set<T> neighbours = node == null ? null : adjacencyList.get(node);
-        return neighbours == null ? Set.of() : Collections.unmodifiableSet(neighbours);
+        if (node == null || !adjacencyList.containsKey(node)) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(adjacencyList.get(node));
     }
 
-    // Breadth-First Search traversal starting from startId without depth limit
+    // Breadth-First Search (BFS)
     public List<T> bfs(T startId) {
         return bfs(startId, Integer.MAX_VALUE);
     }
 
-    // Breadth-First Search traversal starting from startId up to maxDepth hops
     public List<T> bfs(T startId, int maxDepth) {
-        List<T> order = new ArrayList<>();
+        List<T> visitOrder = new ArrayList<>();
         if (startId == null || !adjacencyList.containsKey(startId) || maxDepth < 0) {
-            return order;
+            return visitOrder;
         }
-        Set<T> visited = new LinkedHashSet<>();
+
+        Set<T> visited = new HashSet<>();
         Deque<T> queue = new ArrayDeque<>();
+
         visited.add(startId);
         queue.add(startId);
-        int depth = 0;
-        while (!queue.isEmpty() && depth <= maxDepth) {
+
+        int currentDepth = 0;
+        while (!queue.isEmpty() && currentDepth <= maxDepth) {
             int levelSize = queue.size();
             for (int i = 0; i < levelSize; i++) {
                 T current = queue.poll();
-                order.add(current);
-                if (depth < maxDepth) {
-                    for (T neighbour : adjacencyList.getOrDefault(current, Set.of())) {
-                        if (visited.add(neighbour)) {
-                            queue.add(neighbour);
+                visitOrder.add(current);
+
+                if (currentDepth < maxDepth) {
+                    Set<T> neighborSet = adjacencyList.get(current);
+                    if (neighborSet != null) {
+                        for (T neighbor : neighborSet) {
+                            if (!visited.contains(neighbor)) {
+                                visited.add(neighbor);
+                                queue.add(neighbor);
+                            }
                         }
                     }
                 }
             }
-            depth++;
+            currentDepth++;
         }
-        return order;
+        return visitOrder;
     }
 
-    // Find all disjoint connected components in the graph
+    // Depth-First Search (DFS)
+    public List<T> dfs(T startId) {
+        List<T> visitOrder = new ArrayList<>();
+        if (startId == null || !adjacencyList.containsKey(startId)) {
+            return visitOrder;
+        }
+
+        Set<T> visited = new HashSet<>();
+        Deque<T> stack = new ArrayDeque<>();
+
+        stack.push(startId);
+
+        while (!stack.isEmpty()) {
+            T current = stack.pop();
+            if (!visited.contains(current)) {
+                visited.add(current);
+                visitOrder.add(current);
+
+                Set<T> neighborSet = adjacencyList.get(current);
+                if (neighborSet != null) {
+                    List<T> neighborList = new ArrayList<>(neighborSet);
+                    for (int i = neighborList.size() - 1; i >= 0; i--) {
+                        T neighbor = neighborList.get(i);
+                        if (!visited.contains(neighbor)) {
+                            stack.push(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+        return visitOrder;
+    }
+
+    // Find connected components
     public List<Set<T>> connectedComponents() {
         List<Set<T>> components = new ArrayList<>();
-        Set<T> seen = new HashSet<>();
+        Set<T> overallVisited = new HashSet<>();
+
         for (T node : adjacencyList.keySet()) {
-            if (seen.contains(node)) {
-                continue;
+            if (!overallVisited.contains(node)) {
+                List<T> componentList = bfs(node);
+                Set<T> componentSet = new LinkedHashSet<>(componentList);
+                overallVisited.addAll(componentSet);
+                components.add(componentSet);
             }
-            Set<T> component = new LinkedHashSet<>(bfs(node));
-            seen.addAll(component);
-            components.add(component);
         }
         return components;
     }
 
-    // Remove a node and clean up all edge references connected to it
     public void removeNode(T node) {
-        if (node == null) {
+        if (node == null || !adjacencyList.containsKey(node)) {
             return;
         }
-        Set<T> neighbours = adjacencyList.remove(node);
-        if (neighbours == null) {
-            return;
-        }
-        for (T neighbour : neighbours) {
-            Set<T> back = adjacencyList.get(neighbour);
-            if (back != null) {
-                back.remove(node);
+
+        Set<T> connectedNeighbors = adjacencyList.remove(node);
+        if (connectedNeighbors != null) {
+            for (T neighbor : connectedNeighbors) {
+                Set<T> neighborSet = adjacencyList.get(neighbor);
+                if (neighborSet != null) {
+                    neighborSet.remove(node);
+                }
+                edgeTypes.remove(edgeKey(node, neighbor));
             }
-            edgeTypes.remove(edgeKey(node, neighbour));
         }
     }
 
-    // Get total number of nodes in the graph
     public int nodeCount() {
         return adjacencyList.size();
     }
 
-    // Get total number of unique undirected edges
     public int edgeCount() {
-        return adjacencyList.values().stream().mapToInt(Set::size).sum() / 2;
+        int totalSum = 0;
+        for (Set<T> neighbors : adjacencyList.values()) {
+            totalSum += neighbors.size();
+        }
+        return totalSum / 2;
     }
 
-    // Clear all nodes and edges
     public void clear() {
         adjacencyList.clear();
         edgeTypes.clear();
     }
 
-    // Get all node IDs
     public Set<T> nodes() {
         return Collections.unmodifiableSet(adjacencyList.keySet());
     }
 
-    // Build a consistent string key for undirected edge lookup
     private String edgeKey(T sourceNode, T targetNode) {
-        String sourceIdStr = String.valueOf(sourceNode);
-        String targetIdStr = String.valueOf(targetNode);
-        return sourceIdStr.compareTo(targetIdStr) <= 0
-                ? sourceIdStr + "\0" + targetIdStr
-                : targetIdStr + "\0" + sourceIdStr;
+        String s1 = String.valueOf(sourceNode);
+        String s2 = String.valueOf(targetNode);
+        if (s1.compareTo(s2) <= 0) {
+            return s1 + "\0" + s2;
+        } else {
+            return s2 + "\0" + s1;
+        }
     }
 }
+
+
