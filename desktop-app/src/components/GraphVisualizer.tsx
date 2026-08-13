@@ -300,7 +300,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                             return (
                               <div key={reason} style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
                                 <Link style={{ width: 10, height: 10, color: iconColor, flexShrink: 0, marginTop: 3 }} />
-                                <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, wordBreak: 'break-word' }}>
+                                <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, wordBreak: 'break-all' }}>
                                   {reason}
                                 </span>
                               </div>
