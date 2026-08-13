@@ -50,6 +50,8 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
     fetchPatternsAndRelations();
   }, [errors]);
 
+  const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
+
   useEffect(() => {
     if (selectedError) {
       setLoadingRelated(true);
@@ -72,8 +74,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   const handleNodeClick = (errorId: number) => {
     setSelectedErrorId(errorId);
   };
-
-  const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
 
   // Explains why a related error is connected to the selected one
   const getLinkReasons = (other: ErrorRecord): string[] => {
