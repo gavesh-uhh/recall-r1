@@ -28,15 +28,17 @@ public class FuzzyMatchService {
         int prefixThreshold = recallProperties.getGraph().getPrefixThreshold();
         SignatureNode[] neighbors = tree.findNeighbors(signature);
 
+        MatchResult result = MatchResult.newError(errorId);
         for (SignatureNode neighbor : neighbors) {
             if (neighbor != null && !neighbor.errorId.equals(errorId) &&
                     commonPrefixLength(signature, neighbor.normalizedSignature) >= prefixThreshold) {
-                return MatchResult.linkedTo(neighbor.errorId);
+                result = MatchResult.linkedTo(neighbor.errorId);
+                break;
             }
         }
 
         tree.insert(signature, errorId);
-        return MatchResult.newError(errorId);
+        return result;
     }
 
     public int commonPrefixLength(String firstSignature, String secondSignature) {

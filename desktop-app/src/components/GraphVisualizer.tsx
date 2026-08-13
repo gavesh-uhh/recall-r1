@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Network, Link, Share2, Layers, GitCommit, Filter, Sparkles, RefreshCw, Folder } from 'lucide-react';
-import { PatternCluster, ErrorRecord } from '../types/api';
+import { Network, Link, Share2, Layers, GitCommit, Filter, Sparkles, RefreshCw, Folder, Tags } from 'lucide-react';
+import { PatternCluster, ErrorRecord, ErrorRelation } from '../types/api';
 import { recallApi } from '../services/api';
 import { ErrorGraphEChart } from './ErrorGraphEChart';
 
@@ -11,10 +11,12 @@ interface GraphVisualizerProps {
 
 export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpenLinkModal }) => {
   const [patterns, setPatterns] = useState<PatternCluster[]>([]);
+  const [relations, setRelations] = useState<ErrorRelation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<string>('all');
-  const [edgeFilter, setEdgeFilter] = useState<'all' | 'patterns' | 'tags' | 'projects'>('all');
+  const [edgeFilter, setEdgeFilter] = useState<'all' | 'patterns' | 'tags' | 'projects' | 'persisted'>('all');
   const [graphLayout, setGraphLayout] = useState<'force' | 'circular' | 'grid'>('force');
+  const [showReasons, setShowReasons] = useState<boolean>(true);
   const [selectedErrorId, setSelectedErrorId] = useState<number | null>(null);
   const [relatedErrors, setRelatedErrors] = useState<ErrorRecord[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
@@ -28,11 +30,15 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
     return errors.filter((e) => e.project.toLowerCase() === selectedProject.toLowerCase());
   }, [errors, selectedProject]);
 
-  const fetchPatterns = async () => {
+  const fetchPatternsAndRelations = async () => {
     setLoading(true);
     try {
-      const data = await recallApi.getPatterns();
+      const [data, rels] = await Promise.all([
+        recallApi.getPatterns(),
+        recallApi.getRelations(),
+      ]);
       setPatterns(data);
+      setRelations(rels);
     } catch (err) {
       console.error(err);
     } finally {
@@ -41,14 +47,14 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   };
 
   useEffect(() => {
-    fetchPatterns();
+    fetchPatternsAndRelations();
   }, [errors]);
 
   const handleNodeClick = async (errorId: number) => {
     setSelectedErrorId(errorId);
     setLoadingRelated(true);
     try {
-      const related = await recallApi.getRelatedErrors(errorId, 2);
+      const related = await recallApi.getRelatedErrors(errorId, 1);
       setRelatedErrors(related);
     } catch (err) {
       console.error(err);
@@ -60,26 +66,58 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
 
   const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
 
+  // Explains why a related error is connected to the selected one
+  const getLinkReasons = (other: ErrorRecord): string[] => {
+    if (!selectedError) return [];
+    const reasons: string[] = [];
+    
+    // Check actual persisted relations
+    const actualRels = relations.filter(r => 
+      (r.errorAId === selectedError.id && r.errorBId === other.id) ||
+      (r.errorAId === other.id && r.errorBId === selectedError.id)
+    );
+    
+    actualRels.forEach(r => {
+      if (r.relationType === 'SIGNATURE_MATCH') reasons.push(`SIGNATURE MATCH: Similar error signature`);
+      else if (r.relationType === 'TAG_MATCH') reasons.push(`TAG MATCH: Shared explicit tags`);
+      else if (r.relationType === 'MANUAL') reasons.push(`MANUAL: Manually linked by user`);
+      else reasons.push(`Relationship: ${r.relationType}`);
+    });
+
+    const sharedTags = selectedError.tags.filter((t) => other.tags.includes(t));
+    if (sharedTags.length > 0) reasons.push(`Shared tags (derived): ${sharedTags.join(', ')}`);
+    if (selectedError.project.toLowerCase() === other.project.toLowerCase()) {
+      reasons.push(`Same project (derived): ${selectedError.project}`);
+    }
+    const sharedPattern = patterns.find(
+      (p: any) => p.examples?.some((e: any) => e.id === selectedError.id) && 
+                  p.examples?.some((e: any) => e.id === other.id)
+    );
+    if (sharedPattern) reasons.push(`Pattern (derived): ${sharedPattern.tag}`);
+    if (reasons.length === 0) reasons.push('Indirectly related (Depth 2+)');
+    return reasons;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Network style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
+      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Network style={{ width: 15, height: 15, color: 'var(--primary)' }} />
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text)' }}>Pattern Graph</span>
         </div>
 
-        <div className="vert-divider" style={{ height: 18 }} />
+        <div className="vert-divider" style={{ height: 20 }} />
 
         {/* Project Selection Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Folder style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Project:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Folder style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Project:</span>
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
             className="tool-select"
-            style={{ minWidth: 130 }}
+            style={{ minWidth: 150 }}
           >
             <option value="all">All Projects ({errors.length})</option>
             {projectsList.map((p) => (
@@ -89,25 +127,26 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
         </div>
 
         {/* Edge Filter Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Edges:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Filter style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Edges:</span>
           <select
             value={edgeFilter}
             onChange={(e) => setEdgeFilter(e.target.value as any)}
             className="tool-select"
           >
             <option value="all">All Connections</option>
-            <option value="patterns">Patterns Only</option>
-            <option value="tags">Shared Tags Only</option>
-            <option value="projects">Same Project Only</option>
+            <option value="persisted">Actual Backend Relations</option>
+            <option value="patterns">Patterns Only (Derived)</option>
+            <option value="tags">Shared Tags Only (Derived)</option>
+            <option value="projects">Same Project Only (Derived)</option>
           </select>
         </div>
 
         {/* Layout Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Layers style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Layout:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Layers style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Layout:</span>
           <select
             value={graphLayout}
             onChange={(e) => setGraphLayout(e.target.value as any)}
@@ -119,9 +158,19 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
           </select>
         </div>
 
+        {/* Edge Reason Labels Toggle */}
+        <button
+          onClick={() => setShowReasons((v) => !v)}
+          className={`btn btn-sm ${showReasons ? 'btn-primary' : 'btn-ghost'}`}
+          title="Show or hide link reasons on graph edges"
+        >
+          <Tags style={{ width: 12, height: 12 }} />
+          Reasons
+        </button>
+
         <div style={{ marginLeft: 'auto' }}>
-          <button onClick={onOpenLinkModal} disabled={errors.length === 0} className="btn btn-primary btn-sm">
-            <Link style={{ width: 11, height: 11 }} />
+          <button onClick={onOpenLinkModal} disabled={errors.length === 0} className="btn btn-primary">
+            <Link style={{ width: 13, height: 13 }} />
             Link Errors
           </button>
         </div>
@@ -130,21 +179,25 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Share2 style={{ width: 12, height: 12, color: 'var(--text-dim)' }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>Graph Topology</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Share2 style={{ width: 14, height: 14, color: 'var(--text-dim)' }} />
+              <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>Graph Topology</span>
               <span className="badge badge-muted mono">{selectedProject.toUpperCase()}</span>
               <span className="badge badge-blue mono">{graphLayout.toUpperCase()}</span>
             </div>
-            <div style={{ display: 'flex', gap: 10, fontSize: 10 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
-                <span style={{ width: 16, height: 2, background: '#d8871d', display: 'inline-block' }} />
+            <div style={{ display: 'flex', gap: 16, fontSize: 11 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-dim)' }}>
+                <span style={{ width: 18, height: 2, background: '#fdad00', display: 'inline-block' }} />
                 Patterns
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-dim)' }}>
-                <span style={{ width: 16, height: 2, background: '#3fb950', display: 'inline-block' }} />
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-dim)' }}>
+                <span style={{ width: 18, height: 2, background: '#3fb950', display: 'inline-block' }} />
                 Tags
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-dim)' }}>
+                <span style={{ width: 18, height: 2, background: '#5d6670', display: 'inline-block' }} />
+                Projects
               </span>
             </div>
           </div>
@@ -152,51 +205,71 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
             <ErrorGraphEChart
               patterns={patterns}
               errors={filteredErrors}
+              relations={relations}
               edgeFilter={edgeFilter}
               graphLayout={graphLayout}
+              showEdgeLabels={showReasons}
               onNodeClick={handleNodeClick}
             />
           </div>
         </div>
 
-        <div style={{ width: 340, flexShrink: 0, overflowY: 'auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ width: 360, flexShrink: 0, overflowY: 'auto', padding: '28px 30px', display: 'flex', flexDirection: 'column', gap: 24 }}>
           {selectedError ? (
             <>
-              <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 18 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <span className="badge badge-blue">#{selectedError.id}</span>
-                  <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
-                  {loadingRelated && <RefreshCw style={{ width: 10, height: 10, color: 'var(--primary)' }} className="spin" />}
+                  <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{selectedError.project}</span>
+                  {loadingRelated && <RefreshCw style={{ width: 12, height: 12, color: 'var(--primary)' }} className="spin" />}
                 </div>
-                <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all' }}>
+                <div className="mono" style={{ fontSize: 12.5, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5 }}>
                   {selectedError.signature}
                 </div>
               </div>
 
               <div>
-                <div className="section-label" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <GitCommit style={{ width: 11, height: 11 }} />
+                <div className="section-label" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <GitCommit style={{ width: 12, height: 12 }} />
                   Related Error Network
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {relatedErrors.length > 0 ? (
                     relatedErrors.map((rel) => (
                       <div
                         key={rel.id}
                         onClick={() => handleNodeClick(rel.id)}
                         className="tool-card"
-                        style={{ padding: '14px 16px', cursor: 'pointer' }}
+                        style={{ padding: '16px 18px', cursor: 'pointer' }}
                       >
-                        <div className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: '#fdad00', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
+                        <div className="mono" style={{ fontSize: 11.5, fontWeight: 600, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5, marginBottom: 4 }}>
                           #{rel.id} {rel.signature}
                         </div>
-                        <div style={{ fontSize: 10, color: 'var(--text-dim)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.4 }}>
                           {rel.message}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border-subtle)' }}>
+                          {getLinkReasons(rel).map((reason) => {
+                            let iconColor = 'var(--text-dim)';
+                            if (reason.startsWith('SIGNATURE MATCH')) iconColor = '#fdad00';
+                            else if (reason.startsWith('TAG MATCH') || reason.startsWith('Shared tags')) iconColor = '#3fb950';
+                            else if (reason.startsWith('Same project')) iconColor = '#5d6670';
+                            else if (reason.startsWith('MANUAL')) iconColor = '#f85149';
+                            
+                            return (
+                              <div key={reason} style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                                <Link style={{ width: 10, height: 10, color: iconColor, flexShrink: 0, marginTop: 3 }} />
+                                <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, wordBreak: 'break-word' }}>
+                                  {reason}
+                                </span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
                       No direct edges. Use "Link Errors" to connect nodes.
                     </div>
                   )}
@@ -204,9 +277,9 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
               </div>
             </>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 40 }}>
-              <Network style={{ width: 28, height: 28, opacity: 0.2 }} />
-              <span style={{ fontSize: 11, textAlign: 'center' }}>Click a node to inspect its related error network</span>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--text-dim)', paddingTop: 60 }}>
+              <Network style={{ width: 36, height: 36, opacity: 0.2 }} />
+              <span style={{ fontSize: 12.5, textAlign: 'center', lineHeight: 1.6 }}>Click a node to inspect its related error network</span>
             </div>
           )}
         </div>

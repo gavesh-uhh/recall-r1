@@ -3,7 +3,6 @@ import { Header, Sidebar } from './components/Header';
 import { ErrorExplorer } from './components/ErrorExplorer';
 import { SolutionRanker } from './components/SolutionRanker';
 import { GraphVisualizer } from './components/GraphVisualizer';
-import { SessionLogger } from './components/SessionLogger';
 import { ProjectLanguageManager } from './components/ProjectLanguageManager';
 import { LogErrorModal } from './components/LogErrorModal';
 import { AddSolutionModal } from './components/AddSolutionModal';
@@ -12,12 +11,10 @@ import { ConfirmModal } from './components/ConfirmModal';
 import { SplashScreen } from './components/SplashScreen';
 import {
   ErrorRecord,
-  DebugSession,
   HealthStatus,
   CreateErrorRequest,
   CreateSolutionRequest,
   SolutionFeedbackRequest,
-  CreateSessionRequest,
 } from './types/api';
 import { recallApi } from './services/api';
 
@@ -44,13 +41,13 @@ class TabErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="p-8 text-center space-y-4">
-          <div className="text-rose-400 font-mono font-bold text-xs bg-rose-950/60 p-4 rounded-xl border border-rose-900 max-w-lg mx-auto">
+        <div className="p-10 text-center space-y-5">
+          <div className="text-rose-400 font-mono font-bold text-[13px] bg-rose-950/60 p-5 rounded-xl border border-rose-900 max-w-lg mx-auto leading-relaxed">
             Render Exception: {this.state.error?.message || 'An unexpected rendering error occurred.'}
           </div>
           <button
             onClick={() => this.setState({ hasError: false })}
-            className="pro-button-primary px-4 py-2 text-xs rounded-lg font-semibold"
+            className="pro-button-primary px-5 py-2.5 text-[13px] rounded-lg font-semibold"
           >
             Reset View State
           </button>
@@ -66,7 +63,6 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('explorer');
   const [health, setHealth] = useState<HealthStatus>({ status: 'offline', indexStale: false });
   const [errors, setErrors] = useState<ErrorRecord[]>([]);
-  const [sessions, setSessions] = useState<DebugSession[]>([]);
   const [selectedError, setSelectedError] = useState<ErrorRecord | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -196,14 +192,6 @@ export const App: React.FC = () => {
     }
   }, [searchQuery, selectedProject, selectedLanguage]);
 
-  const loadSessions = useCallback(async () => {
-    try {
-      const data = await recallApi.getSessions();
-      setSessions(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
 
   const checkHealthStatus = useCallback(async () => {
     const status = await recallApi.checkHealth();
@@ -220,9 +208,6 @@ export const App: React.FC = () => {
     loadErrors();
   }, [loadErrors]);
 
-  useEffect(() => {
-    loadSessions();
-  }, [loadSessions]);
 
   const handleCreateError = async (req: CreateErrorRequest) => {
     try {
@@ -263,22 +248,19 @@ export const App: React.FC = () => {
   ) => {
     try {
       await recallApi.submitSolutionFeedback(solutionId, feedback);
-      showToast(feedback.success ? 'Recorded fix success! (+1 Score)' : 'Recorded fix failure');
+      showToast(
+        feedback.success === true
+          ? 'Recorded fix success! (+1 Score)'
+          : feedback.success === false
+            ? 'Recorded fix failure'
+            : 'Recorded fix rating'
+      );
       await loadErrors();
     } catch (err) {
       showToast('Error: Feedback failed');
     }
   };
 
-  const handleCreateSession = async (req: CreateSessionRequest) => {
-    try {
-      await recallApi.createSession(req);
-      showToast('Logged debug investigation session!');
-      await loadSessions();
-    } catch (err) {
-      showToast('Error: Failed to log session');
-    }
-  };
 
   const handleLinkErrors = async (sourceId: number, targetId: number) => {
     try {
@@ -311,7 +293,6 @@ export const App: React.FC = () => {
       showToast('Sample data seeded successfully into backend DB!');
       setSelectedError(null);
       await loadErrors();
-      await loadSessions();
       await loadBackendMetadata();
     } catch (err) {
       showToast('Error: Failed to seed sample data');
@@ -333,7 +314,6 @@ export const App: React.FC = () => {
       setSelectedError(null);
       setIsClearConfirmOpen(false);
       await loadErrors();
-      await loadSessions();
       await loadBackendMetadata();
     } catch (err) {
       showToast('Error: Failed to clear database');
@@ -409,16 +389,6 @@ export const App: React.FC = () => {
               <GraphVisualizer
                 errors={errors}
                 onOpenLinkModal={() => setLinkErrorSourceId(errors[0]?.id || 1)}
-              />
-            )}
-
-            {activeTab === 'sessions' && (
-              <SessionLogger
-                sessions={sessions}
-                errors={errors}
-                onCreateSession={handleCreateSession}
-                availableProjects={availableProjects}
-                availableLanguages={availableLanguages}
               />
             )}
           </TabErrorBoundary>

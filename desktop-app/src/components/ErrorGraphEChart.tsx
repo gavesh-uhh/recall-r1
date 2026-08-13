@@ -1,21 +1,25 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
-import { PatternCluster, ErrorRecord } from '../types/api';
+import { PatternCluster, ErrorRecord, ErrorRelation } from '../types/api';
 
 interface ErrorGraphEChartProps {
   patterns: PatternCluster[];
   errors: ErrorRecord[];
-  edgeFilter: 'all' | 'patterns' | 'tags' | 'projects';
+  relations: ErrorRelation[];
+  edgeFilter: 'all' | 'patterns' | 'tags' | 'projects' | 'persisted';
   graphLayout?: 'force' | 'circular' | 'grid';
+  showEdgeLabels?: boolean;
   onNodeClick?: (errorId: number) => void;
 }
 
 export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
   patterns,
   errors,
+  relations,
   edgeFilter,
   graphLayout = 'force',
+  showEdgeLabels = true,
   onNodeClick,
 }) => {
   const nodesMap = new Map<
@@ -64,12 +68,34 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
     });
   });
 
+  if (edgeFilter === 'all' || edgeFilter === 'persisted') {
+    relations.forEach((rel) => {
+      let color = '#c9d1d9'; // Default MANUAL color
+      let label = `MANUAL: user linked`;
+      let style = 'solid';
+      
+      if (rel.relationType === 'SIGNATURE_MATCH') {
+        color = '#fdad00';
+        label = `SIGNATURE_MATCH: similar signature`;
+      } else if (rel.relationType === 'TAG_MATCH') {
+        color = '#3fb950';
+        label = `TAG_MATCH: backend tags`;
+      }
+      
+      addEdge(rel.errorAId, rel.errorBId, label, {
+        color: color,
+        width: 2,
+        type: style,
+      });
+    });
+  }
+
   if (edgeFilter === 'all' || edgeFilter === 'patterns') {
-    patterns.forEach((pat) => {
-      if (pat.errorIds && pat.errorIds.length > 1) {
-        for (let i = 0; i < pat.errorIds.length - 1; i++) {
-          addEdge(pat.errorIds[i], pat.errorIds[i + 1], `Cross-Project: ${pat.name}`, {
-            color: '#60a5fa',
+    patterns.forEach((pat: any) => {
+      if (pat.examples && pat.examples.length > 1) {
+        for (let i = 0; i < pat.examples.length - 1; i++) {
+          addEdge(pat.examples[i].id, pat.examples[i + 1].id, `Cross-Project: ${pat.tag}`, {
+            color: '#fdad00',
             width: 3,
           });
         }
@@ -85,7 +111,7 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
         const sharedTags = e1.tags.filter((t) => e2.tags.includes(t));
         if (sharedTags.length > 0) {
           addEdge(e1.id, e2.id, `Shared Tags: ${sharedTags.join(', ')}`, {
-            color: '#34d399',
+            color: '#3fb950',
             width: 2,
             type: 'dashed',
           });
@@ -101,7 +127,7 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
         const e2 = errors[j];
         if (e1.project.toLowerCase() === e2.project.toLowerCase()) {
           addEdge(e1.id, e2.id, `Same Project: ${e1.project}`, {
-            color: '#1d4ed8',
+            color: '#5d6670',
             width: 1.5,
           });
         }
@@ -135,12 +161,46 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
   const echartsLayoutMode =
     graphLayout === 'circular' ? 'circular' : graphLayout === 'grid' ? 'none' : 'none';
 
+  // Turns "Shared Tags: auth, jwt" into a compact "tags: auth, jwt" edge caption
+  const shortenReason = (valueText?: string): string => {
+    if (!valueText) return '';
+    const [kind, ...rest] = valueText.split(': ');
+    const payload = rest.join(': ');
+    const label =
+      kind === 'Shared Tags'
+        ? `tags: ${payload}`
+        : kind === 'Same Project'
+          ? `project: ${payload}`
+          : kind === 'Cross-Project'
+            ? `pattern: ${payload}`
+            : kind === 'SIGNATURE_MATCH'
+              ? `sig_match`
+              : kind === 'TAG_MATCH'
+                ? `tag_match`
+                : kind === 'MANUAL'
+                  ? `manual`
+                  : valueText;
+    return label.length > 32 ? `${label.substring(0, 30)}…` : label;
+  };
+
+  const edgeLabelStyle = {
+    formatter: (params: any) => shortenReason(params.data.valueText),
+    fontSize: 9,
+    color: '#c9d1d9',
+    fontFamily: 'JetBrains Mono, monospace',
+    backgroundColor: 'rgba(13, 11, 7, 0.88)',
+    borderColor: '#31373f',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: [2, 5] as [number, number],
+  };
+
   const option: echarts.EChartsOption = {
     animation: false,
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'item',
-      backgroundColor: '#090f1e',
+      backgroundColor: '#15120d',
       borderColor: '#fdad00',
       textStyle: { color: '#f8fafc', fontSize: 12, fontFamily: 'JetBrains Mono' },
       formatter: (params: any) => {
@@ -186,12 +246,17 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
           color: '#f8fafc',
           fontSize: 11,
           fontFamily: 'JetBrains Mono, monospace',
-          backgroundColor: '#090f1e',
+          backgroundColor: '#13100b',
           padding: [3, 6],
           borderRadius: 4,
           borderWidth: 1,
-          borderColor: '#1e293b',
+          borderColor: '#31373f',
           distance: 8,
+        },
+        // Always-visible "why linked" captions on edges (toggleable via prop)
+        edgeLabel: {
+          show: showEdgeLabels,
+          ...edgeLabelStyle,
         },
         force: {
           repulsion: 300,
@@ -204,7 +269,12 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
           focus: 'adjacency',
           lineStyle: {
             width: 4,
-            color: '#60a5fa',
+            color: '#fdad00',
+          },
+          // Hovering an edge reveals its reason even when global labels are off
+          edgeLabel: {
+            show: true,
+            ...edgeLabelStyle,
           },
         },
       },

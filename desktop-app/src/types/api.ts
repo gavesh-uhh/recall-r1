@@ -29,18 +29,16 @@ export interface CreateErrorRequest {
   language: string;
   project: string;
   tags: string[];
-  initialSolution?: string;
 }
 
+/** A new solution carries no history: counters/rating are earned only via feedback. */
 export interface CreateSolutionRequest {
   description: string;
-  successCount?: number;
-  lastSuccessDate?: string;
-  feedbackScore?: number;
 }
 
+/** success may be omitted for rating-only feedback; rating (0..5) is always optional. */
 export interface SolutionFeedbackRequest {
-  success: boolean;
+  success?: boolean;
   rating?: number;
 }
 
@@ -68,9 +66,9 @@ export interface CreateSessionRequest {
 
 export interface ErrorRelation {
   id?: number;
-  sourceErrorId: number;
-  targetErrorId: number;
-  relationType: 'MANUAL' | 'FUZZY_MATCH' | 'SHARED_TAG';
+  errorAId: number;
+  errorBId: number;
+  relationType: 'MANUAL' | 'SIGNATURE_MATCH' | 'TAG_MATCH';
   weight?: number;
 }
 

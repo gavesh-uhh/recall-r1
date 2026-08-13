@@ -4,9 +4,10 @@ An error tracking and solution ranking system that logs errors, ranks solution f
 
 ## 🧠 Data Structures & Usage
 
-* **AVL Tree (`AVLTree`)**: Fast $O(\log n)$ error signature lookups and prefix searching in Error Explorer (`/api/errors/search`).
+* **AVL Tree (`AVLTree`)**: Fast $O(\log n)$ error signature lookups in Error Explorer.
+* **Signature BST (`SignatureBST`)**: Signature similarity candidate lookup for the fuzzy matcher.
 * **Max Heap (`MaxHeap`)**: Dynamic, decay-weighted solution ranking in Solution Ranker (`/api/errors/{id}/solutions`).
-* **Graph (`Graph`)**: Error network traversal (BFS) and cross-project pattern clustering in Pattern Graph (`/api/patterns` & `/api/errors/{id}/related`).
+* **Graph (`Graph`)**: Error relationship storage, network traversal (BFS), and connected components clustering in Pattern Graph (`/api/patterns` & `/api/relations`).
 
 ## Modules
 

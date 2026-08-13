@@ -43,6 +43,10 @@ public class SolutionService {
     }
 
     /**
+     * Creates a genuinely new solution with zero history. Success/failure counters, ratings, and
+     * {@code lastSuccessDate} are earned exclusively through {@link #applyFeedback(Long, FeedbackRequest)}
+     * once the fix has actually been tried — never supplied at creation time.
+     *
      * @throws NoSuchElementException when {@code errorId} does not exist — the controller layer
      *                                maps this to 404.
      */
@@ -54,13 +58,11 @@ public class SolutionService {
         Solution solution = new Solution();
         solution.setErrorRecord(error);
         solution.setDescription(req == null ? null : req.description());
-        solution.setSuccessCount(req == null || req.successCount() == null ? 0 : Math.max(0, req.successCount()));
-        solution.setFailureCount(req == null || req.failureCount() == null ? 0 : Math.max(0, req.failureCount()));
-        solution.setLastSuccessDate(req == null ? null : req.lastSuccessDate());
-        double seeded = req == null || req.feedbackScore() == null ? 0.0 : clampRating(req.feedbackScore());
-        solution.setFeedbackScore(seeded);
-        // A seeded score counts as one observation so later ratings average against it sensibly.
-        solution.setRatingCount(seeded > 0.0 ? 1 : 0);
+        solution.setSuccessCount(0);
+        solution.setFailureCount(0);
+        solution.setLastSuccessDate(null);
+        solution.setFeedbackScore(0.0);
+        solution.setRatingCount(0);
 
         return solutionRepository.save(solution);
     }

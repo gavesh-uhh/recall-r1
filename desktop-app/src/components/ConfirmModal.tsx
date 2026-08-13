@@ -44,21 +44,21 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         className="tool-panel"
         style={{
           width: '100%',
-          maxWidth: 420,
-          padding: '20px 24px',
-          borderRadius: 8,
+          maxWidth: 480,
+          padding: '26px 28px',
+          borderRadius: 12,
           display: 'flex',
           flexDirection: 'column',
-          gap: 16,
+          gap: 20,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
+                width: 42,
+                height: 42,
+                borderRadius: 10,
                 background: variant === 'danger' ? 'rgba(248, 81, 73, 0.12)' : 'rgba(210, 153, 34, 0.12)',
                 border: `1px solid ${variant === 'danger' ? 'rgba(248, 81, 73, 0.35)' : 'rgba(210, 153, 34, 0.35)'}`,
                 display: 'flex',
@@ -67,11 +67,11 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 flexShrink: 0,
               }}
             >
-              <AlertTriangle style={{ width: 18, height: 18, color: variant === 'danger' ? '#f85149' : '#d29922' }} />
+              <AlertTriangle style={{ width: 20, height: 20, color: variant === 'danger' ? '#f85149' : '#d29922' }} />
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{title}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Action Confirmation Required</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>{title}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>Action Confirmation Required</div>
             </div>
           </div>
           <button
@@ -79,24 +79,22 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             className="btn btn-ghost btn-icon"
             style={{ color: 'var(--text-dim)' }}
           >
-            <X style={{ width: 14, height: 14 }} />
+            <X style={{ width: 15, height: 15 }} />
           </button>
         </div>
 
         <div
-          className="code-block"
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             color: 'var(--text)',
-            lineHeight: 1.6,
-            background: 'var(--bg)',
-            borderColor: 'var(--border)',
+            lineHeight: 1.7,
+            padding: '2px 4px',
           }}
         >
           {message}
         </div>
 
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
           <button onClick={onClose} disabled={isSubmitting} className="btn btn-ghost">
             {cancelText}
           </button>

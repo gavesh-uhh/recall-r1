@@ -143,6 +143,11 @@ public class GraphService {
         });
     }
 
+    @Transactional(readOnly = true)
+    public List<ErrorRelation> findAllRelations() {
+        return errorRelationRepository.findAll();
+    }
+
     // Filter connected components across 2 or more projects
     @Transactional(readOnly = true)
     public List<Set<Long>> crossProjectComponents() {

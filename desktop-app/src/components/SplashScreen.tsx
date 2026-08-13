@@ -85,9 +85,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-1">
             <span className="flex items-center space-x-1.5 truncate pr-2">
-              <Activity className="h-3 w-3 text-[#fdad00] animate-spin" />
+              <Activity className="h-3.5 w-3.5 text-[#fdad00] animate-spin" />
               <span className="truncate">{statusText}</span>
             </span>
             <span className="text-[#fdad00] font-bold">{progress}%</span>

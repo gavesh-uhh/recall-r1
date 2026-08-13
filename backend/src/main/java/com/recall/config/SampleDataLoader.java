@@ -1,11 +1,11 @@
 package com.recall.config;
 
 import com.recall.dto.DebugSessionRequest;
-import com.recall.dto.SolutionRequest;
 import com.recall.entity.ErrorRecord;
 import com.recall.entity.ErrorRelation;
 import com.recall.entity.Language;
 import com.recall.entity.Project;
+import com.recall.entity.Solution;
 import com.recall.repository.DebugSessionRepository;
 import com.recall.repository.ErrorRecordRepository;
 import com.recall.repository.ErrorRelationRepository;
@@ -15,7 +15,6 @@ import com.recall.repository.SolutionRepository;
 import com.recall.service.DebugSessionService;
 import com.recall.service.ErrorRecordService;
 import com.recall.service.IndexBootstrapService;
-import com.recall.service.SolutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -41,7 +40,6 @@ public class SampleDataLoader implements CommandLineRunner {
     private final ProjectRepository projectRepository;
     private final LanguageRepository languageRepository;
     private final ErrorRecordService errorRecordService;
-    private final SolutionService solutionService;
     private final DebugSessionService debugSessionService;
     private final IndexBootstrapService indexBootstrapService;
 
@@ -52,7 +50,6 @@ public class SampleDataLoader implements CommandLineRunner {
                             ProjectRepository projectRepository,
                             LanguageRepository languageRepository,
                             ErrorRecordService errorRecordService,
-                            SolutionService solutionService,
                             DebugSessionService debugSessionService,
                             IndexBootstrapService indexBootstrapService) {
         this.errorRecordRepository = errorRecordRepository;
@@ -62,7 +59,6 @@ public class SampleDataLoader implements CommandLineRunner {
         this.projectRepository = projectRepository;
         this.languageRepository = languageRepository;
         this.errorRecordService = errorRecordService;
-        this.solutionService = solutionService;
         this.debugSessionService = debugSessionService;
         this.indexBootstrapService = indexBootstrapService;
     }
@@ -95,6 +91,26 @@ public class SampleDataLoader implements CommandLineRunner {
         seedData();
     }
 
+    /**
+     * Seeds a solution WITH pre-existing history, built directly at the entity level.
+     * This is deliberately kept off the user-facing create path ({@code SolutionRequest} /
+     * {@code SolutionService.create}), where new solutions always start with zero history.
+     * Historical values exist here only so demos/fixtures can showcase ranking immediately.
+     */
+    private void seedSolution(ErrorRecord error, String description, int successCount, int failureCount,
+                              LocalDateTime lastSuccessDate, double feedbackScore) {
+        Solution solution = new Solution();
+        solution.setErrorRecord(error);
+        solution.setDescription(description);
+        solution.setSuccessCount(successCount);
+        solution.setFailureCount(failureCount);
+        solution.setLastSuccessDate(lastSuccessDate);
+        solution.setFeedbackScore(feedbackScore);
+        // A seeded score counts as one observation so later ratings average against it sensibly.
+        solution.setRatingCount(feedbackScore > 0.0 ? 1 : 0);
+        solutionRepository.save(solution);
+    }
+
     public synchronized void seedData() {
         log.info("Starting sample data population...");
 
@@ -122,14 +138,14 @@ public class SampleDataLoader implements CommandLineRunner {
         e1.setTags(Arrays.asList("null-pointer", "authentication", "spring-boot", "java", "security"));
         e1 = errorRecordService.create(e1);
 
-        solutionService.create(e1.getId(), new SolutionRequest(
+        seedSolution(e1,
                 "Add null check on user repository lookup before attempting password verification. Return Optional.empty() for unknown users.",
                 18, 1, LocalDateTime.now().minusDays(1), 4.9
-        ));
-        solutionService.create(e1.getId(), new SolutionRequest(
+        );
+        seedSolution(e1,
                 "Use Spring Security UserDetailsService with custom UserNotFoundException mapper.",
                 10, 2, LocalDateTime.now().minusDays(4), 4.6
-        ));
+        );
 
         // 2. JWTTokenProvider NPE
         ErrorRecord e2 = new ErrorRecord();
@@ -140,14 +156,14 @@ public class SampleDataLoader implements CommandLineRunner {
         e2.setTags(Arrays.asList("null-pointer", "jwt", "security", "auth", "java"));
         e2 = errorRecordService.create(e2);
 
-        solutionService.create(e2.getId(), new SolutionRequest(
+        seedSolution(e2,
                 "Inject DefaultJwtParser with mandatory signing key validation and non-null claim extraction fallback.",
                 14, 0, LocalDateTime.now().minusDays(2), 4.85
-        ));
-        solutionService.create(e2.getId(), new SolutionRequest(
+        );
+        seedSolution(e2,
                 "Check for empty Bearer token prefix in HTTP authorization header filter prior to claim parsing.",
                 9, 1, LocalDateTime.now().minusDays(5), 4.5
-        ));
+        );
 
         // 3. HikariPool ConnectionTimeoutException
         ErrorRecord e3 = new ErrorRecord();
@@ -158,14 +174,14 @@ public class SampleDataLoader implements CommandLineRunner {
         e3.setTags(Arrays.asList("hikaricp", "database", "jdbc", "timeout", "hibernate", "spring-boot"));
         e3 = errorRecordService.create(e3);
 
-        solutionService.create(e3.getId(), new SolutionRequest(
+        seedSolution(e3,
                 "Increase HikariCP maximumPoolSize from 10 to 30 and set leakDetectionThreshold to 2000ms.",
                 24, 2, LocalDateTime.now().minusHours(12), 4.95
-        ));
-        solutionService.create(e3.getId(), new SolutionRequest(
+        );
+        seedSolution(e3,
                 "Ensure all @Transactional methods release connections before executing external HTTP payment gateway calls.",
                 19, 1, LocalDateTime.now().minusDays(3), 4.85
-        ));
+        );
 
         // 4. CorsPreflightFailedException
         ErrorRecord e4 = new ErrorRecord();
@@ -176,14 +192,14 @@ public class SampleDataLoader implements CommandLineRunner {
         e4.setTags(Arrays.asList("cors", "electron", "vite", "http", "api", "typescript"));
         e4 = errorRecordService.create(e4);
 
-        solutionService.create(e4.getId(), new SolutionRequest(
+        seedSolution(e4,
                 "Add @CrossOrigin(origins = \"*\") to REST controllers or configure WebCorsConfig CorsRegistry mapping for /api/**.",
                 22, 0, LocalDateTime.now().minusDays(1), 5.0
-        ));
-        solutionService.create(e4.getId(), new SolutionRequest(
+        );
+        seedSolution(e4,
                 "Route fetch requests through IPC bridge in Electron main process to bypass browser CORS origin restrictions.",
                 15, 2, LocalDateTime.now().minusDays(6), 4.7
-        ));
+        );
 
         // 5. Metaspace OutOfMemoryError
         ErrorRecord e5 = new ErrorRecord();
@@ -194,10 +210,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e5.setTags(Arrays.asList("memory-leak", "jvm", "gc", "metaspace", "java", "performance"));
         e5 = errorRecordService.create(e5);
 
-        solutionService.create(e5.getId(), new SolutionRequest(
+        seedSolution(e5,
                 "Increase JVM start parameters to -XX:MaxMetaspaceSize=512m and enable -XX:+ClassUnloadingWithConcurrentMark.",
                 16, 1, LocalDateTime.now().minusDays(2), 4.75
-        ));
+        );
 
         // 6. ConcurrentModificationException
         ErrorRecord e6 = new ErrorRecord();
@@ -208,10 +224,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e6.setTags(Arrays.asList("concurrency", "cache", "java", "threads", "null-pointer"));
         e6 = errorRecordService.create(e6);
 
-        solutionService.create(e6.getId(), new SolutionRequest(
+        seedSolution(e6,
                 "Replace standard HashMap with ConcurrentHashMap and use keySet().removeIf() for atomic thread-safe eviction.",
                 13, 0, LocalDateTime.now().minusDays(1), 4.85
-        ));
+        );
 
         // 7. UnhandledPromiseRejection
         ErrorRecord e7 = new ErrorRecord();
@@ -222,10 +238,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e7.setTags(Arrays.asList("electron", "typescript", "null-pointer", "react", "ipc"));
         e7 = errorRecordService.create(e7);
 
-        solutionService.create(e7.getId(), new SolutionRequest(
+        seedSolution(e7,
                 "Add safe optional chaining session.errorRecordIds?.length ?? (session.errorRecordId ? 1 : 0) in React component.",
                 20, 0, LocalDateTime.now().minusHours(4), 4.95
-        ));
+        );
 
         // 8. DeadlockDetectedException
         ErrorRecord e8 = new ErrorRecord();
@@ -236,10 +252,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e8.setTags(Arrays.asList("database", "deadlock", "sql", "concurrency", "jdbc"));
         e8 = errorRecordService.create(e8);
 
-        solutionService.create(e8.getId(), new SolutionRequest(
+        seedSolution(e8,
                 "Enforce strict alphabetical table locking order across all multi-table update transactions.",
                 17, 1, LocalDateTime.now().minusDays(2), 4.9
-        ));
+        );
 
         // 9. auth-service in TypeScript
         ErrorRecord e9 = new ErrorRecord();
@@ -250,10 +266,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e9.setTags(Arrays.asList("jwt", "typescript", "auth-service", "security", "node"));
         e9 = errorRecordService.create(e9);
 
-        solutionService.create(e9.getId(), new SolutionRequest(
+        seedSolution(e9,
                 "Ensure standard base64 secret encoding matches across AuthMiddleware and JWT Token Provider microservices.",
                 21, 0, LocalDateTime.now().minusHours(8), 4.9
-        ));
+        );
 
         // 10. api-gateway in Go
         ErrorRecord e10 = new ErrorRecord();
@@ -264,10 +280,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e10.setTags(Arrays.asList("go", "api-gateway", "timeout", "http", "concurrency"));
         e10 = errorRecordService.create(e10);
 
-        solutionService.create(e10.getId(), new SolutionRequest(
+        seedSolution(e10,
                 "Configure custom http.Transport with MaxIdleConnsPerHost=100 and IdleConnTimeout=90s in Go gateway client.",
                 19, 1, LocalDateTime.now().minusDays(1), 4.85
-        ));
+        );
 
         // 11. payment-processor in Python
         ErrorRecord e11 = new ErrorRecord();
@@ -278,10 +294,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e11.setTags(Arrays.asList("python", "stripe", "payment-processor", "api", "idempotency"));
         e11 = errorRecordService.create(e11);
 
-        solutionService.create(e11.getId(), new SolutionRequest(
+        seedSolution(e11,
                 "Generate UUIDv4 string for idempotency keys scoped per unique checkout transaction payload.",
                 25, 0, LocalDateTime.now().minusHours(18), 4.95
-        ));
+        );
 
         // 12. desktop-app in C++
         ErrorRecord e12 = new ErrorRecord();
@@ -292,10 +308,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e12.setTags(Arrays.asList("cpp", "electron", "native", "segfault", "memory"));
         e12 = errorRecordService.create(e12);
 
-        solutionService.create(e12.getId(), new SolutionRequest(
+        seedSolution(e12,
                 "Wrap Node-API Napi::Buffer::Copy pointer initialization with std::nothrow and non-null check before dereferencing.",
                 16, 2, LocalDateTime.now().minusDays(3), 4.8
-        ));
+        );
 
         // 13. analytics-engine in Rust
         ErrorRecord e13 = new ErrorRecord();
@@ -306,10 +322,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e13.setTags(Arrays.asList("rust", "analytics-engine", "panic", "tokio", "performance"));
         e13 = errorRecordService.create(e13);
 
-        solutionService.create(e13.getId(), new SolutionRequest(
+        seedSolution(e13,
                 "Use slice get() method with safe Option pattern matching instead of direct indexing vector bounds.",
                 28, 0, LocalDateTime.now().minusDays(1), 5.0
-        ));
+        );
 
         // 14. notification-service in Python
         ErrorRecord e14 = new ErrorRecord();
@@ -320,10 +336,10 @@ public class SampleDataLoader implements CommandLineRunner {
         e14.setTags(Arrays.asList("python", "redis", "celery", "notification-service", "queue"));
         e14 = errorRecordService.create(e14);
 
-        solutionService.create(e14.getId(), new SolutionRequest(
+        seedSolution(e14,
                 "Reuse global redis.ConnectionPool instance across Celery task workers instead of instantiating new StrictRedis objects per task.",
                 22, 1, LocalDateTime.now().minusDays(2), 4.9
-        ));
+        );
 
         // Seed manual relations if not present
         try {

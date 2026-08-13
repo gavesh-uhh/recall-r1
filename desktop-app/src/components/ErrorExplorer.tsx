@@ -10,7 +10,6 @@ import {
   Terminal,
   Database,
   AlertCircle,
-  ChevronRight,
   X,
 } from 'lucide-react';
 import { ErrorRecord } from '../types/api';
@@ -67,42 +66,42 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
       <div className="tool-toolbar">
-        <div style={{ position: 'relative', flex: 1, maxWidth: 340 }}>
-          <Search style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, color: 'var(--text-dim)' }} />
+        <div style={{ position: 'relative', flex: 1, maxWidth: 400 }}>
+          <Search style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: 'var(--text-dim)' }} />
           <input
             type="text"
             placeholder="Search signatures, messages, projects, tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="tool-input mono"
-            style={{ width: '100%', paddingLeft: 24, paddingRight: searchQuery ? 24 : 8 }}
+            style={{ width: '100%', paddingLeft: 32, paddingRight: searchQuery ? 30 : 13 }}
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               style={{
                 position: 'absolute',
-                right: 6,
+                right: 9,
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'none',
                 border: 'none',
                 color: 'var(--text-dim)',
                 cursor: 'pointer',
-                padding: 2,
+                padding: 3,
                 display: 'flex',
                 alignItems: 'center',
               }}
             >
-              <X style={{ width: 12, height: 12 }} />
+              <X style={{ width: 13, height: 13 }} />
             </button>
           )}
         </div>
 
-        <div className="vert-divider" style={{ height: 18, margin: '0 8px' }} />
+        <div className="vert-divider" style={{ height: 20, margin: '0 10px' }} />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <Filter style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Filter style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
@@ -113,8 +112,8 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           </select>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <Code style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Code style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -133,7 +132,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         <div style={{
-          width: 380,
+          width: 400,
           flexShrink: 0,
           borderRight: '1px solid var(--border)',
           overflowY: 'auto',
@@ -141,21 +140,21 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
           flexDirection: 'column',
         }}>
           {!isOnline ? (
-            <div style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-muted)' }}>
-              <AlertCircle style={{ width: 24, height: 24, color: 'var(--danger)' }} />
-              <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text)' }}>Backend Offline</div>
-              <div className="mono" style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            <div style={{ padding: 40, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, color: 'var(--text-muted)' }}>
+              <AlertCircle style={{ width: 32, height: 32, color: 'var(--danger)' }} />
+              <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>Backend Offline</div>
+              <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
                 Start Spring Boot at<br />
                 <span style={{ color: 'var(--primary)' }}>localhost:8080</span>
               </div>
             </div>
           ) : errors.length === 0 ? (
-            <div style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: 'var(--text-muted)' }}>
-              <Database style={{ width: 24, height: 24, color: 'var(--text-dim)' }} />
-              <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text)' }}>No Records</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>No errors match this filter</div>
-              <button onClick={onOpenLogError} className="btn btn-success btn-sm" style={{ marginTop: 4 }}>
-                <Plus style={{ width: 12, height: 12 }} />
+            <div style={{ padding: 40, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, color: 'var(--text-muted)' }}>
+              <Database style={{ width: 32, height: 32, color: 'var(--text-dim)' }} />
+              <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>No Records</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>No errors match this filter</div>
+              <button onClick={onOpenLogError} className="btn btn-success btn-sm" style={{ marginTop: 6 }}>
+                <Plus style={{ width: 13, height: 13 }} />
                 Log Error
               </button>
             </div>
@@ -169,7 +168,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   key={err.id}
                   onClick={() => onSelectError(err)}
                   style={{
-                    padding: '16px 20px',
+                    padding: '18px 22px',
                     borderBottom: '1px solid var(--border-subtle)',
                     cursor: 'pointer',
                     background: isSelected ? 'rgba(253, 173, 0, 0.12)' : 'transparent',
@@ -179,10 +178,10 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'var(--hover)'; }}
                   onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 8 }}>
-                    <Terminal style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <Terminal style={{ width: 13, height: 13, color: 'var(--primary)', flexShrink: 0 }} />
                     <span className="mono" style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       color: isSelected ? '#fdad00' : 'var(--text)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -196,28 +195,51 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   </div>
 
                   <div className="mono" style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     color: 'var(--text-muted)',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    marginBottom: 8,
+                    marginBottom: 10,
                   }}>
                     {err.message}
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{err.project}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                    <span style={{
+                      fontSize: 11,
+                      color: 'var(--text-dim)',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      minWidth: 0,
+                      flexShrink: 1,
+                    }}>
+                      {err.project}
+                    </span>
                     {err.tags.slice(0, 2).map((t) => (
-                      <span key={t} className="badge badge-muted" style={{ fontSize: 9 }}>#{t}</span>
+                      <span
+                        key={t}
+                        className="badge badge-muted"
+                        style={{
+                          fontSize: 10,
+                          flexShrink: 0,
+                          maxWidth: 120,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        #{t}
+                      </span>
                     ))}
-                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Zap style={{ width: 10, height: 10, color: 'var(--success)' }} />
-                      <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>
+                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                      <Zap style={{ width: 11, height: 11, color: 'var(--success)' }} />
+                      <span className="mono" style={{ fontSize: 11, color: 'var(--text-dim)' }}>
                         {err.solutions?.length || 0}
                       </span>
                       {topSolution?.decayScore !== undefined && (
-                        <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>
+                        <span className="mono" style={{ fontSize: 11, color: 'var(--text-dim)' }}>
                           · {topSolution.decayScore.toFixed(2)}
                         </span>
                       )}
@@ -231,33 +253,33 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {selectedError ? (
-            <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 920, width: '100%', margin: '0 auto' }}>
 
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                     <span className="badge badge-blue">#{selectedError.id}</span>
                     <span className="badge badge-blue">{selectedError.language}</span>
-                    <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{selectedError.project}</span>
+                    <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{selectedError.project}</span>
                   </div>
-                  <div className="mono" style={{ fontSize: 12, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.4 }}>
+                  <div className="mono" style={{ fontSize: 13.5, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5 }}>
                     {selectedError.signature}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <button
                     onClick={() => onLinkError(selectedError.id)}
                     className="btn btn-ghost btn-icon"
                     title="Link to another error"
                   >
-                    <Link style={{ width: 13, height: 13 }} />
+                    <Link style={{ width: 15, height: 15 }} />
                   </button>
                   <button
                     onClick={() => setDeleteConfirmId(selectedError.id)}
                     className="btn btn-ghost btn-icon"
                     title="Delete"
                   >
-                    <Trash2 style={{ width: 13, height: 13 }} />
+                    <Trash2 style={{ width: 15, height: 15 }} />
                   </button>
                 </div>
               </div>
@@ -265,14 +287,14 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
               <div className="tool-divider" />
 
               <div>
-                <div className="section-label" style={{ marginBottom: 5 }}>Exception Message</div>
+                <div className="section-label" style={{ marginBottom: 8 }}>Exception Message</div>
                 <div className="code-block">{selectedError.message}</div>
               </div>
 
               {selectedError.tags.length > 0 && (
                 <div>
-                  <div className="section-label" style={{ marginBottom: 5 }}>Tags</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  <div className="section-label" style={{ marginBottom: 8 }}>Tags</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {selectedError.tags.map((t) => (
                       <span key={t} className="badge badge-muted">#{t}</span>
                     ))}
@@ -281,45 +303,41 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
               )}
 
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <Zap style={{ width: 11, height: 11, color: 'var(--success)' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     Ranked Fix Strategies
                     <span className="badge badge-muted">{selectedError.solutions?.length || 0}</span>
                   </div>
                   <button onClick={() => onAddSolution(selectedError.id)} className="btn btn-success btn-sm">
-                    <Plus style={{ width: 10, height: 10 }} />
+                    <Plus style={{ width: 12, height: 12 }} />
                     Attach Fix
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {selectedError.solutions && selectedError.solutions.length > 0 ? (
                     selectedError.solutions.map((sol, index) => (
-                      <div key={sol.id} className="tool-card" style={{ padding: '16px 20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+                      <div key={sol.id} className="tool-card" style={{ padding: '20px 22px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span className="badge badge-green">#{index + 1}</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                              <ChevronRight style={{ width: 10, height: 10, color: 'var(--text-dim)' }} />
-                            </span>
                           </div>
-                          <span className="mono" style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                          <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                             score {sol.decayScore?.toFixed(4) ?? 'N/A'}
                           </span>
                         </div>
-                        <p style={{ fontSize: 11.5, color: 'var(--text)', lineHeight: 1.55, margin: 0 }}>
+                        <p style={{ fontSize: 12.5, color: 'var(--text)', lineHeight: 1.6, margin: 0 }}>
                           {sol.description}
                         </p>
-                        <div className="tool-divider" style={{ margin: '8px 0' }} />
-                        <div className="mono" style={{ display: 'flex', gap: 14, fontSize: 10, color: 'var(--text-dim)' }}>
-                          <span>✓ {sol.successCount} success</span>
-                          <span>✗ {sol.failureCount} fail</span>
+                        <div className="tool-divider" style={{ margin: '12px 0' }} />
+                        <div className="mono" style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--text-dim)' }}>
+                          <span>{sol.successCount} success</span>
+                          <span>{sol.failureCount} fail</span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="tool-card" style={{ padding: '16px 10px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 11 }}>
+                    <div className="tool-card" style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 12 }}>
                       No solutions attached. Click "Attach Fix" to log one.
                     </div>
                   )}
@@ -328,9 +346,9 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
 
             </div>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)' }}>
-              <Terminal style={{ width: 28, height: 28, opacity: 0.3 }} />
-              <span style={{ fontSize: 11 }}>Select an error to inspect</span>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--text-dim)' }}>
+              <Terminal style={{ width: 36, height: 36, opacity: 0.3 }} />
+              <span style={{ fontSize: 12.5 }}>Select an error to inspect</span>
             </div>
           )}
         </div>

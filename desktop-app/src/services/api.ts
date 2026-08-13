@@ -1,14 +1,12 @@
 import {
   ErrorRecord,
   Solution,
-  DebugSession,
   ErrorRelation,
   PatternCluster,
   HealthStatus,
   CreateErrorRequest,
   CreateSolutionRequest,
   SolutionFeedbackRequest,
-  CreateSessionRequest,
   SystemConfig,
 } from '../types/api';
 
@@ -163,13 +161,6 @@ export class RecallApiService {
     }
 
     const created = res.data;
-    if (req.initialSolution) {
-      await this.addSolution(created.id, {
-        description: req.initialSolution,
-        successCount: 1,
-        feedbackScore: 5.0,
-      });
-    }
     return this.attachDecayScores(created);
   }
 
@@ -264,13 +255,11 @@ export class RecallApiService {
   }
 
   public async addSolution(errorId: number, req: CreateSolutionRequest): Promise<Solution> {
+    // New solutions start with zero history — only the description is sent.
     const res = await this.executeRequest<Solution>(`/errors/${errorId}/solutions`, {
       method: 'POST',
       body: {
         description: req.description,
-        successCount: req.successCount ?? 1,
-        lastSuccessDate: req.lastSuccessDate || new Date().toISOString(),
-        feedbackScore: req.feedbackScore ?? 5.0,
       },
     });
     if (!res.ok || !res.data) {
@@ -301,62 +290,6 @@ export class RecallApiService {
     return res.data;
   }
 
-  public async createSession(req: CreateSessionRequest): Promise<DebugSession> {
-    const payload = {
-      errorId: req.errorRecordIds?.[0] || null,
-      project: req.project,
-      actionsPerformed: `${req.title}: ${req.notes}`,
-      sessionDate: new Date().toISOString(),
-      feedback: req.notes,
-    };
-    const res = await this.executeRequest<any>('/sessions', {
-      method: 'POST',
-      body: payload,
-    });
-    if (!res.ok || !res.data) {
-      throw new Error(`Failed to log debug session: ${res.error}`);
-    }
-    const d = res.data;
-    return {
-      id: d.id,
-      title: req.title,
-      durationMinutes: req.durationMinutes,
-      notes: req.notes,
-      project: d.project || req.project,
-      timestamp: d.sessionDate || new Date().toISOString(),
-      errorRecordIds: req.errorRecordIds,
-      errorRecordId: d.errorRecordId,
-      actionsPerformed: d.actionsPerformed,
-      sessionDate: d.sessionDate,
-      feedback: d.feedback,
-    };
-  }
-
-  public async getSessions(project = '', errorId?: number): Promise<DebugSession[]> {
-    let endpoint = '/sessions';
-    const params = new URLSearchParams();
-    if (project) params.append('project', project);
-    if (errorId) params.append('errorId', errorId.toString());
-    if (params.toString()) endpoint += `?${params.toString()}`;
-
-    const res = await this.executeRequest<any[]>(endpoint);
-    if (res.ok && Array.isArray(res.data)) {
-      return res.data.map((s) => ({
-        id: s.id,
-        title: s.title || s.actionsPerformed || `Debug Session #${s.id}`,
-        durationMinutes: s.durationMinutes || 30,
-        notes: s.notes || s.feedback || s.actionsPerformed || 'No notes',
-        project: s.project || 'General',
-        timestamp: s.timestamp || s.sessionDate || new Date().toISOString(),
-        errorRecordIds: s.errorRecordIds || (s.errorRecordId ? [s.errorRecordId] : []),
-        errorRecordId: s.errorRecordId,
-        actionsPerformed: s.actionsPerformed,
-        sessionDate: s.sessionDate,
-        feedback: s.feedback,
-      }));
-    }
-    return [];
-  }
 
   public async linkErrors(sourceId: number, targetId: number): Promise<ErrorRelation> {
     const res = await this.executeRequest<ErrorRelation>(`/errors/${sourceId}/relations`, {
@@ -379,6 +312,12 @@ export class RecallApiService {
 
   public async getPatterns(): Promise<PatternCluster[]> {
     const res = await this.executeRequest<PatternCluster[]>('/patterns');
+    if (res.ok && res.data) return res.data;
+    return [];
+  }
+
+  public async getRelations(): Promise<ErrorRelation[]> {
+    const res = await this.executeRequest<ErrorRelation[]>('/relations');
     if (res.ok && res.data) return res.data;
     return [];
   }

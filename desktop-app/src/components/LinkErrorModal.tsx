@@ -42,25 +42,25 @@ export const LinkErrorModal: React.FC<LinkErrorModalProps> = ({
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(1,4,9,0.75)', backdropFilter: 'blur(4px)' }} className="fade-in">
-      <div className="tool-panel" style={{ width: '100%', maxWidth: 400, padding: '14px 16px', borderRadius: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <Link style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Link Graph Edge</span>
+      <div className="tool-panel" style={{ width: '100%', maxWidth: 480, padding: '24px 26px', borderRadius: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 14, marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Link style={{ width: 15, height: 15, color: 'var(--primary)' }} />
+            <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Link Graph Edge</span>
           </div>
-          <button onClick={onClose} className="btn btn-ghost btn-icon"><X style={{ width: 14, height: 14 }} /></button>
+          <button onClick={onClose} className="btn btn-ghost btn-icon"><X style={{ width: 15, height: 15 }} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <div className="section-label" style={{ marginBottom: 4 }}>Source Node</div>
-            <div className="code-block" style={{ fontSize: 11 }}>
+            <div className="section-label" style={{ marginBottom: 6 }}>Source Node</div>
+            <div className="code-block">
               #{sourceErr?.id}: {sourceErr?.signature}
             </div>
           </div>
 
           <div>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Target Error *</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Target Error *</label>
             <select
               value={targetId}
               onChange={(e) => setTargetId(Number(e.target.value))}
@@ -74,7 +74,7 @@ export const LinkErrorModal: React.FC<LinkErrorModalProps> = ({
           </div>
 
           <div className="tool-divider" />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4 }}>
             <button type="button" onClick={onClose} className="btn btn-ghost">Cancel</button>
             <button type="submit" disabled={isSubmitting || !targetId} className="btn btn-primary">
               {isSubmitting ? 'Linking…' : 'Create Edge'}

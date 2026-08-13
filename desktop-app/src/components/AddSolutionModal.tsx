@@ -16,8 +16,6 @@ export const AddSolutionModal: React.FC<AddSolutionModalProps> = ({
   onSubmit,
 }) => {
   const [description, setDescription] = useState('');
-  const [successCount, setSuccessCount] = useState(1);
-  const [feedbackScore, setFeedbackScore] = useState(5.0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen || errorId === null) return null;
@@ -28,15 +26,11 @@ export const AddSolutionModal: React.FC<AddSolutionModalProps> = ({
 
     setIsSubmitting(true);
     try {
+      // A new solution starts with zero history; success/failure/rating come from real feedback.
       await onSubmit(errorId, {
         description: description.trim(),
-        successCount,
-        feedbackScore,
-        lastSuccessDate: new Date().toISOString(),
       });
       setDescription('');
-      setSuccessCount(1);
-      setFeedbackScore(5.0);
       onClose();
     } catch (err) {
       console.error(err);
@@ -47,21 +41,21 @@ export const AddSolutionModal: React.FC<AddSolutionModalProps> = ({
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(1,4,9,0.75)', backdropFilter: 'blur(4px)' }} className="fade-in">
-      <div className="tool-panel" style={{ width: '100%', maxWidth: 440, padding: '14px 16px', borderRadius: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <Zap style={{ width: 13, height: 13, color: 'var(--success)' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Attach Solution Strategy</span>
+      <div className="tool-panel" style={{ width: '100%', maxWidth: 520, padding: '24px 26px', borderRadius: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 14, marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Zap style={{ width: 15, height: 15, color: 'var(--success)' }} />
+            <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Attach Solution Strategy</span>
           </div>
-          <button onClick={onClose} className="btn btn-ghost btn-icon"><X style={{ width: 14, height: 14 }} /></button>
+          <button onClick={onClose} className="btn btn-ghost btn-icon"><X style={{ width: 15, height: 15 }} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Solution Description *</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Solution Description *</label>
             <textarea
               required
-              rows={3}
+              rows={4}
               placeholder="Resolution steps, code guard, or configuration fix..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -70,23 +64,8 @@ export const AddSolutionModal: React.FC<AddSolutionModalProps> = ({
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Success Count</label>
-              <input type="number" min={1} max={100} value={successCount}
-                onChange={(e) => setSuccessCount(Number(e.target.value))}
-                className="tool-input mono" style={{ width: '100%' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Feedback Score (1–5)</label>
-              <input type="number" step="0.1" min={1.0} max={5.0} value={feedbackScore}
-                onChange={(e) => setFeedbackScore(Number(e.target.value))}
-                className="tool-input mono" style={{ width: '100%' }} />
-            </div>
-          </div>
-
           <div className="tool-divider" />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4 }}>
             <button type="button" onClick={onClose} className="btn btn-ghost">Cancel</button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
               {isSubmitting ? 'Attaching…' : 'Attach Solution'}

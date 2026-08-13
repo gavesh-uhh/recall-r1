@@ -81,18 +81,18 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <History style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Debug Sessions</span>
+      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <History style={{ width: 15, height: 15, color: 'var(--text-dim)' }} />
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text)' }}>Debug Sessions</span>
           <span className="badge badge-muted" style={{ marginLeft: 4 }}>{filteredSessions.length}</span>
         </div>
 
-        <div className="vert-divider" style={{ height: 18 }} />
+        <div className="vert-divider" style={{ height: 20 }} />
 
         {/* Project Selection Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Folder style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Folder style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
           <select
             value={selectedProjectFilter}
             onChange={(e) => setSelectedProjectFilter(e.target.value)}
@@ -106,25 +106,25 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
         </div>
 
         {/* Search input */}
-        <div style={{ position: 'relative', minWidth: 180 }}>
-          <Search style={{ position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)', width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ position: 'relative', minWidth: 220 }}>
+          <Search style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 13, height: 13, color: 'var(--text-dim)' }} />
           <input
             type="text"
             placeholder="Search sessions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="tool-input mono"
-            style={{ width: '100%', paddingLeft: 22, paddingRight: searchQuery ? 22 : 6, fontSize: 11, height: 26 }}
+            style={{ width: '100%', paddingLeft: 30, paddingRight: searchQuery ? 28 : 13 }}
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               style={{
-                position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)',
-                background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex'
+                position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex', padding: 3
               }}
             >
-              <X style={{ width: 10, height: 10 }} />
+              <X style={{ width: 12, height: 12 }} />
             </button>
           )}
         </div>
@@ -136,36 +136,35 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
               setSearchQuery('');
             }}
             className="btn btn-ghost btn-xs"
-            style={{ fontSize: 10, gap: 4 }}
           >
-            <X style={{ width: 10, height: 10 }} />
+            <X style={{ width: 11, height: 11 }} />
             Clear Filters
           </button>
         )}
 
         <div style={{ marginLeft: 'auto' }}>
           <button onClick={() => setShowModal(true)} className="btn btn-primary">
-            <Plus style={{ width: 12, height: 12 }} />
+            <Plus style={{ width: 13, height: 13 }} />
             Log Session
           </button>
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {filteredSessions.length === 0 ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--text-dim)', paddingTop: 60 }}>
-            <Clock style={{ width: 28, height: 28, opacity: 0.3 }} />
-            <span style={{ fontSize: 11 }}>No debug sessions found</span>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--text-dim)', paddingTop: 80 }}>
+            <Clock style={{ width: 36, height: 36, opacity: 0.3 }} />
+            <span style={{ fontSize: 12.5 }}>No debug sessions found</span>
             {(selectedProjectFilter || searchQuery) ? (
               <button
                 onClick={() => { setSelectedProjectFilter(''); setSearchQuery(''); }}
                 className="btn btn-ghost btn-sm"
-                style={{ marginTop: 4 }}
+                style={{ marginTop: 6 }}
               >
                 Reset Filters
               </button>
             ) : (
-              <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: 4 }}>
+              <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: 6 }}>
                 <Plus style={{ width: 12, height: 12 }} />
                 Log First Session
               </button>
@@ -182,35 +181,35 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
             const linkedCount = session.errorRecordIds?.length ?? (session.errorRecordId ? 1 : 0);
 
             return (
-              <div key={session.id} className="tool-card" style={{ padding: '12px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+              <div key={session.id} className="tool-card" style={{ padding: '18px 20px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                       <span className="badge badge-blue">#{session.id}</span>
-                      <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{session.project || 'General'}</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{session.project || 'General'}</span>
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {sessionTitle}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                    <Clock style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
-                    <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <Clock style={{ width: 12, height: 12, color: 'var(--text-dim)' }} />
+                    <span className="mono" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                       {session.durationMinutes || 30}m
                     </span>
                   </div>
                 </div>
 
-                <div className="code-block" style={{ fontSize: 11, marginBottom: 10 }}>
+                <div className="code-block" style={{ marginBottom: 12 }}>
                   {sessionNotes}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Calendar style={{ width: 10, height: 10, color: 'var(--text-dim)' }} />
-                    <span className="mono" style={{ fontSize: 10, color: 'var(--text-dim)' }}>{formattedDate}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Calendar style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+                    <span className="mono" style={{ fontSize: 11, color: 'var(--text-dim)' }}>{formattedDate}</span>
                   </div>
-                  <span className="mono" style={{ fontSize: 10, color: linkedCount > 0 ? '#fdad00' : 'var(--text-dim)' }}>
+                  <span className="mono" style={{ fontSize: 11, color: linkedCount > 0 ? '#fdad00' : 'var(--text-dim)' }}>
                     {linkedCount} linked error{linkedCount !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -228,15 +227,15 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
         }}
           className="fade-in"
         >
-          <div className="tool-panel" style={{ width: '100%', maxWidth: 520, padding: '20px 24px', borderRadius: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
-              <Clock style={{ width: 14, height: 14, color: 'var(--primary)' }} />
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Log Debug Session</span>
+          <div className="tool-panel" style={{ width: '100%', maxWidth: 560, padding: '26px 30px', borderRadius: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+              <Clock style={{ width: 16, height: 16, color: 'var(--primary)' }} />
+              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Log Debug Session</span>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                   Session Title *
                 </label>
                 <input
@@ -250,9 +249,9 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                     Duration (min) *
                   </label>
                   <input
@@ -266,7 +265,7 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                     Project *
                   </label>
                   <input
@@ -286,15 +285,14 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                   </datalist>
 
                   {projectsList.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4, alignItems: 'center' }}>
-                      <span style={{ fontSize: 9, color: 'var(--text-dim)' }}>Quick Pick:</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, alignItems: 'center' }}>
+                      <span style={{ fontSize: 10.5, color: 'var(--text-dim)' }}>Quick Pick:</span>
                       {projectsList.slice(0, 4).map((p) => (
                         <button
                           key={p}
                           type="button"
                           onClick={() => setProject(p)}
                           className={`btn btn-xs ${project === p ? 'btn-primary' : 'btn-ghost'}`}
-                          style={{ fontSize: 9, padding: '1px 5px', height: 'auto' }}
                         >
                           {p}
                         </button>
@@ -305,12 +303,12 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                   Investigation Notes *
                 </label>
                 <textarea
                   required
-                  rows={3}
+                  rows={4}
                   placeholder="Steps taken, root cause, fix applied..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -320,22 +318,22 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                   Link Error Records
                 </label>
                 <div style={{
-                  maxHeight: 100,
+                  maxHeight: 170,
                   overflowY: 'auto',
                   background: 'var(--bg)',
                   border: '1px solid var(--border)',
-                  borderRadius: 5,
-                  padding: '4px 6px',
+                  borderRadius: 8,
+                  padding: '8px 10px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 3,
+                  gap: 6,
                 }}>
                   {errors.length === 0 ? (
-                    <span style={{ fontSize: 11, color: 'var(--text-dim)', padding: '4px 0' }}>No error records available</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-dim)', padding: '6px 2px' }}>No error records available</span>
                   ) : (
                     errors.map((err) => {
                       const isChecked = selectedErrorIds.includes(err.id);
@@ -345,17 +343,17 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                           onClick={() => toggleErrorSelect(err.id)}
                           style={{
                             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            padding: '3px 6px',
-                            borderRadius: 4,
+                            padding: '8px 10px',
+                            borderRadius: 6,
                             cursor: 'pointer',
                             background: isChecked ? 'rgba(253, 173, 0, 0.15)' : 'transparent',
                             border: `1px solid ${isChecked ? 'rgba(253, 173, 0, 0.4)' : 'transparent'}`,
                           }}
                         >
-                          <span className="mono" style={{ fontSize: 10, color: isChecked ? '#fdad00' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                          <span className="mono" style={{ fontSize: 11, color: isChecked ? '#fdad00' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                             #{err.id} {err.signature}
                           </span>
-                          {isChecked && <CheckCircle style={{ width: 11, height: 11, color: 'var(--primary)', flexShrink: 0 }} />}
+                          {isChecked && <CheckCircle style={{ width: 13, height: 13, color: 'var(--primary)', flexShrink: 0 }} />}
                         </div>
                       );
                     })
@@ -365,7 +363,7 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
 
               <div className="tool-divider" />
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost">
                   Cancel
                 </button>

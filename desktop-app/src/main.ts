@@ -53,10 +53,10 @@ ipcMain.handle(
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    minWidth: 1280,
-    minHeight: 720,
+    width: 1440,
+    height: 900,
+    minWidth: 1180,
+    minHeight: 700,
     title: 'Recall',
     backgroundColor: '#000000',
     autoHideMenuBar: true,

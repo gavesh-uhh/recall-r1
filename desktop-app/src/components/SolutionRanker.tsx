@@ -34,7 +34,6 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'ranker' | 'simulator'>('ranker');
-  const [fetchedSolutions, setFetchedSolutions] = useState<Solution[]>([]);
 
   const projects = useMemo(() => {
     return Array.from(
@@ -77,23 +76,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
 
   const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
 
-  useEffect(() => {
-    if (selectedErrorId) {
-      let isMounted = true;
-      recallApi.getRankedSolutions(selectedErrorId)
-        .then((sols) => {
-          if (isMounted && sols && sols.length > 0) {
-            setFetchedSolutions(sols);
-          }
-        })
-        .catch(() => {});
-      return () => { isMounted = false; };
-    }
-  }, [selectedErrorId]);
-
-  const activeSolutions = fetchedSolutions.length > 0
-    ? fetchedSolutions
-    : (selectedError?.solutions || []);
+  const activeSolutions = selectedError?.solutions || [];
 
   const simSolution: Solution = {
     id: 9999,
@@ -108,17 +91,17 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Zap style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
+      <div className="tool-toolbar" style={{ flexWrap: 'wrap', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Zap style={{ width: 15, height: 15, color: 'var(--primary)' }} />
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text)' }}>Solution Ranker</span>
         </div>
 
-        <div className="vert-divider" style={{ height: 18 }} />
+        <div className="vert-divider" style={{ height: 20 }} />
 
         {/* Project Selection Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Folder style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Folder style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
@@ -132,8 +115,8 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
         </div>
 
         {/* Language Selection Dropdown */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Code style={{ width: 11, height: 11, color: 'var(--text-dim)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Code style={{ width: 13, height: 13, color: 'var(--text-dim)' }} />
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -153,26 +136,25 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
               setSelectedLanguage('');
             }}
             className="btn btn-ghost btn-xs"
-            style={{ fontSize: 10, gap: 4 }}
           >
-            <X style={{ width: 10, height: 10 }} />
+            <X style={{ width: 11, height: 11 }} />
             Clear Filters
           </button>
         )}
 
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
           <button
             onClick={() => setActiveTab('ranker')}
-            className={`btn btn-sm ${activeTab === 'ranker' ? 'btn-primary' : 'btn-ghost'}`}
+            className={`btn ${activeTab === 'ranker' ? 'btn-primary' : 'btn-ghost'}`}
           >
-            <Award style={{ width: 11, height: 11 }} />
+            <Award style={{ width: 13, height: 13 }} />
             Rankings
           </button>
           <button
             onClick={() => setActiveTab('simulator')}
-            className={`btn btn-sm ${activeTab === 'simulator' ? 'btn-primary' : 'btn-ghost'}`}
+            className={`btn ${activeTab === 'simulator' ? 'btn-primary' : 'btn-ghost'}`}
           >
-            <Calculator style={{ width: 11, height: 11 }} />
+            <Calculator style={{ width: 13, height: 13 }} />
             Simulator
           </button>
         </div>
@@ -180,18 +162,17 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
 
       {activeTab === 'ranker' ? (
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <div style={{ width: 300, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
-            <div className="section-label" style={{ padding: '14px 18px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ width: 320, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div className="section-label" style={{ padding: '18px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Error Records ({filteredErrors.length})</span>
             </div>
             {filteredErrors.length === 0 ? (
-              <div className="text-xs text-slate-500 p-4 text-center">
+              <div className="text-xs text-slate-500 p-6 text-center">
                 No error records found matching filters.
                 {(selectedProject || selectedLanguage) && (
                   <button
                     onClick={() => { setSelectedProject(''); setSelectedLanguage(''); }}
-                    className="btn btn-ghost btn-xs block mx-auto mt-2"
-                    style={{ fontSize: 10 }}
+                    className="btn btn-ghost btn-xs block mx-auto mt-3"
                   >
                     Reset Filters
                   </button>
@@ -205,19 +186,19 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
                     key={err.id}
                     onClick={() => setSelectedErrorId(err.id)}
                     style={{
-                      padding: '14px 18px',
+                      padding: '16px 20px',
                       borderBottom: '1px solid var(--border-subtle)',
                       borderLeft: `4px solid ${isSelected ? '#fdad00' : 'transparent'}`,
                       background: isSelected ? 'rgba(253, 173, 0, 0.12)' : 'transparent',
                       cursor: 'pointer',
                     }}
                   >
-                    <div className="mono" style={{ fontSize: 11, fontWeight: 600, color: isSelected ? '#fdad00' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>
+                    <div className="mono" style={{ fontSize: 12, fontWeight: 600, color: isSelected ? '#fdad00' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>
                       {err.signature}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{err.project}</span>
-                      <span style={{ fontSize: 10, color: 'var(--success)', fontFamily: 'monospace' }}>{err.solutions?.length || 0} fixes</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{err.project}</span>
+                      <span style={{ fontSize: 11, color: 'var(--success)', fontFamily: 'monospace' }}>{err.solutions?.length || 0} fixes</span>
                     </div>
                   </div>
                 );
@@ -227,64 +208,85 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
 
           <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             {selectedError ? (
-              <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-                  <div className="section-label" style={{ marginBottom: 4 }}>Selected Signature</div>
-                  <div className="mono" style={{ fontSize: 11, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all' }}>
+              <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 920, width: '100%', margin: '0 auto' }}>
+                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 18 }}>
+                  <div className="section-label" style={{ marginBottom: 6 }}>Selected Signature</div>
+                  <div className="mono" style={{ fontSize: 13, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5 }}>
                     {selectedError.signature}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {activeSolutions && activeSolutions.length > 0 ? (
                     activeSolutions.map((sol, index) => {
                       const math = recallApi.calculateDecayScore(sol);
 
                       return (
-                        <div key={sol.id} className="tool-card" style={{ padding: '18px 22px' }}>
-                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                        <div key={sol.id} className="tool-card" style={{ padding: '22px 24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
                               <span className="badge badge-blue mono" style={{ flexShrink: 0 }}>#{index + 1}</span>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 11.5, color: 'var(--text)', fontWeight: 500, lineHeight: 1.5, marginBottom: 5 }}>
+                                <div style={{ fontSize: 12.5, color: 'var(--text)', fontWeight: 500, lineHeight: 1.6, marginBottom: 6 }}>
                                   {sol.description}
                                 </div>
-                                <div className="mono" style={{ fontSize: 10, color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                                  <Clock style={{ width: 10, height: 10 }} />
-                                  {math.daysSinceSuccess.toFixed(1)}d ago
+                                <div className="mono" style={{ fontSize: 11, color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <Clock style={{ width: 11, height: 11 }} />
+                                  {sol.lastSuccessDate ? `${math.daysSinceSuccess.toFixed(1)}d ago` : 'never tried'}
                                 </div>
                               </div>
                             </div>
-                            <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 14 }}>
-                              <div className="section-label" style={{ marginBottom: 3 }}>Score</div>
-                              <div className="mono" style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary)' }}>
+                            <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 16 }}>
+                              <div className="section-label" style={{ marginBottom: 4 }}>Score</div>
+                              <div className="mono" style={{ fontSize: 16, fontWeight: 700, color: 'var(--primary)' }}>
                                 {math.totalScore.toFixed(4)}
                               </div>
                             </div>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '14px 18px', marginBottom: 14 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18, background: 'var(--bg)', border: '1px solid var(--border-subtle)', borderRadius: 10, padding: '16px 22px', marginBottom: 16 }}>
                             <div>
-                              <div className="section-label" style={{ marginBottom: 4 }}>Success Rate</div>
-                              <div className="mono" style={{ fontSize: 11, color: 'var(--success)', fontWeight: 600 }}>{(math.successRate * 100).toFixed(0)}%</div>
+                              <div className="section-label" style={{ marginBottom: 5 }}>Success Rate</div>
+                              <div className="mono" style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600 }}>{(math.successRate * 100).toFixed(0)}%</div>
                             </div>
                             <div>
-                              <div className="section-label" style={{ marginBottom: 4 }}>Usage Freq</div>
-                              <div className="mono" style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600 }}>{(math.usageFreq * 100).toFixed(0)}%</div>
+                              <div className="section-label" style={{ marginBottom: 5 }}>Usage Freq</div>
+                              <div className="mono" style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 600 }}>{(math.usageFreq * 100).toFixed(0)}%</div>
                             </div>
                             <div>
-                              <div className="section-label" style={{ marginBottom: 4 }}>Decay</div>
-                              <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{math.decayFactor.toFixed(3)}</div>
+                              <div className="section-label" style={{ marginBottom: 5 }}>Decay</div>
+                              <div className="mono" style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{math.decayFactor.toFixed(3)}</div>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderTop: '1px solid var(--border-subtle)', paddingTop: 16 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginRight: 'auto' }}>
+                              <span style={{ fontSize: 11, color: 'var(--text-dim)', marginRight: 4 }}>Rate this fix</span>
+                              {[1, 2, 3, 4, 5].map((n) => {
+                                const active = n <= Math.round(sol.feedbackScore || 0);
+                                return (
+                                  <button
+                                    key={n}
+                                    type="button"
+                                    onClick={() => onFeedback(sol.id, { rating: n })}
+                                    title={`Rate ${n}/5 (optional)`}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}
+                                  >
+                                    <Star
+                                      style={{ width: 14, height: 14 }}
+                                      fill={active ? '#fdad00' : 'none'}
+                                      color={active ? '#fdad00' : 'var(--text-dim)'}
+                                    />
+                                  </button>
+                                );
+                              })}
+                            </div>
                             <button onClick={() => onFeedback(sol.id, { success: false })} className="btn btn-danger btn-sm">
-                              <XCircle style={{ width: 11, height: 11 }} />
-                              Failed
+                              <XCircle style={{ width: 12, height: 12 }} />
+                              Didn't work
                             </button>
                             <button onClick={() => onFeedback(sol.id, { success: true })} className="btn btn-success btn-sm">
-                              <CheckCircle2 style={{ width: 11, height: 11 }} />
+                              <CheckCircle2 style={{ width: 12, height: 12 }} />
                               Worked
                             </button>
                           </div>
@@ -292,14 +294,14 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
                       );
                     })
                   ) : (
-                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 11 }}>
+                  <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 12 }}>
                     No solutions logged for this error record.
                   </div>
                 )}
               </div>
             </div>
             ) : (
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: 11 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: 12.5 }}>
                 Select an error record on the left.
               </div>
             )}
@@ -307,13 +309,13 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
         </div>
       ) : (
         <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ width: 360, flexShrink: 0, borderRight: '1px solid var(--border)', overflowY: 'auto', padding: '28px 26px', display: 'flex', flexDirection: 'column', gap: 28 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Sliders style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Controls</span>
+              <Sliders style={{ width: 14, height: 14, color: 'var(--primary)' }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>Decay Controls</span>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-slate-300">Days Passed:</span>
                 <span className="text-[#fdad00] font-bold">{simDaysAgo} days</span>
@@ -329,7 +331,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-slate-300">Success Count:</span>
                 <span className="text-emerald-400 font-bold">{simSuccessCount}</span>
@@ -344,7 +346,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-slate-300">Failure Count:</span>
                 <span className="text-rose-400 font-bold">{simFailureCount}</span>
@@ -359,7 +361,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <div className="flex justify-between text-xs font-mono">
                 <span className="text-slate-300">Rating:</span>
                 <span className="text-amber-300 font-bold">⭐ {simFeedbackScore.toFixed(1)} / 5.0</span>
@@ -375,19 +377,19 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
               />
             </div>
 
-            <div className="p-3 rounded-lg bg-black border border-[#fdad00]/40 text-[11px] text-slate-300 leading-relaxed font-mono">
+            <div className="p-4 rounded-lg bg-black border border-[#fdad00]/40 text-[12px] text-slate-300 leading-relaxed font-mono">
               <div>Computed Score: <b className="text-[#fdad00]">{simResult.totalScore.toFixed(4)}</b></div>
-              <div className="text-slate-500 text-[10px] mt-0.5">
+              <div className="text-slate-500 text-[11px] mt-1">
                 Multiplier: {simResult.decayFactor.toFixed(4)}
               </div>
             </div>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '24px 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 14, marginBottom: 18 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '28px 32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16, marginBottom: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Calculator style={{ width: 13, height: 13, color: 'var(--primary)' }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Decay Trajectory</span>
+                <Calculator style={{ width: 14, height: 14, color: 'var(--primary)' }} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>Decay Trajectory</span>
               </div>
             </div>
 
