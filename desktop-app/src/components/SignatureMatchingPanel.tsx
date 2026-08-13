@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Network, Activity, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
+import { Network, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import { recallApi } from '../services/api';
 import { SignatureMatchDto, SignatureCandidate, ErrorRecord } from '../types/api';
 
@@ -13,8 +13,7 @@ interface SignatureMatchingPanelProps {
 export const SignatureMatchingPanel: React.FC<SignatureMatchingPanelProps> = ({ 
   errorId, 
   allErrors,
-  onSelectError,
-  onNavigateToPatterns
+  onSelectError
 }) => {
   const [matchData, setMatchData] = useState<SignatureMatchDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,61 +46,52 @@ export const SignatureMatchingPanel: React.FC<SignatureMatchingPanelProps> = ({
   }, [errorId]);
 
   if (loading) {
-    return <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: 16 }}>Loading signature matching data...</div>;
+    return <div style={{ fontSize: 11, color: 'var(--text-dim)', padding: '8px 0' }}>Loading signature matching data...</div>;
   }
 
   if (error || !matchData) {
     return (
-      <div className="tool-card" style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-dim)', fontSize: 12 }}>
+      <div className="tool-card" style={{ padding: '12px 16px', color: 'var(--text-dim)', fontSize: 11 }}>
         {error || 'No matching data found.'}
       </div>
     );
   }
 
   const renderCandidate = (label: string, candidate: SignatureCandidate | null) => {
-    if (!candidate) {
-      return (
-        <div style={{ flex: 1, padding: 16, border: '1px solid var(--border-subtle)', borderRadius: 6, background: 'rgba(255, 255, 255, 0.02)' }}>
-          <div className="section-label" style={{ marginBottom: 8, color: 'var(--text-dim)' }}>{label}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>None found</div>
-        </div>
-      );
-    }
+    if (!candidate) return null;
     
     const isMatched = matchData.matchOccurred && matchData.matchedErrorId === candidate.errorId;
     const isSelf = candidate.errorId === errorId;
 
     return (
       <div style={{ 
-        flex: 1, 
-        padding: 16, 
-        border: `1px solid ${isMatched ? '#fdad00' : 'var(--border-subtle)'}`, 
-        borderRadius: 6, 
-        background: isMatched ? 'rgba(253, 173, 0, 0.05)' : 'rgba(255, 255, 255, 0.02)',
-        position: 'relative'
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        padding: '6px 8px', 
+        border: `1px solid ${isMatched ? '#fdad00' : 'transparent'}`, 
+        borderRadius: 4, 
+        background: isMatched ? 'rgba(253, 173, 0, 0.05)' : 'var(--hover)',
+        marginBottom: 4
       }}>
-        {isMatched && (
-          <div style={{ position: 'absolute', top: -8, right: 12, background: '#fdad00', color: '#000', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4 }}>
-            MATCHED
-          </div>
-        )}
-        <div className="section-label" style={{ marginBottom: 8 }}>{label}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-          <span className="badge badge-blue">#{candidate.errorId}</span>
-          <span style={{ fontSize: 11, color: isSelf ? 'var(--text-dim)' : (candidate.similarity >= matchData.prefixThreshold ? 'var(--success)' : 'var(--warning)') }}>
-            Similarity: {candidate.similarity}%
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          <span className="badge badge-blue" style={{ flexShrink: 0 }}>#{candidate.errorId}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-dim)', flexShrink: 0 }}>{label}</span>
+          <span className="mono" style={{ fontSize: 11, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {candidate.errorSignature}
           </span>
         </div>
-        <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', wordBreak: 'break-all', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {candidate.errorSignature}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <span style={{ fontSize: 11, fontWeight: 500, color: isSelf ? 'var(--text-dim)' : (candidate.similarity >= matchData.prefixThreshold ? 'var(--success)' : 'var(--warning)') }}>
+            {candidate.similarity}%
+          </span>
+          {isMatched && <span style={{ fontSize: 9, fontWeight: 700, color: '#fdad00', background: 'rgba(253, 173, 0, 0.1)', padding: '2px 4px', borderRadius: 2 }}>MATCH</span>}
         </div>
-        
-        {isSelf && (
-          <div style={{ marginTop: 8, fontSize: 10, color: 'var(--text-dim)', fontStyle: 'italic' }}>(Self Reference)</div>
-        )}
       </div>
     );
   };
+
+  const hasCandidates = matchData.predecessor || matchData.successor;
 
   const handleNavigateToMatch = () => {
     if (matchData.matchedErrorId) {
@@ -111,72 +101,53 @@ export const SignatureMatchingPanel: React.FC<SignatureMatchingPanelProps> = ({
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <Network style={{ width: 14, height: 14, color: 'var(--primary)' }} />
-        <div className="section-label" style={{ margin: 0 }}>Signature Matching</div>
+    <div className="tool-card" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Network style={{ width: 14, height: 14, color: 'var(--primary)' }} />
+          <div className="section-label" style={{ margin: 0 }}>Signature Matching</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {matchData.matchOccurred ? (
+            <CheckCircle2 style={{ width: 14, height: 14, color: 'var(--success)' }} />
+          ) : (
+            <XCircle style={{ width: 14, height: 14, color: 'var(--text-dim)' }} />
+          )}
+          <span style={{ fontSize: 11, color: matchData.matchOccurred ? 'var(--text)' : 'var(--text-dim)' }}>
+            {matchData.matchOccurred ? 'Match Found' : 'No Match'} ({matchData.prefixThreshold}% req)
+          </span>
+        </div>
       </div>
       
-      <div className="tool-card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-        
-        <div>
-          <div className="section-label" style={{ marginBottom: 6, fontSize: 10 }}>Current Signature</div>
-          <div className="mono" style={{ fontSize: 12, color: 'var(--text)', wordBreak: 'break-all', background: 'var(--hover)', padding: '8px 12px', borderRadius: 6 }}>
-            {matchData.currentSignature}
-          </div>
+      <div>
+        <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: 4 }}>
+          {matchData.currentSignature}
         </div>
-
-        <div>
-          <div className="section-label" style={{ marginBottom: 12, fontSize: 11, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Activity style={{ width: 12, height: 12 }} />
-            BST Candidates
-          </div>
-          <div style={{ display: 'flex', gap: 16 }}>
-            {renderCandidate('Predecessor', matchData.predecessor)}
-            {renderCandidate('Successor', matchData.successor)}
-          </div>
-        </div>
-
-        <div className="tool-divider" />
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              {matchData.matchOccurred ? (
-                <CheckCircle2 style={{ width: 16, height: 16, color: 'var(--success)' }} />
-              ) : (
-                <XCircle style={{ width: 16, height: 16, color: 'var(--text-dim)' }} />
-              )}
-              <span style={{ fontSize: 13, fontWeight: 600, color: matchData.matchOccurred ? 'var(--text)' : 'var(--text-dim)' }}>
-                {matchData.matchOccurred ? 'Match Found' : 'No Match Found'}
-              </span>
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              Threshold: {matchData.prefixThreshold}% similarity required
-            </div>
-          </div>
-
-          {matchData.matchOccurred && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Relationship created</div>
-                <div className="mono" style={{ fontSize: 11, color: '#fdad00', fontWeight: 600 }}>{matchData.relationshipType}</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <button 
-                  onClick={handleNavigateToMatch}
-                  className="btn btn-ghost btn-sm" 
-                  style={{ display: 'flex', gap: 4 }}
-                >
-                  View Error #{matchData.matchedErrorId}
-                  <ArrowRight style={{ width: 12, height: 12 }} />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
       </div>
+
+      <div>
+        {!hasCandidates ? (
+          <div style={{ fontSize: 11, color: 'var(--text-dim)', fontStyle: 'italic', paddingLeft: 4 }}>No BST candidates found</div>
+        ) : (
+          <div>
+            {renderCandidate('Pred', matchData.predecessor)}
+            {renderCandidate('Succ', matchData.successor)}
+          </div>
+        )}
+      </div>
+
+      {matchData.matchOccurred && matchData.matchedErrorId && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: -4 }}>
+          <button 
+            onClick={handleNavigateToMatch}
+            className="btn btn-ghost btn-sm" 
+            style={{ display: 'flex', gap: 4, height: 24, padding: '0 8px', fontSize: 11 }}
+          >
+            View Error #{matchData.matchedErrorId}
+            <ArrowRight style={{ width: 12, height: 12 }} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
