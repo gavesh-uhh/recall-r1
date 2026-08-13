@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Clock, Plus, Calendar, CheckCircle, History, Filter, Folder, Search, X } from 'lucide-react';
 import { DebugSession, ErrorRecord, CreateSessionRequest } from '../types/api';
+import { formatSignatureTitle } from '../utils/formatters';
 
 interface SessionLoggerProps {
   sessions: DebugSession[];
@@ -351,7 +352,7 @@ export const SessionLogger: React.FC<SessionLoggerProps> = ({
                           }}
                         >
                           <span className="mono" style={{ fontSize: 11, color: isChecked ? '#fdad00' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                            #{err.id} {err.signature}
+                            #{err.id} {formatSignatureTitle(err.signature)}
                           </span>
                           {isChecked && <CheckCircle style={{ width: 13, height: 13, color: 'var(--primary)', flexShrink: 0 }} />}
                         </div>

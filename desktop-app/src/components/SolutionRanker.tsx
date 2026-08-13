@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ErrorRecord, Solution, SolutionFeedbackRequest } from '../types/api';
 import { recallApi } from '../services/api';
+import { formatSignatureTitle } from '../utils/formatters';
 import { SolutionDecayChart } from './SolutionDecayChart';
 
 interface SolutionRankerProps {
@@ -194,7 +195,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
                     }}
                   >
                     <div className="mono" style={{ fontSize: 12, fontWeight: 600, color: isSelected ? '#fdad00' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>
-                      {err.signature}
+                      {formatSignatureTitle(err.signature)}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{err.project}</span>

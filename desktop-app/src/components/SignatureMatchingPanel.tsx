@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Network, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import { recallApi } from '../services/api';
 import { SignatureMatchDto, SignatureCandidate, ErrorRecord } from '../types/api';
+import { formatSignatureTitle } from '../utils/formatters';
 
 interface SignatureMatchingPanelProps {
   errorId: number;
@@ -77,8 +78,8 @@ export const SignatureMatchingPanel: React.FC<SignatureMatchingPanelProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
           <span className="badge badge-blue" style={{ flexShrink: 0 }}>#{candidate.errorId}</span>
           <span style={{ fontSize: 10, color: 'var(--text-dim)', flexShrink: 0 }}>{label}</span>
-          <span className="mono" style={{ fontSize: 11, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {candidate.errorSignature}
+          <span className="mono" style={{ fontSize: 11, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', title: candidate.errorSignature }}>
+            {formatSignatureTitle(candidate.errorSignature)}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
@@ -120,8 +121,8 @@ export const SignatureMatchingPanel: React.FC<SignatureMatchingPanelProps> = ({
       </div>
       
       <div>
-        <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: 4 }}>
-          {matchData.currentSignature}
+        <div className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: 4, title: matchData.currentSignature }}>
+          {formatSignatureTitle(matchData.currentSignature)}
         </div>
       </div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import { PatternCluster, ErrorRecord, ErrorRelation } from '../types/api';
+import { formatSignatureTitle } from '../utils/formatters';
 
 interface ErrorGraphEChartProps {
   patterns: PatternCluster[];
@@ -55,13 +56,14 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
   };
 
   errors.forEach((err) => {
+    const formattedTitle = formatSignatureTitle(err.signature);
     const shortSig =
-      err.signature.length > 18 ? `${err.signature.substring(0, 16)}…` : err.signature;
+      formattedTitle.length > 18 ? `${formattedTitle.substring(0, 16)}…` : formattedTitle;
 
     nodesMap.set(err.id, {
       id: err.id.toString(),
       name: `#${err.id} ${shortSig}`,
-      fullName: `#${err.id} ${err.signature}`,
+      fullName: `#${err.id} ${formattedTitle}`,
       category: err.project,
       symbolSize: Math.max(36, 28 + (err.solutions?.length || 0) * 8),
       value: `Project: ${err.project} | Language: ${err.language} | Solutions: ${err.solutions?.length || 0}`,

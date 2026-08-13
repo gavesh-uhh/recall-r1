@@ -1,3 +1,4 @@
+import { formatSignatureTitle } from "../utils/formatters";
 import React, { useState } from 'react';
 import {
   Search,
@@ -190,7 +191,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                       flex: 1,
                       fontWeight: 600,
                     }}>
-                      {err.signature}
+                      {formatSignatureTitle(err.signature)}
                     </span>
                     <span className="badge badge-blue">{err.language}</span>
                   </div>

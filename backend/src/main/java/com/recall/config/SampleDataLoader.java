@@ -131,7 +131,6 @@ public class SampleDataLoader implements CommandLineRunner {
 
         // 1. UserAuthService NPE
         ErrorRecord e1 = new ErrorRecord();
-        e1.setSignature("NullPointerException in UserAuthService.authenticate");
         e1.setMessage("java.lang.NullPointerException: Cannot invoke getPasswordHash() at com.auth.UserAuthService.authenticate");
         e1.setProject("auth-service");
         e1.setLanguage("Java");
@@ -145,7 +144,6 @@ public class SampleDataLoader implements CommandLineRunner {
 
         // 2. JWTTokenProvider NPE (Similar signature to e1, will link via SIGNATURE_MATCH)
         ErrorRecord e2 = new ErrorRecord();
-        e2.setSignature("NullPointerException in JWTTokenProvider.validate");
         e2.setMessage("java.lang.NullPointerException: Token claims map is null");
         e2.setProject("auth-service");
         e2.setLanguage("Java");
@@ -159,7 +157,6 @@ public class SampleDataLoader implements CommandLineRunner {
 
         // 3. PaymentTimeout (Will link via MANUAL relation)
         ErrorRecord e3 = new ErrorRecord();
-        e3.setSignature("ConnectionTimeoutException in PaymentService");
         e3.setMessage("HikariPool-1 - Connection is not available, request timed out");
         e3.setProject("payment-processor");
         e3.setLanguage("Java");
