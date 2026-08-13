@@ -80,6 +80,8 @@ export interface PatternCluster {
   errorIds: number[];
   errors: ErrorRecord[];
   description: string;
+  tag?: string;
+  examples?: { id: number; signature: string; message: string; project: string }[];
 }
 
 export interface HealthStatus {
@@ -95,4 +97,20 @@ export interface SystemConfig {
   frequencySaturation: number;
   fuzzyThreshold: number;
   backendUrl: string;
+}
+
+export interface SignatureCandidate {
+  errorId: number;
+  errorSignature: string;
+  similarity: number;
+}
+
+export interface SignatureMatchDto {
+  currentSignature: string;
+  prefixThreshold: number;
+  matchOccurred: boolean;
+  matchedErrorId: number | null;
+  relationshipType: string | null;
+  predecessor: SignatureCandidate | null;
+  successor: SignatureCandidate | null;
 }

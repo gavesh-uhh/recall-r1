@@ -8,6 +8,7 @@ import {
   CreateSolutionRequest,
   SolutionFeedbackRequest,
   SystemConfig,
+  SignatureMatchDto,
 } from '../types/api';
 
 const DEFAULT_CONFIG: SystemConfig = {
@@ -149,6 +150,14 @@ export class RecallApiService {
       method: 'POST',
     });
     return res.ok;
+  }
+
+  public async getSignatureMatching(id: number): Promise<SignatureMatchDto | null> {
+    const res = await this.executeRequest<SignatureMatchDto>(`/errors/${id}/signature-matching`);
+    if (res.ok && res.data) {
+      return res.data;
+    }
+    return null;
   }
 
   public async createError(req: CreateErrorRequest): Promise<ErrorRecord> {

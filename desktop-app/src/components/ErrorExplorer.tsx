@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ErrorRecord } from '../types/api';
 import { ConfirmModal } from './ConfirmModal';
+import { SignatureMatchingPanel } from './SignatureMatchingPanel';
 
 interface ErrorExplorerProps {
   errors: ErrorRecord[];
@@ -301,6 +302,13 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                   </div>
                 </div>
               )}
+
+              <SignatureMatchingPanel 
+                errorId={selectedError.id} 
+                allErrors={errors} 
+                onSelectError={onSelectError} 
+                onNavigateToPatterns={() => {}} 
+              />
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>

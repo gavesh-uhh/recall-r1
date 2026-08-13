@@ -83,7 +83,7 @@ public class IndexBootstrapService {
                             signature, existing, id);
                 }
                 indexRegistry.getSignatureIndex().insert(signature, id);
-                fuzzyMatchService.getTree().insert(signature, id);
+                fuzzyMatchService.processNewError(signature, id);
                 counters[0]++;
             }
 

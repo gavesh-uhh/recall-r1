@@ -19,6 +19,9 @@ class GraphIntegrationTest {
     private ErrorRecordService errorRecordService;
 
     @Autowired
+    private com.recall.controller.ErrorRecordController errorRecordController;
+
+    @Autowired
     private GraphService graphService;
 
     @Autowired
@@ -77,6 +80,37 @@ class GraphIntegrationTest {
         List<ErrorRecord> relatedToE1 = graphService.findRelated(e1.getId(), null);
         assertThat(relatedToE1).hasSize(1);
         assertThat(relatedToE1.get(0).getId()).isEqualTo(e2.getId());
+    }
+
+    @Test
+    void testSignatureMatchApi() {
+        ErrorRecord e1 = new ErrorRecord();
+        e1.setSignature("java.lang.NullPointerException: foo");
+        e1.setProject("P1");
+        e1.setLanguage("java");
+        e1 = errorRecordService.create(e1);
+
+        ErrorRecord e2 = new ErrorRecord();
+        e2.setSignature("java.lang.NullPointerException: bar");
+        e2.setProject("P2");
+        e2.setLanguage("java");
+        e2 = errorRecordService.create(e2);
+
+        org.springframework.http.ResponseEntity<com.recall.dto.SignatureMatchDto> response = errorRecordController.signatureMatching(e2.getId());
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        
+        com.recall.dto.SignatureMatchDto dto = response.getBody();
+        assertThat(dto).isNotNull();
+        assertThat(dto.getCurrentSignature()).isEqualTo("java.lang.NullPointerException: bar");
+        assertThat(dto.getMatchOccurred()).isTrue();
+        assertThat(dto.getMatchedErrorId()).isEqualTo(e1.getId());
+        assertThat(dto.getRelationshipType()).isEqualTo("SIGNATURE_MATCH");
+        assertThat(dto.getPrefixThreshold()).isEqualTo(30);
+        
+        assertThat(dto.getSuccessor()).isNotNull();
+        assertThat(dto.getSuccessor().getErrorId()).isEqualTo(e1.getId());
+        assertThat(dto.getSuccessor().getErrorSignature()).isEqualTo("java.lang.NullPointerException: foo");
+        assertThat(dto.getSuccessor().getSimilarity()).isGreaterThanOrEqualTo(30);
     }
 
     @Test
