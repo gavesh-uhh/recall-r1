@@ -53,23 +53,55 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
 
   useEffect(() => {
-    if (selectedError) {
-      setLoadingRelated(true);
-      recallApi.getRelatedErrors(selectedError.id, 1)
-        .then(related => {
-          setRelatedErrors(related);
-        })
-        .catch(err => {
-          console.error(err);
-          setRelatedErrors([]);
-        })
-        .finally(() => {
-          setLoadingRelated(false);
-        });
-    } else {
+    if (!selectedError) {
       setRelatedErrors([]);
+      return;
     }
-  }, [selectedError?.id, relations]);
+
+    const relatedIds = new Set<number>();
+
+    if (edgeFilter === 'all' || edgeFilter === 'persisted') {
+      relations.forEach(r => {
+        if (r.errorAId === selectedError.id) relatedIds.add(r.errorBId);
+        if (r.errorBId === selectedError.id) relatedIds.add(r.errorAId);
+      });
+    }
+
+    if (edgeFilter === 'all' || edgeFilter === 'patterns') {
+      patterns.forEach((pat: any) => {
+        if (pat.examples && pat.examples.length > 1) {
+          const inPattern = pat.examples.some((e: any) => e.id === selectedError.id);
+          if (inPattern) {
+            pat.examples.forEach((e: any) => {
+              if (e.id !== selectedError.id) relatedIds.add(e.id);
+            });
+          }
+        }
+      });
+    }
+
+    if (edgeFilter === 'all' || edgeFilter === 'tags') {
+      errors.forEach(e => {
+        if (e.id !== selectedError.id) {
+          const sharedTags = selectedError.tags.filter(t => e.tags.includes(t));
+          if (sharedTags.length > 0) relatedIds.add(e.id);
+        }
+      });
+    }
+
+    if (edgeFilter === 'all' || edgeFilter === 'projects') {
+      errors.forEach(e => {
+        if (e.id !== selectedError.id) {
+          if (selectedError.project.toLowerCase() === e.project.toLowerCase()) {
+            relatedIds.add(e.id);
+          }
+        }
+      });
+    }
+
+    setRelatedErrors(errors.filter(e => relatedIds.has(e.id)));
+    setLoadingRelated(false);
+  }, [selectedError?.id, relations, patterns, edgeFilter, errors]);
 
   const handleNodeClick = (errorId: number) => {
     setSelectedErrorId(errorId);
