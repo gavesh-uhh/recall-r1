@@ -76,12 +76,16 @@ export const ErrorGraphEChart: React.FC<ErrorGraphEChartProps> = ({
       let label = `MANUAL: user linked`;
       let style = 'solid';
       
+      const e1 = errors.find((e) => e.id === rel.errorAId);
+      const e2 = errors.find((e) => e.id === rel.errorBId);
+      const sharedTags = e1 && e2 ? e1.tags.filter((t) => e2.tags.includes(t)) : [];
+
       if (rel.relationType === 'SIGNATURE_MATCH') {
         color = '#fdad00';
         label = `SIGNATURE_MATCH: similar signature`;
       } else if (rel.relationType === 'TAG_MATCH') {
         color = '#3fb950';
-        label = `TAG_MATCH: backend tags`;
+        label = sharedTags.length > 0 ? `TAG MATCH: ${sharedTags.join(', ')}` : `TAG MATCH: shared tags`;
       }
       
       addEdge(rel.errorAId, rel.errorBId, label, {

@@ -121,7 +121,10 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
     if (actualRels.length > 0) {
       return actualRels.map(r => {
         if (r.relationType === 'SIGNATURE_MATCH') return `SIGNATURE MATCH: Similar error signature`;
-        if (r.relationType === 'TAG_MATCH') return `TAG MATCH: Shared explicit tags`;
+        if (r.relationType === 'TAG_MATCH') {
+          const sharedTags = selectedError.tags.filter(t => other.tags.includes(t));
+          return sharedTags.length > 0 ? `TAG MATCH: ${sharedTags.join(', ')}` : `TAG MATCH: Shared explicit tags`;
+        }
         if (r.relationType === 'MANUAL') return `MANUAL: Manually linked by user`;
         return `Relationship: ${r.relationType}`;
       });
