@@ -21,6 +21,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   const [selectedErrorId, setSelectedErrorId] = useState<number | null>(null);
   const [relatedErrors, setRelatedErrors] = useState<ErrorRecord[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
+  const [networkFilter, setNetworkFilter] = useState<'signature' | 'tag' | 'manual' | 'all'>('signature');
 
   const projectsList = useMemo(() => {
     return Array.from(new Set(errors.map((e) => e.project).filter(Boolean)));
@@ -145,6 +146,26 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
 
     return ['Indirectly related (Depth 2+)'];
   };
+
+  const displayedRelatedErrors = useMemo(() => {
+    if (networkFilter === 'all') return relatedErrors;
+
+    return relatedErrors.filter((other) => {
+      const reasons = getLinkReasons(other);
+      if (networkFilter === 'signature') {
+        return reasons.some((r) => r.startsWith('SIGNATURE MATCH'));
+      }
+      if (networkFilter === 'tag') {
+        return reasons.some(
+          (r) => r.startsWith('TAG MATCH') || r.startsWith('Shared tags') || r.startsWith('Pattern')
+        );
+      }
+      if (networkFilter === 'manual') {
+        return reasons.some((r) => r.startsWith('MANUAL'));
+      }
+      return true;
+    });
+  }, [relatedErrors, networkFilter, selectedError?.id, relations]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
@@ -277,13 +298,26 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
               </div>
 
               <div>
-                <div className="section-label" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <GitCommit style={{ width: 12, height: 12 }} />
-                  Related Error Network
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div className="section-label" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <GitCommit style={{ width: 12, height: 12 }} />
+                    Related Network
+                  </div>
+                  <select
+                    value={networkFilter}
+                    onChange={(e) => setNetworkFilter(e.target.value as any)}
+                    className="tool-select mono"
+                    style={{ fontSize: 11, padding: '2px 6px', height: 24, cursor: 'pointer' }}
+                  >
+                    <option value="signature">Signature Match</option>
+                    <option value="tag">Tag Match</option>
+                    <option value="manual">Manual Link</option>
+                    <option value="all">Show All ({relatedErrors.length})</option>
+                  </select>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {relatedErrors.length > 0 ? (
-                    relatedErrors.map((rel) => (
+                  {displayedRelatedErrors.length > 0 ? (
+                    displayedRelatedErrors.map((rel) => (
                       <div
                         key={rel.id}
                         onClick={() => handleNodeClick(rel.id)}
@@ -317,8 +351,15 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                       </div>
                     ))
                   ) : (
-                    <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-                      No direct edges. Use "Link Errors" to connect nodes.
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.6, padding: '12px 14px', background: 'var(--hover)', borderRadius: 6 }}>
+                      No {networkFilter === 'signature' ? 'signature matches' : networkFilter === 'tag' ? 'tag matches' : networkFilter === 'manual' ? 'manual links' : 'related errors'} found for this node.
+                      {relatedErrors.length > 0 && (
+                        <div style={{ marginTop: 8 }}>
+                          <button onClick={() => setNetworkFilter('all')} className="btn btn-ghost btn-sm" style={{ fontSize: 10, padding: '2px 8px' }}>
+                            Show All ({relatedErrors.length}) Links
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
