@@ -8,19 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Array-backed binary max-heap. Deliberately not {@code java.util.PriorityQueue} —
- * the sift-up / sift-down and the O(n) bottom-up heapify are the point of the exercise.
- *
- * <p>The heap is stored in an {@link ArrayList} using the standard implicit-tree layout:
- * for index {@code i} the parent is {@code (i-1)/2} and the children are {@code 2i+1}
- * and {@code 2i+2}.
- *
- * <p><strong>Not thread-safe.</strong> The service layer rebuilds the heap per query, so
- * each instance is confined to a single thread.
- *
- * @param <T> element type, ordered by the supplied comparator (max = comparator-greatest)
- */
+
 public class MaxHeap<T> {
 
     private final List<T> heap = new ArrayList<>();
@@ -33,17 +21,11 @@ public class MaxHeap<T> {
         this.comparator = comparator;
     }
 
-    /** Appends then sifts up — O(log n). */
     public void insert(T item) {
         heap.add(item);
         siftUp(heap.size() - 1);
     }
 
-    /**
-     * Removes and returns the comparator-greatest element.
-     *
-     * @return the max, or {@code null} when the heap is empty
-     */
     public T extractMax() {
         if (heap.isEmpty()) {
             return null;
@@ -57,15 +39,11 @@ public class MaxHeap<T> {
         return max;
     }
 
-    /** @return the max without removing it, or {@code null} when empty. */
     public T peek() {
         return heap.isEmpty() ? null : heap.get(0);
     }
 
-    /**
-     * Discards the current contents and builds a heap from {@code items} bottom-up in O(n)
-     * (rather than n inserts at O(n log n)). A null or empty list simply empties the heap.
-     */
+
     public void heapify(List<T> items) {
         heap.clear();
         if (items == null || items.isEmpty()) {
@@ -85,10 +63,7 @@ public class MaxHeap<T> {
         return heap.isEmpty();
     }
 
-    /**
-     * Drains the whole heap into a list in descending comparator order.
-     * The heap is left empty — callers wanting to keep the contents should re-heapify.
-     */
+
     public List<T> drainSorted() {
         List<T> sorted = new ArrayList<>(heap.size());
         T next;
@@ -143,16 +118,7 @@ public class MaxHeap<T> {
 
     // ------------------------------------------------------- solution ranking
 
-    /**
-     * The single source of truth for a solution's rank score, so the heap ordering and the
-     * {@code decayScore} field exposed by the API can never diverge.
-     *
-     * <p>Score is
-     * {@code (successRate*w1 + usageFrequency*w2 + normalisedFeedback*w3) * exp(-lambda*days)}.
-     * Days elapsed is fractional (minutes / 1440) so two successes on the same day still
-     * order sensibly. A {@code null} lastSuccessDate means "never succeeded", which is
-     * treated as maximally decayed: the decay factor is 0.0, driving the score to 0.
-     */
+    // {code (successRate*w1 + usageFrequency*w2 + normalisedFeedback*w3) * exp(-lambda*days)}
     public static double scoreOf(Solution s,
                                  double lambda,
                                  double w1, double w2, double w3,
@@ -175,10 +141,7 @@ public class MaxHeap<T> {
         return DecayFunction.weightedScore(successRate, usage, feedback, w1, w2, w3, decay);
     }
 
-    /**
-     * Comparator ranking solutions by {@link #scoreOf} descending (highest score = heap max).
-     * Ties break on id so the ordering is deterministic across rebuilds.
-     */
+
     public static Comparator<Solution> solutionComparator(double lambda,
                                                           double w1, double w2, double w3,
                                                           double frequencySaturation,

@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class AVLTree<K extends Comparable<K>, V> {
 
-    /** Package-private only in the sense of being nested; nothing outside sees Node. */
     private static final class Node<K, V> {
         K key;
         V value;
@@ -28,12 +27,6 @@ public class AVLTree<K extends Comparable<K>, V> {
     private Node<K, V> root;
     private int size;
 
-    /**
-     * Inserts the key, or overwrites the value if the key is already present.
-     * A duplicate key never adds a node, so {@link #size()} is unchanged.
-     *
-     * @throws NullPointerException if {@code key} is null
-     */
     public void insert(K key, V value) {
         if (key == null) {
             throw new NullPointerException("AVLTree does not support null keys");
@@ -58,7 +51,6 @@ public class AVLTree<K extends Comparable<K>, V> {
         return rebalance(node);
     }
 
-    /** @return the stored value, or {@code null} if the key is absent (or null). */
     public V search(K key) {
         Node<K, V> node = findNode(key);
         return node == null ? null : node.value;
@@ -82,7 +74,6 @@ public class AVLTree<K extends Comparable<K>, V> {
         return null;
     }
 
-    /** @return true if a node was actually removed. Rebalances on the way up. */
     public boolean delete(K key) {
         if (key == null) {
             return false;
@@ -135,7 +126,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         return current;
     }
 
-    /** @return all entries ascending by key. Iterative to avoid deep-recursion surprises. */
+    // return all entries ascending by key.
     public List<Map.Entry<K, V>> inOrderTraversal() {
         List<Map.Entry<K, V>> out = new ArrayList<>(size);
         Deque<Node<K, V>> stack = new ArrayDeque<>();
@@ -152,17 +143,14 @@ public class AVLTree<K extends Comparable<K>, V> {
         return out;
     }
 
-    /** @return number of distinct keys held. */
     public int size() {
         return size;
     }
 
-    /** @return height in nodes; an empty tree has height 0, a single node height 1. */
     public int height() {
         return height(root);
     }
 
-    /** Drops every node. */
     public void clear() {
         root = null;
         size = 0;
@@ -178,7 +166,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         node.height = 1 + Math.max(height(node.left), height(node.right));
     }
 
-    /** Positive = left-heavy, negative = right-heavy. */
+    // Positive = left-heavy, negative = right-heavy.
     private int balanceFactor(Node<K, V> node) {
         return node == null ? 0 : height(node.left) - height(node.right);
     }
@@ -202,15 +190,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         return node;
     }
 
-    /**
-     * <pre>
-     *      y            x
-     *     / \          / \
-     *    x   c   =&gt;   a   y
-     *   / \              / \
-     *  a   b            b   c
-     * </pre>
-     */
+
     private Node<K, V> rightRotate(Node<K, V> y) {
         Node<K, V> x = y.left;
         Node<K, V> b = x.right;
@@ -221,15 +201,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         return x;
     }
 
-    /**
-     * <pre>
-     *    x                y
-     *   / \              / \
-     *  a   y      =&gt;    x   c
-     *     / \          / \
-     *    b   c        a   b
-     * </pre>
-     */
+
     private Node<K, V> leftRotate(Node<K, V> x) {
         Node<K, V> y = x.right;
         Node<K, V> b = y.left;
@@ -242,22 +214,22 @@ public class AVLTree<K extends Comparable<K>, V> {
 
     // -- test/diagnostic helpers
 
-    /** @return the root key, or {@code null} when empty. Lets tests assert rotation outcomes. */
+    // return the root key, or  null when empty.
     public K rootKey() {
         return root == null ? null : root.key;
     }
 
-    /** @return the key of the root's left child, or {@code null}. */
+    // return the key of the root's left child or null
     public K leftChildKey() {
         return root == null || root.left == null ? null : root.left.key;
     }
 
-    /** @return the key of the root's right child, or {@code null}. */
+    // return the key of the root's right child or null
     public K rightChildKey() {
         return root == null || root.right == null ? null : root.right.key;
     }
 
-    /** @return true if every node satisfies the AVL balance invariant. */
+    // satisfies the AVL balance invariant.
     public boolean isBalanced() {
         return isBalanced(root);
     }
