@@ -110,7 +110,6 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
   // Explains why a related error is connected to the selected one
   const getLinkReasons = (other: ErrorRecord): string[] => {
     if (!selectedError) return [];
-    const reasons: string[] = [];
     
     // Check actual persisted relations
     const actualRels = relations.filter(r => 
@@ -118,25 +117,29 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
       (r.errorAId === other.id && r.errorBId === selectedError.id)
     );
     
-    actualRels.forEach(r => {
-      if (r.relationType === 'SIGNATURE_MATCH') reasons.push(`SIGNATURE MATCH: Similar error signature`);
-      else if (r.relationType === 'TAG_MATCH') reasons.push(`TAG MATCH: Shared explicit tags`);
-      else if (r.relationType === 'MANUAL') reasons.push(`MANUAL: Manually linked by user`);
-      else reasons.push(`Relationship: ${r.relationType}`);
-    });
-
-    const sharedTags = selectedError.tags.filter((t) => other.tags.includes(t));
-    if (sharedTags.length > 0) reasons.push(`Shared tags (derived): ${sharedTags.join(', ')}`);
-    if (selectedError.project.toLowerCase() === other.project.toLowerCase()) {
-      reasons.push(`Same project (derived): ${selectedError.project}`);
+    if (actualRels.length > 0) {
+      return actualRels.map(r => {
+        if (r.relationType === 'SIGNATURE_MATCH') return `SIGNATURE MATCH: Similar error signature`;
+        if (r.relationType === 'TAG_MATCH') return `TAG MATCH: Shared explicit tags`;
+        if (r.relationType === 'MANUAL') return `MANUAL: Manually linked by user`;
+        return `Relationship: ${r.relationType}`;
+      });
     }
+
     const sharedPattern = patterns.find(
       (p: any) => p.examples?.some((e: any) => e.id === selectedError.id) && 
                   p.examples?.some((e: any) => e.id === other.id)
     );
-    if (sharedPattern) reasons.push(`Pattern (derived): ${sharedPattern.tag}`);
-    if (reasons.length === 0) reasons.push('Indirectly related (Depth 2+)');
-    return reasons;
+    if (sharedPattern) return [`Pattern (derived): ${sharedPattern.tag}`];
+
+    const sharedTags = selectedError.tags.filter((t) => other.tags.includes(t));
+    if (sharedTags.length > 0) return [`Shared tags (derived): ${sharedTags.join(', ')}`];
+
+    if (selectedError.project.toLowerCase() === other.project.toLowerCase()) {
+      return [`Same project (derived): ${selectedError.project}`];
+    }
+
+    return ['Indirectly related (Depth 2+)'];
   };
 
   return (
