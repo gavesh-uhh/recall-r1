@@ -3,6 +3,7 @@ import { Network, Link, Share2, Layers, GitCommit, Filter, Sparkles, RefreshCw, 
 import { PatternCluster, ErrorRecord, ErrorRelation } from '../types/api';
 import { recallApi } from '../services/api';
 import { ErrorGraphEChart } from './ErrorGraphEChart';
+import { formatSignatureTitle } from '../utils/formatters';
 
 interface GraphVisualizerProps {
   errors: ErrorRecord[];
@@ -268,7 +269,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                   {loadingRelated && <RefreshCw style={{ width: 12, height: 12, color: 'var(--primary)' }} className="spin" />}
                 </div>
                 <div className="mono" style={{ fontSize: 12.5, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5 }}>
-                  {selectedError.signature}
+                  {formatSignatureTitle(selectedError.signature)}
                 </div>
               </div>
 
@@ -287,7 +288,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
                         style={{ padding: '16px 18px', cursor: 'pointer' }}
                       >
                         <div className="mono" style={{ fontSize: 11.5, fontWeight: 600, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5, marginBottom: 4 }}>
-                          #{rel.id} {rel.signature}
+                          #{rel.id} {formatSignatureTitle(rel.signature)}
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.4 }}>
                           {rel.message}

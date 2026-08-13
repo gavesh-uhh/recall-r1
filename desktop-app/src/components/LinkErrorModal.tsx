@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Link } from 'lucide-react';
 import { ErrorRecord } from '../types/api';
+import { formatSignatureTitle } from '../utils/formatters';
 
 interface LinkErrorModalProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export const LinkErrorModal: React.FC<LinkErrorModalProps> = ({
           <div>
             <div className="section-label" style={{ marginBottom: 6 }}>Source Node</div>
             <div className="code-block">
-              #{sourceErr?.id}: {sourceErr?.signature}
+              #{sourceErr?.id}: {sourceErr ? formatSignatureTitle(sourceErr.signature) : ''}
             </div>
           </div>
 
@@ -68,7 +69,7 @@ export const LinkErrorModal: React.FC<LinkErrorModalProps> = ({
               style={{ width: '100%' }}
             >
               {availableTargets.map((e) => (
-                <option key={e.id} value={e.id}>#{e.id} [{e.project}] {e.signature}</option>
+                <option key={e.id} value={e.id}>#{e.id} [{e.project}] {formatSignatureTitle(e.signature)}</option>
               ))}
             </select>
           </div>

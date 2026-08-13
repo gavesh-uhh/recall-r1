@@ -265,7 +265,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
                     <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{selectedError.project}</span>
                   </div>
                   <div className="mono" style={{ fontSize: 13.5, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5 }}>
-                    {selectedError.signature}
+                    {formatSignatureTitle(selectedError.signature)}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
@@ -366,7 +366,7 @@ export const ErrorExplorer: React.FC<ErrorExplorerProps> = ({
       <ConfirmModal
         isOpen={deleteConfirmId !== null}
         title="Delete Error Record"
-        message={`Are you sure you want to delete Error #${deleteConfirmId}${selectedError ? ` (${selectedError.signature})` : ''}? All attached fix strategies and pattern linkages for this error will be permanently removed.`}
+        message={`Are you sure you want to delete Error #${deleteConfirmId}${selectedError ? ` (${formatSignatureTitle(selectedError.signature)})` : ''}? All attached fix strategies and pattern linkages for this error will be permanently removed.`}
         confirmText="Delete Error"
         cancelText="Cancel"
         variant="danger"

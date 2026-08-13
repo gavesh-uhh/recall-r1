@@ -213,7 +213,7 @@ export const SolutionRanker: React.FC<SolutionRankerProps> = ({
                 <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 18 }}>
                   <div className="section-label" style={{ marginBottom: 6 }}>Selected Signature</div>
                   <div className="mono" style={{ fontSize: 13, fontWeight: 700, color: '#fdad00', wordBreak: 'break-all', lineHeight: 1.5 }}>
-                    {selectedError.signature}
+                    {formatSignatureTitle(selectedError.signature)}
                   </div>
                 </div>
 

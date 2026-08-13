@@ -17,6 +17,7 @@ import {
   SolutionFeedbackRequest,
 } from './types/api';
 import { recallApi } from './services/api';
+import { formatSignatureTitle } from './utils/formatters';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -212,7 +213,7 @@ export const App: React.FC = () => {
   const handleCreateError = async (req: CreateErrorRequest) => {
     try {
       const created = await recallApi.createError(req);
-      showToast(`Logged error "${created.signature}" successfully!`);
+      showToast(`Logged error "${formatSignatureTitle(created.signature)}" successfully!`);
       await loadErrors();
       setSelectedError(created);
     } catch (err) {
