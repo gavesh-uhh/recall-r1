@@ -50,18 +50,27 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ errors, onOpen
     fetchPatternsAndRelations();
   }, [errors]);
 
-  const handleNodeClick = async (errorId: number) => {
-    setSelectedErrorId(errorId);
-    setLoadingRelated(true);
-    try {
-      const related = await recallApi.getRelatedErrors(errorId, 1);
-      setRelatedErrors(related);
-    } catch (err) {
-      console.error(err);
+  useEffect(() => {
+    if (selectedError) {
+      setLoadingRelated(true);
+      recallApi.getRelatedErrors(selectedError.id, 1)
+        .then(related => {
+          setRelatedErrors(related);
+        })
+        .catch(err => {
+          console.error(err);
+          setRelatedErrors([]);
+        })
+        .finally(() => {
+          setLoadingRelated(false);
+        });
+    } else {
       setRelatedErrors([]);
-    } finally {
-      setLoadingRelated(false);
     }
+  }, [selectedError?.id, relations]);
+
+  const handleNodeClick = (errorId: number) => {
+    setSelectedErrorId(errorId);
   };
 
   const selectedError = filteredErrors.find((e) => e.id === selectedErrorId) || filteredErrors[0];
