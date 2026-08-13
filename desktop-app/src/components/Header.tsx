@@ -52,8 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isRebuilding,
 }) => {
   const items = [
-    { id: 'explorer',  label: 'Error Explorer',       icon: FolderSearch },
     { id: 'projects',  label: 'Projects & Stack',     icon: Boxes },
+    { id: 'explorer',  label: 'Error Explorer',       icon: FolderSearch },
     { id: 'solutions', label: 'Solution Ranker',      icon: Award },
     { id: 'patterns',  label: 'Pattern Graph',        icon: GitFork },
   ];
