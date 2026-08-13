@@ -191,16 +191,9 @@ public class ErrorRecordService {
         repository.delete(record);
     }
 
-    /**
-     * Deterministic signature key: {@code type + ":" + first 16 hex chars of sha256(cleanedMessage)}.
-     *
-     * <p>Cleaning lowercases, drops quoted literals, hex addresses and digits, and collapses
-     * whitespace so that "line 42" and "line 87" of the same failure land on one key.
-     */
     public String normalizeSignature(String type, String message) {
-        String safeType = (type == null || type.isBlank()) ? "UNKNOWN" : type.trim();
-        String cleaned = clean(message);
-        return safeType + ":" + sha256Prefix(cleaned);
+        ParsedSignature sig = SignatureParser.parse(message);
+        return sig.toSearchableString();
     }
 
     /**
@@ -287,42 +280,7 @@ public class ErrorRecordService {
         return "UNKNOWN";
     }
 
-    /** Lowercase, strip quoted literals / hex addresses / digits, collapse whitespace. */
-    private static String clean(String message) {
-        if (message == null) {
-            return "";
-        }
-        String out = message.toLowerCase(Locale.ROOT);
-        out = out.replaceAll("\"[^\"]*\"", " ");   // double-quoted literals
-        out = out.replaceAll("'[^']*'", " ");      // single-quoted literals
-        out = out.replaceAll("0x[0-9a-f]+", " ");  // hex addresses
-        out = out.replaceAll("@[0-9a-f]+", " ");   // identity hash suffixes
-        out = out.replaceAll("[0-9]+", " ");       // remaining digits
-        out = out.replaceAll("\\s+", " ");
-        return out.trim();
-    }
 
-    private static String sha256Prefix(String value) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(SIGNATURE_HASH_LENGTH);
-            for (byte b : hash) {
-                if (sb.length() >= SIGNATURE_HASH_LENGTH) {
-                    break;
-                }
-                sb.append(Character.forDigit((b >> 4) & 0xF, 16));
-                if (sb.length() >= SIGNATURE_HASH_LENGTH) {
-                    break;
-                }
-                sb.append(Character.forDigit(b & 0xF, 16));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            // SHA-256 is mandated by the JLS; this cannot happen on a valid JRE.
-            throw new IllegalStateException("SHA-256 unavailable", ex);
-        }
-    }
 
     private static Set<String> lowerTags(List<String> tags) {
         Set<String> out = new HashSet<>();

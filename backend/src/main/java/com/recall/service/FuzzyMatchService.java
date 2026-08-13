@@ -42,18 +42,18 @@ public class FuzzyMatchService {
         if (predecessor != null) {
             result.setPredecessorId(predecessor.errorId);
             result.setPredecessorSignature(predecessor.normalizedSignature);
-            result.setPredecessorSimilarity(commonPrefixLength(signature, predecessor.normalizedSignature));
+            result.setPredecessorSimilarity(calculateSimilarity(signature, predecessor.normalizedSignature));
         }
 
         if (successor != null) {
             result.setSuccessorId(successor.errorId);
             result.setSuccessorSignature(successor.normalizedSignature);
-            result.setSuccessorSimilarity(commonPrefixLength(signature, successor.normalizedSignature));
+            result.setSuccessorSimilarity(calculateSimilarity(signature, successor.normalizedSignature));
         }
 
         for (SignatureNode neighbor : neighbors) {
             if (neighbor != null && !neighbor.errorId.equals(errorId) &&
-                    commonPrefixLength(signature, neighbor.normalizedSignature) >= prefixThreshold) {
+                    calculateSimilarity(signature, neighbor.normalizedSignature) >= prefixThreshold) {
                 result = MatchResult.linkedTo(neighbor.errorId);
                 result.setCurrentSignature(signature);
                 result.setPrefixThreshold(prefixThreshold);
@@ -62,13 +62,13 @@ public class FuzzyMatchService {
                 if (predecessor != null) {
                     result.setPredecessorId(predecessor.errorId);
                     result.setPredecessorSignature(predecessor.normalizedSignature);
-                    result.setPredecessorSimilarity(commonPrefixLength(signature, predecessor.normalizedSignature));
+                    result.setPredecessorSimilarity(calculateSimilarity(signature, predecessor.normalizedSignature));
                 }
 
                 if (successor != null) {
                     result.setSuccessorId(successor.errorId);
                     result.setSuccessorSignature(successor.normalizedSignature);
-                    result.setSuccessorSimilarity(commonPrefixLength(signature, successor.normalizedSignature));
+                    result.setSuccessorSimilarity(calculateSimilarity(signature, successor.normalizedSignature));
                 }
                 
                 break;
@@ -84,8 +84,8 @@ public class FuzzyMatchService {
         return history.get(errorId);
     }
 
-    public int commonPrefixLength(String firstSignature, String secondSignature) {
-        return SignatureSimilarity.commonPrefixLength(firstSignature, secondSignature);
+    public int calculateSimilarity(String firstSignature, String secondSignature) {
+        return SignatureSimilarity.calculateSimilarity(firstSignature, secondSignature);
     }
 
     public synchronized void clear() {

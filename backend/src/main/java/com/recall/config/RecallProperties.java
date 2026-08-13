@@ -56,11 +56,10 @@ public class RecallProperties {
 
     public static class Graph {
         /**
-         * Minimum common-prefix character count required to auto-link signatures in BST neighbor matching.
-         * Default is 30 characters: long enough to prevent accidental cross-linking of distinct error types
-         * while matching near-identical error headers and messages.
+         * Minimum similarity score required to auto-link signatures in BST neighbor matching.
+         * Default is 60: matching exception type (40) + something else (class/message) to prevent accidental cross-linking.
          */
-        private int prefixThreshold = 30;
+        private int prefixThreshold = 60;
 
         public int getPrefixThreshold() { return prefixThreshold; }
         public void setPrefixThreshold(int prefixThreshold) { this.prefixThreshold = prefixThreshold; }

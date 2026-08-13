@@ -85,13 +85,13 @@ class GraphIntegrationTest {
     @Test
     void testSignatureMatchApi() {
         ErrorRecord e1 = new ErrorRecord();
-        e1.setSignature("java.lang.NullPointerException: foo");
+        e1.setSignature("java.lang.NullPointerException:com.example.Test:UNKNOWN:foo");
         e1.setProject("P1");
         e1.setLanguage("java");
         e1 = errorRecordService.create(e1);
 
         ErrorRecord e2 = new ErrorRecord();
-        e2.setSignature("java.lang.NullPointerException: bar");
+        e2.setSignature("java.lang.NullPointerException:com.example.Test:UNKNOWN:bar");
         e2.setProject("P2");
         e2.setLanguage("java");
         e2 = errorRecordService.create(e2);
@@ -101,16 +101,18 @@ class GraphIntegrationTest {
         
         com.recall.dto.SignatureMatchDto dto = response.getBody();
         assertThat(dto).isNotNull();
-        assertThat(dto.getCurrentSignature()).isEqualTo("java.lang.NullPointerException: bar");
+        assertThat(dto.getCurrentSignature()).isEqualTo("java.lang.NullPointerException:com.example.Test:UNKNOWN:bar");
         assertThat(dto.getMatchOccurred()).isTrue();
         assertThat(dto.getMatchedErrorId()).isEqualTo(e1.getId());
         assertThat(dto.getRelationshipType()).isEqualTo("SIGNATURE_MATCH");
-        assertThat(dto.getPrefixThreshold()).isEqualTo(30);
+        assertThat(dto.getPrefixThreshold()).isEqualTo(60);
         
+        // BST order: "java.lang.NullPointerException:com.example.Test:UNKNOWN:bar" comes before "foo"
+        // So e1 ("foo") will be the successor of e2 ("bar").
         assertThat(dto.getSuccessor()).isNotNull();
         assertThat(dto.getSuccessor().getErrorId()).isEqualTo(e1.getId());
-        assertThat(dto.getSuccessor().getErrorSignature()).isEqualTo("java.lang.NullPointerException: foo");
-        assertThat(dto.getSuccessor().getSimilarity()).isGreaterThanOrEqualTo(30);
+        assertThat(dto.getSuccessor().getErrorSignature()).isEqualTo("java.lang.NullPointerException:com.example.Test:UNKNOWN:foo");
+        assertThat(dto.getSuccessor().getSimilarity()).isGreaterThanOrEqualTo(60);
     }
 
     @Test

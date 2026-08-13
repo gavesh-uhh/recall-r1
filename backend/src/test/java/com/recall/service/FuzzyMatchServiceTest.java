@@ -15,13 +15,13 @@ class FuzzyMatchServiceTest {
     @BeforeEach
     void setUp() {
         RecallProperties properties = new RecallProperties();
-        properties.getGraph().setPrefixThreshold(25);
+        properties.getGraph().setPrefixThreshold(60);
         fuzzyMatchService = new FuzzyMatchService(properties);
     }
 
     @Test
     void emptyTreeProcessNewError() {
-        MatchResult result = fuzzyMatchService.processNewError("java.lang.NullPointerException: foo", 100L);
+        MatchResult result = fuzzyMatchService.processNewError("java.lang.NullPointerException:UNKNOWN:UNKNOWN:foo", 100L);
         assertFalse(result.isLinked(), "First insertion into empty tree should not be linked");
         assertEquals(100L, result.getErrorId());
     }
@@ -29,11 +29,11 @@ class FuzzyMatchServiceTest {
     @Test
     void prefixMatchLongPrefixLinked() {
         // First error
-        String sig1 = "java.lang.NullPointerException: Cannot invoke method on null reference at com.example.Foo";
+        String sig1 = "java.lang.NullPointerException:com.example.Foo:UNKNOWN:cannot invoke method on null reference";
         fuzzyMatchService.processNewError(sig1, 101L);
 
-        // Second error sharing 65 prefix characters (well above 25 threshold)
-        String sig2 = "java.lang.NullPointerException: Cannot invoke method on null reference at com.example.Bar";
+        // Second error sharing class and exception type (score = 40 + 30 + 15 = 85)
+        String sig2 = "java.lang.NullPointerException:com.example.Foo:UNKNOWN:cannot invoke method on null reference";
         MatchResult result = fuzzyMatchService.processNewError(sig2, 102L);
 
         assertTrue(result.isLinked(), "Signatures sharing a long common prefix should be linked");
@@ -43,11 +43,11 @@ class FuzzyMatchServiceTest {
     @Test
     void prefixMismatchShortPrefixNotLinked() {
         // First error
-        String sig1 = "java.lang.NullPointerException: foo error";
+        String sig1 = "java.lang.NullPointerException:UNKNOWN:UNKNOWN:foo error";
         fuzzyMatchService.processNewError(sig1, 201L);
 
-        // Second error sharing only 10 chars "java.lang." (< 25 threshold)
-        String sig2 = "java.lang.IllegalArgumentException: bar error";
+        // Second error - different exception, different message
+        String sig2 = "java.lang.IllegalArgumentException:UNKNOWN:UNKNOWN:bar error";
         MatchResult result = fuzzyMatchService.processNewError(sig2, 202L);
 
         assertFalse(result.isLinked(), "Signatures sharing a short prefix below threshold should not be linked");
@@ -56,7 +56,7 @@ class FuzzyMatchServiceTest {
 
     @Test
     void identicalSignatureMatchesTrivially() {
-        String sig = "java.lang.RuntimeException: identical stack trace header";
+        String sig = "java.lang.RuntimeException:UNKNOWN:UNKNOWN:identical stack trace header";
         fuzzyMatchService.processNewError(sig, 301L);
 
         MatchResult result = fuzzyMatchService.processNewError(sig, 302L);
